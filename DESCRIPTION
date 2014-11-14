@@ -1,14 +1,22 @@
 Package: dataRetrieval
 Type: Package
-Title: Retrieval functions for hydrologic data
-Version: 1.4.0
+Title: Retrieval Functions for USGS and EPA Hydrologic and Water
+        Quality Data
+Version: 2.0.0
 Date: 2014-10-13
 Authors@R: c( person("Robert", "Hirsch", role = c("aut"),
     email = "rhirsch@usgs.gov"),
     person("Laura", "DeCicco", role = c("aut","cre"),
-    email = "ldecicco@usgs.gov"))
-Description: Collection of functions to help retrieve USGS data from either web
-    services or user-provided data files.
+    email = "ldecicco@usgs.gov"),
+    person("David","Lorenz", role=c("aut"),
+    email = "lorenz@usgs.gov"))
+Description: Collection of functions to help retrieve U.S. Geological Survey
+    (USGS) and U.S. Environmental Protection Agency (EPA) water quality and
+    hydrology data from web services. USGS web services are discovered from the
+    National Water Information Services (NWIS) tools found here:
+    http://waterservices.usgs.gov/ Both EPA and USGS water quality data are
+    obtained from the Water Quality Portal found here:
+    http://www.waterqualitydata.us/portal.jsp
 License: Unlimited | file LICENSE
 Copyright: This software is in the public domain because it contains
         materials that originally came from the United States
@@ -17,17 +25,18 @@ Copyright: This software is in the public domain because it contains
         policy at
         http://www.usgs.gov/visual-id/credit_usgs.html#copyright
 Depends: R (>= 3.0)
-Imports: zoo, XML, RCurl, reshape2, lubridate
-Suggests: xtable, EGRET, knitr, testthat
+Imports: XML, RCurl, reshape2, lubridate, plyr, httr
+Suggests: xtable, knitr, testthat
 LazyLoad: yes
 LazyData: yes
 VignetteBuilder: knitr
 BuildVignettes: true
-Additional_repositories: http://usgs-r.github.com
-Packaged: 2014-10-13 15:59:48 UTC; ldecicco
+URL: https://github.com/USGS-R/dataRetrieval
+Packaged: 2014-11-13 17:46:23 UTC; ldecicco
 Author: Robert Hirsch [aut],
-  Laura DeCicco [aut, cre]
+  Laura DeCicco [aut, cre],
+  David Lorenz [aut]
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2014-10-13 21:59:18
+Date/Publication: 2014-11-14 01:10:20
