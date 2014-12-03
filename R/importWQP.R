@@ -1,16 +1,17 @@
-#' Basic Water Quality Portal Data grabber
+#' Basic Water Quality Portal Data parser
 #'
 #' Imports data from the Water Quality Portal based on a specified url.
 #' 
-#' @param url string URL to Water Quality Portal#' @keywords data import USGS web service
+#' @param url character URL to Water Quality Portal#' @keywords data import USGS web service
 #' @param zip logical used to request the data in a zip format (TRUE)
-#' @param tz string to set timezone attribute of datetime. Default is an empty quote, which converts the 
+#' @param tz character to set timezone attribute of datetime. Default is an empty quote, which converts the 
 #' datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
 #' Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
 #' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
 #' @return retval dataframe raw data returned from the Water Quality Portal. Additionally, a POSIXct dateTime column is supplied for 
-#' start and end times.
+#' start and end times, and converted to UTC. See \url{http://www.waterqualitydata.us/portal_userguide.jsp} for more information.
 #' @export
+#' @seealso \code{\link{readWQPdata}}, \code{\link{readWQPqw}}, \code{\link{whatWQPsites}}
 #' @import RCurl
 #' @import httr
 #' @import lubridate
@@ -22,6 +23,8 @@
 #' rawSample <- importWQP(rawSampleURL)
 #' url2 <- paste0(rawSampleURL,"&zip=yes")
 #' rawSample2 <- importWQP(url2, TRUE)
+#' STORETex <- constructWQPURL('WIDNR_WQX-10032762','Specific conductance', '', '')
+#' STORETdata <- importWQP(STORETex)
 #' }
 importWQP <- function(url, zip=FALSE, tz=""){
   
@@ -106,18 +109,21 @@ importWQP <- function(url, zip=FALSE, tz=""){
       retval$ActivityStartDateTime <- with(retval, as.POSIXct(paste(ActivityStartDate, ActivityStartTime.Time),format="%Y-%m-%d %H:%M:%S", tz = "UTC"))
       retval$ActivityStartDateTime <- retval$ActivityStartDateTime + timeZoneStart*60*60
       retval$ActivityStartDateTime <- as.POSIXct(retval$ActivityStartDateTime)
+      attr(retval$ActivityStartDateTime, "tzone") <- "UTC"
       
     }
     
-    if(any(!is.na(timeZoneEnd))){
-      
+    if(any(!is.na(timeZoneEnd))){      
       retval$ActivityEndDateTime <- with(retval, as.POSIXct(paste(ActivityEndDate, ActivityEndTime.Time),format="%Y-%m-%d %H:%M:%S", tz = "UTC"))
       retval$ActivityEndDateTime <- retval$ActivityEndDateTime + timeZoneEnd*60*60
       retval$ActivityEndDateTime <- as.POSIXct(retval$ActivityEndDateTime)
-      
-      
+      attr(retval$ActivityEndDateTime, "tzone") <- "UTC"
     }
-        
+    
+    if(all(is.na(retval$ActivityEndDateTime))){
+      retval$ActivityEndDateTime <- NULL
+    }
+                
     return(retval)
     
   } else {

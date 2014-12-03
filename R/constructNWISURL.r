@@ -6,15 +6,17 @@
 #'
 #' @param siteNumber string or vector of strings USGS site number.  This is usually an 8 digit number
 #' @param parameterCd string or vector of USGS parameter code.  This is usually an 5 digit number.
-#' @param startDate string starting date for data retrieval in the form YYYY-MM-DD.
-#' @param endDate string ending date for data retrieval in the form YYYY-MM-DD.
+#' @param startDate character starting date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+#' retrieval for the earliest possible record.
+#' @param endDate character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+#' retrieval for the latest possible record.
 #' @param statCd string or vector USGS statistic code only used for daily value service. This is usually 5 digits.  Daily mean (00003) is the default.
 #' @param service string USGS service to call. Possible values are "dv" (daily values), "uv" (unit/instantaneous values), 
 #'  "qw" (water quality data), "gwlevels" (groundwater),and "rating" (rating curve), "peak", "meas" (discrete streamflow measurements).
 #' @param format string, can be "tsv" or "xml", and is only applicable for daily and unit value requests.  "tsv" returns results faster, but there is a possiblitiy that an incomplete file is returned without warning. XML is slower, 
 #' but will offer a warning if the file was incomplete (for example, if there was a momentary problem with the internet connection). It is possible to safely use the "tsv" option, 
 #' but the user must carefully check the results to see if the data returns matches what is expected. The default is therefore "xml". 
-#' @param expanded logical defaults to FALSE. If TRUE, retrieves additional information, only applicable for qw data.
+#' @param expanded logical defaults to \code{TRUE}. If \code{TRUE}, retrieves additional information, only applicable for qw data.
 #' @param ratingType can be "base", "corr", or "exsa". Only applies to rating curve data.
 #' @keywords data import USGS web service
 #' @return url string
@@ -41,7 +43,7 @@
 #' url_meas <- constructNWISURL(siteNumber, service="meas")
 #'            }
 constructNWISURL <- function(siteNumber,parameterCd="00060",startDate="",endDate="",
-                             service,statCd="00003", format="xml",expanded=FALSE,
+                             service,statCd="00003", format="xml",expanded=TRUE,
                              ratingType="base"){
 
   service <- match.arg(service, c("dv","uv","iv","qw","gwlevels","rating","peak","meas"))
@@ -203,12 +205,13 @@ constructNWISURL <- function(siteNumber,parameterCd="00060",startDate="",endDate
         }
          
     )
-  
-  if(url.exists(url)){
-    return(url)
-  } else {
-    stop("The following url doesn't seem to exist:\n",url)    
-  }  
+# This was waaay to slow:  
+#   if(url.exists(url)){
+#     return(url)
+#   } else {
+#     stop("The following url doesn't seem to exist:\n",url)    
+#   }  
+  return(url)
 }
 
 
@@ -223,8 +226,10 @@ constructNWISURL <- function(siteNumber,parameterCd="00060",startDate="",endDate
 #'
 #' @param siteNumber string or vector of strings USGS site number.  This is usually an 8 digit number
 #' @param parameterCd string or vector of USGS parameter code.  This is usually an 5 digit number.
-#' @param startDate string starting date for data retrieval in the form YYYY-MM-DD.
-#' @param endDate string ending date for data retrieval in the form YYYY-MM-DD.
+#' @param startDate character starting date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+#' retrieval for the earliest possible record.
+#' @param endDate character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+#' retrieval for the latest possible record.
 #' @keywords data import WQP web service
 #' @return url string
 #' @export
@@ -241,7 +246,7 @@ constructWQPURL <- function(siteNumber,parameterCd,startDate,endDate){
   
   multipleSites <- length(siteNumber) > 1
   multiplePcodes <- length(parameterCd)>1
-  siteNumber <- paste(siteNumber, collapse=",")
+  siteNumber <- paste(siteNumber, collapse=";")
 
   if(all(nchar(parameterCd) == 5)){
     suppressWarnings(pCodeLogic <- all(!is.na(as.numeric(parameterCd))))

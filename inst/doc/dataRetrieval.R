@@ -162,16 +162,26 @@ names(temperatureAndFlow)
 temperatureAndFlow <- renameNWISColumns(temperatureAndFlow)
 names(temperatureAndFlow)
 
+
+## ----label=attr1, echo=TRUE-------------------------------
+#Information about the data frame attributes:
+names(attributes(temperatureAndFlow))
+
+statInfo <- attr(temperatureAndFlow, "statisticInfo")
+variableInfo <- attr(temperatureAndFlow, "variableInfo")
+siteInfo <- attr(temperatureAndFlow, "siteInfo")
+
+
 ## ----getNWIStemperaturePlot, echo=TRUE, fig.cap="Temperature and discharge plot of Choptank River in 2012.",out.width='1\\linewidth',out.height='1\\linewidth',fig.show='hold'----
 variableInfo <- attr(temperatureAndFlow, "variableInfo")
 siteInfo <- attr(temperatureAndFlow, "siteInfo")
 
 par(mar=c(5,5,5,5)) #sets the size of the plot window
 
-plot(temperatureAndFlow$dateTime, temperatureAndFlow$Wtemp_Max,
+plot(temperatureAndFlow$Date, temperatureAndFlow$Wtemp_Max,
   ylab=variableInfo$parameter_desc[1],xlab="" )
 par(new=TRUE)
-plot(temperatureAndFlow$dateTime, temperatureAndFlow$Flow,
+plot(temperatureAndFlow$Date, temperatureAndFlow$Flow,
   col="red",type="l",xaxt="n",yaxt="n",xlab="",ylab="",axes=FALSE
   )
 axis(4,col="red",col.axis="red")
@@ -187,6 +197,7 @@ startDate <- "2012-05-12"
 endDate <- "2012-05-13" 
 dischargeUnit <- readNWISuv(siteNumber, parameterCd, 
         startDate, endDate)
+dischargeUnit <- renameNWISColumns(dischargeUnit)
 
 ## ----dischargeData, echo=TRUE-----------------------------
 head(dischargeUnit)
@@ -199,11 +210,11 @@ startDate <- "1985-10-01"
 endDate <- "2012-09-30"
 
 dfLong <- readNWISqw(siteNumber, parameterCd, 
-      startDate, endDate, expanded=TRUE,reshape=FALSE)
+      startDate, endDate)
 
 # Or the wide return:
 # dfWide <- readNWISqw(siteNumber, parameterCd, 
-#       startDate, endDate, expanded=TRUE, reshape=TRUE)
+#       startDate, endDate, reshape=TRUE)
 
 
 ## ----qwmeta, echo=TRUE, eval=FALSE------------------------
@@ -239,16 +250,6 @@ surfaceData <- readNWISmeas(siteNumber)
 names(surfaceData)
 
 
-## ----label=geturl, echo=TRUE, eval=FALSE------------------
-#  # Dissolved Nitrate parameter codes:
-#  pCode <- c("00618","71851")
-#  startDate <- "1964-06-11"
-#  endDate <- "2012-12-18"
-#  url_qw <- constructNWISURL(siteNumber,pCode,startDate,endDate,"qw")
-#  url_dv <- constructNWISURL(siteNumber,"00060",startDate,endDate,
-#                             "dv",statCd="00003")
-#  url_uv <- constructNWISURL(siteNumber,"00060",startDate,endDate,"uv")
-
 ## ----label=getQWData, echo=TRUE, eval=FALSE---------------
 #  specificCond <- readWQPqw('WIDNR_WQX-10032762',
 #                  'Specific conductance','2011-05-01','2011-09-30')
@@ -270,6 +271,10 @@ dischargeWI <- readNWISdata(service="dv",
 names(dischargeWI)
 nrow(dischargeWI)
 
+siteInfo <- attr(dischargeWI, "siteInfo")
+head(siteInfo)
+
+
 ## ----NJChloride, eval=FALSE-------------------------------
 #  
 #  sitesNJ <- whatWQPsites(statecode="US:34",
@@ -287,6 +292,8 @@ nrow(dischargeWI)
 attr(dischargeWI, "url")
 
 attr(dischargeWI, "queryTime")
+
+siteInfo <- attr(dischargeWI, "siteInfo")
 
 
 ## ----meta2, eval=TRUE-------------------------------------

@@ -7,8 +7,8 @@
 \tabular{ll}{
 Package: \tab dataRetrieval\cr
 Type: \tab Package\cr
-Version: \tab 2.0.0\cr
-Date: \tab 2014-11-13\cr
+Version: \tab 2.0.1\cr
+Date: \tab 2014-12-02\cr
 License: \tab Unlimited for this package, dependencies have more restrictive licensing.\cr
 Copyright: \tab This software is in the public domain because it contains materials
 that originally came from the United States Geological Survey, an agency of
@@ -19,11 +19,14 @@ LazyLoad: \tab yes\cr
 }
 }
 \details{
-Retrieval functions for USGS and EPA hydrologic and water quality data
+Retrieval functions for USGS and EPA hydrologic and water quality data.
+
+Please see \url{http://pubs.usgs.gov/tm/04/a10/} for more information.
 }
 \author{
 Robert M. Hirsch \email{rhirsch@usgs.gov}, Laura De Cicco \email{ldecicco@usgs.gov}
 }
-\keyword{data,}
-\keyword{retrieval}
+\keyword{USGS,}
+\keyword{services}
+\keyword{web}
 

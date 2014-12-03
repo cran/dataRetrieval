@@ -6,20 +6,21 @@
 importWaterML2(obs_url, asDateTime = FALSE, tz = "")
 }
 \arguments{
-\item{obs_url}{string containing the url for the retrieval}
+\item{obs_url}{character containing the url for the retrieval}
 
-\item{asDateTime}{logical, if TRUE returns date and time as POSIXct, if FALSE, Date}
+\item{asDateTime}{logical, if \code{TRUE} returns date and time as POSIXct, if \code{FALSE}, Date}
 
-\item{tz}{string to set timezone attribute of datetime. Default is an empty quote, which converts the
+\item{tz}{character to set timezone attribute of datetime. Default is an empty quote, which converts the
 datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
 Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
 "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
 }
 \value{
-mergedDF a data frame containing columns agency, site, dateTime, values, and remark codes for all requested combinations
+mergedDF a data frame time, value, description, qualifier, and identifier
 }
 \description{
-This function accepts a url parameter for a WaterML2 getObservation
+This function accepts a url parameter for a WaterML2 getObservation. This function is still under development,
+but the general functionality is correct.
 }
 \examples{
 baseURL <- "http://waterservices.usgs.gov/nwis/dv/?format=waterml,2.0"

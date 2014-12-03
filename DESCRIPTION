@@ -2,8 +2,8 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrologic and Water
         Quality Data
-Version: 2.0.0
-Date: 2014-10-13
+Version: 2.0.1
+Date: 2014-12-02
 Authors@R: c( person("Robert", "Hirsch", role = c("aut"),
     email = "rhirsch@usgs.gov"),
     person("Laura", "DeCicco", role = c("aut","cre"),
@@ -17,7 +17,7 @@ Description: Collection of functions to help retrieve U.S. Geological Survey
     http://waterservices.usgs.gov/ Both EPA and USGS water quality data are
     obtained from the Water Quality Portal found here:
     http://www.waterqualitydata.us/portal.jsp
-License: Unlimited | file LICENSE
+License: CC0
 Copyright: This software is in the public domain because it contains
         materials that originally came from the United States
         Geological Survey, an agency of the United States Department of
@@ -31,12 +31,13 @@ LazyLoad: yes
 LazyData: yes
 VignetteBuilder: knitr
 BuildVignettes: true
-URL: https://github.com/USGS-R/dataRetrieval
-Packaged: 2014-11-13 17:46:23 UTC; ldecicco
+URL: https://github.com/USGS-R/dataRetrieval,
+        http://pubs.usgs.gov/tm/04/a10/
+Packaged: 2014-12-02 22:26:13 UTC; ldecicco
 Author: Robert Hirsch [aut],
   Laura DeCicco [aut, cre],
   David Lorenz [aut]
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2014-11-14 01:10:20
+Date/Publication: 2014-12-03 07:44:49

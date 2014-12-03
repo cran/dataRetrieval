@@ -3,25 +3,50 @@
 \alias{readNWISmeas}
 \title{Reads surface-water measurement data from NWISweb.}
 \usage{
-readNWISmeas(siteNumber, startDate = "", endDate = "", tz = "")
+readNWISmeas(siteNumbers, startDate = "", endDate = "", tz = "")
 }
 \arguments{
-\item{siteNumber}{string USGS site number.  This is usually an 8 digit number}
+\item{siteNumbers}{character USGS site number (or multiple sites).  This is usually an 8 digit number}
 
-\item{startDate}{string starting date for data retrieval in the form YYYY-MM-DD.}
+\item{startDate}{character starting date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+retrieval for the earliest possible record.}
 
-\item{endDate}{string ending date for data retrieval in the form YYYY-MM-DD.}
+\item{endDate}{character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+retrieval for the latest possible record.}
 
-\item{tz}{string to set timezone attribute of datetime. Default is an empty quote, which converts the
-datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+\item{tz}{character to set timezone attribute of dateTime. Default is an empty quote, which converts the
+dateTimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
 Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
 "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
 }
+\value{
+A data frame with at least the following columns:
+\tabular{lll}{
+Name \tab Type \tab Description \cr
+agency_cd \tab character \tab The NWIS code for the agency reporting the data\cr
+site_no \tab character \tab The USGS site number \cr
+tz_cd \tab character \tab The time zone code for dateTime \cr
+}
+
+See \url{http://waterdata.usgs.gov/usa/nwis/sw} for details about surface water, and
+\url{http://waterdata.usgs.gov/nwis/help?output_formats_help#streamflow_measurement_data}
+for help on the columns and codes.
+
+There are also several useful attributes attached to the data frame:
+\tabular{lll}{
+Name \tab Type \tab Description \cr
+url \tab character \tab The url used to generate the data \cr
+queryTime \tab POSIXct \tab The time the data was returned \cr
+comment \tab character \tab Header comments from the RDB file \cr
+siteInfo \tab data.frame \tab A data frame containing information on the requested sites \cr
+}
+}
 \description{
-Reads surface-water measurement data from NWISweb.
+Reads surface-water measurement data from NWISweb. Data is retrieved from \url{http://waterdata.usgs.gov/nwis}.
+See \url{http://waterdata.usgs.gov/usa/nwis/sw} for details about surface water.
 }
 \examples{
-siteNumber <- '01594440'
-data <- readNWISmeas(siteNumber)
+siteNumbers <- c('01594440','040851325')
+data <- readNWISmeas(siteNumbers)
 }
 

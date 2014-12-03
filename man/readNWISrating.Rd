@@ -6,12 +6,39 @@
 readNWISrating(siteNumber, type = "base")
 }
 \arguments{
-\item{siteNumber}{string USGS site number.  This is usually an 8 digit number}
+\item{siteNumber}{character USGS site number.  This is usually an 8 digit number}
 
-\item{type}{string can be "base", "corr", or "exsa"}
+\item{type}{character can be "base", "corr", or "exsa"}
+}
+\value{
+A data frame. If \code{type} is "base," then the columns are
+INDEP, typically the gage height, in feet; DEP, typically the streamflow,
+in cubic feet per second; and STOR, where "*" indicates that the pair are
+a fixed point of the rating curve. If \code{type} is "exsa," then an
+additional column, SHIFT, is included that indicates the current shift in
+the rating for that value of INDEP. If \code{type} is "corr," then the
+columns are INDEP, typically the gage height, in feet; CORR, the correction
+for that value; and CORRINDEP, the corrected value for CORR.\cr
+If \code{type} is "base," then the data frame has an attribute called "RATING"
+that describes the rating curve is included.
+
+There are also several useful attributes attached to the data frame:
+\tabular{lll}{
+Name \tab Type \tab Description \cr
+url \tab character \tab The url used to generate the data \cr
+queryTime \tab POSIXct \tab The time the data was returned \cr
+comment \tab character \tab Header comments from the RDB file \cr
+siteInfo \tab data.frame \tab A data frame containing information on the requested sites \cr
+RATING \tab character \tab Rating information \cr
+}
 }
 \description{
-Reads the current rating table for an active USGS streamgage.
+Reads current rating table for an active USGS streamgage from NWISweb.
+Data is retrieved from \url{http://waterdata.usgs.gov/nwis}.
+}
+\note{
+Not all active USGS streamgages have traditional rating curves that
+relate flow to stage.
 }
 \examples{
 siteNumber <- '01594440'

@@ -18,35 +18,29 @@ Web service retrieval functions:
 
 |Function | Inputs | Description | 
 | -------------| ------------------------|:-------------|
-|`readNWISdata` | `...`, service | NWIS data using user-specified queries |
-|`readNWISdv` | `Common 3`, parameter code, statCd | NWIS daily data with `Common` query |
-|`readNWISqw` | `Common 3`, parameter code, expanded | NWIS water quality data with `Common` query |
-|`readNWISuv` | `Common 3`, parameter code | NWIS instantaneous data with `Common` query |
-|`readNWISpCode` | parameterCd | NWIS parameter code information |
+|`readNWISdata` | `...`, `service` | NWIS data using user-specified queries |
+|`readNWISdv` | `Common 3`, `parameterCd`, `statCd` | NWIS daily data with `Common` query |
+|`readNWISqw` | `Common 3`, `parameterCd`, `expanded` | NWIS water quality data with `Common` query |
+|`readNWISuv` | `Common 3`, `parameterCd` | NWIS instantaneous data with `Common` query |
+|`readNWISpCode` | `parameterCd` | NWIS parameter code information |
 |`readNWISgwl` | `Common 3` | NWIS groundwater level data with `Common` query |
 |`readNWISpeak` | `Common 3` | NWIS peak flow data with `Common` query |
 |`readNWISmeas` | `Common 3` | NWIS surface-water measurement data with `Common` query |
-|`readNWISrating` | siteNumber, type | NWIS rating table for an active USGS streamgage |
-|`readNWISsite` | siteNumber | NWIS site information |
+|`readNWISrating` | `siteNumber`, `type` | NWIS rating table for an active USGS streamgage |
+|`readNWISsite` | `siteNumber` | NWIS site information |
 |`whatNWISsites` | `...` | NWIS site search using user-specified queries |
-|`whatNWISdata` | siteNumber, service | NWIS data availability, including period of record and count |
+|`whatNWISdata` | `siteNumber`, `service` | NWIS data availability, including period of record and count |
 |`readWQPdata` | `...` | WQP data using user-specified queries |
 |`readWQPqw` | `Common 3` | WQP data with `Common 3` query and either parameter code or characteristic name|
 |`whatWQPsites` | `...` | WQP site search using user-specified queries |
 
 * `Common 3` = siteNumber, startDate, endDate
 
-Moving `EGRET` specific functions to `EGRET` (version 2.0.0 and greater):
+##Reporting bugs
 
+Please consider reporting bugs and asking questions on the Issues page:
 
-|Information Source | Meta Data | Data |
-| -------------| -------------| ------------- |:-------------|
-|NWIS | `getNWISInfo` | `getNWISSample` |
-|  |  | `getNWISDaily` |
-| Water Quality Portal  | `getWQPInfo`| `getWQPSample` |
-| User-supplied files | `getUserInfo` | `getUserDaily`|
-| | | `getUserSample` |
-
+[https://github.com/USGS-R/dataRetrieval/issues](https://github.com/USGS-R/dataRetrieval/issues)
 
 
 ##Subscribe
@@ -54,6 +48,8 @@ Please email questions, comments, and feedback to:
 egret_comments@usgs.gov
 
 Additionally, to subscribe to an email list concerning updates to these R packages, please send a request to egret_comments@usgs.gov.
+
+
 
 ##Package Installation
 To install the dataRetrieval package, you must be using R 3.0 or greater and run the following command:
@@ -63,10 +59,27 @@ To install the dataRetrieval package, you must be using R 3.0 or greater and run
 
 ##Version updates
 ---------------
+###dataRetrieval 2.0.1
+* Improved help files and vignette documentation
+* Added siteInfo and variableInfo attributes to returned data frames
+* Removed any obsolete functions
+
 
 ###dataRetrieval 2.0.0
 
-* Changing naming convention. Migrated `EGRET` specific retrievals to `EGRET`
+* Changing naming convention. Migrated `EGRET` specific retrievals to `EGRET`:
+
+Moving `EGRET` specific functions to `EGRET` (version 2.0.0 and greater):
+
+
+|Information Source | Meta Data | Data |
+| -------------| -------------| ------------- |:-------------|
+|NWIS | `readNWISInfo` | `readNWISSample` |
+|  |  | `readNWISDaily` |
+| Water Quality Portal  | `readWQPInfo`| `readWQPSample` |
+| User-supplied files | `readUserInfo` | `readUserDaily`|
+| | | `readUserSample` |
+
 * Added back WaterML2 parsing tool
 * Added specific groundwater, rating, peak, and surfacewater measurement functions
 * Attached metadata attributes to returned dataframes
@@ -93,16 +106,6 @@ To install the dataRetrieval package, you must be using R 3.0 or greater and run
 * Updated mergeReport to allow for Sample data with different measurements taken on the same day
 
 
-##Sample Workflow
-
-Load data from web services:
-```R
-	library(dataRetrieval)
-	Daily <- getNWISDaily("06934500","00060","1979-10-01","2010-09-30")
-	Sample <-getNWISSample("06934500","00631","1970-10-01","2011-09-30")
-	INFO <-getNWISInfo("06934500","00631", interactive=FALSE)
-	Sample <-mergeReport(Daily, Sample)
-```
 
 ##Disclaimer
 This software is in the public domain because it contains materials that originally came from the U.S. Geological Survey, an agency of the United States Department of Interior. For more information, see the [official USGS copyright policy](http://www.usgs.gov/visual-id/credit_usgs.html#copyright/ "official USGS copyright policy")
@@ -110,3 +113,7 @@ This software is in the public domain because it contains materials that origina
 Although this software program has been used by the U.S. Geological Survey (USGS), no warranty, expressed or implied, is made by the USGS or the U.S. Government as to the accuracy and functioning of the program and related program material nor shall the fact of distribution constitute any such warranty, and no responsibility is assumed by the USGS in connection therewith.
 
 This software is provided "AS IS."
+
+ [
+    ![CC0](http://i.creativecommons.org/p/zero/1.0/88x31.png)
+  ](http://creativecommons.org/publicdomain/zero/1.0/)

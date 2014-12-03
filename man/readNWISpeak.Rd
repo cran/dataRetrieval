@@ -3,20 +3,51 @@
 \alias{readNWISpeak}
 \title{Reads peak flow data from NWISweb.}
 \usage{
-readNWISpeak(siteNumber, startDate = "", endDate = "")
+readNWISpeak(siteNumbers, startDate = "", endDate = "")
 }
 \arguments{
-\item{siteNumber}{string USGS site number.  This is usually an 8 digit number}
+\item{siteNumbers}{character USGS site number(or multiple sites).  This is usually an 8 digit number.}
 
-\item{startDate}{string starting date for data retrieval in the form YYYY-MM-DD.}
+\item{startDate}{character starting date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+retrieval for the earliest possible record.}
 
-\item{endDate}{string ending date for data retrieval in the form YYYY-MM-DD.}
+\item{endDate}{character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
+retrieval for the latest possible record.}
+}
+\value{
+A data frame with the following columns:
+\tabular{lll}{
+Name \tab Type \tab Description \cr
+agency_cd \tab character \tab The NWIS code for the agency reporting the data\cr
+site_no \tab character \tab The USGS site number \cr
+peak_dt \tab Date \tab Date of peak streamflow \cr
+peak_tm \tab character \tab Time of peak streamflow as character \cr
+peak_va \tab numeric \tab Annual peak streamflow value in cfs \cr
+peak_cd \tab character \tab Peak Discharge-Qualification codes (see \code{comment} for more information) \cr
+gage_ht \tab numeric \tab Gage height for the associated peak streamflow in feet \cr
+gage_ht_cd \tab character \tab Gage height qualification codes \cr
+year_last_pk \tab character \tab Peak streamflow reported is the highest since this year \cr
+ag_dt \tab character \tab Date of maximum gage-height for water year (if not concurrent with peak) \cr
+ag_tm \tab character \tab Time of maximum gage-height for water year (if not concurrent with peak) \cr
+ag_gage_ht \tab character \tab maximum Gage height for water year in feet (if not concurrent with peak) \cr
+ag_gage_ht_cd \tab character \tab maximum Gage height code \cr
+}
+
+There are also several useful attributes attached to the data frame:
+\tabular{lll}{
+Name \tab Type \tab Description \cr
+url \tab character \tab The url used to generate the data \cr
+queryTime \tab POSIXct \tab The time the data was returned \cr
+comment \tab character \tab Header comments from the RDB file \cr
+siteInfo \tab data.frame \tab A data frame containing information on the requested sites \cr
+}
 }
 \description{
-Reads peak flow data from NWISweb.
+Reads peak flow from NWISweb.
+Data is retrieved from \url{http://waterdata.usgs.gov/nwis}.
 }
 \examples{
-siteNumber <- '01594440'
-data <- readNWISpeak(siteNumber)
+siteNumbers <- c('01594440','040851325')
+data <- readNWISpeak(siteNumbers)
 }
 
