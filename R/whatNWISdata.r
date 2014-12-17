@@ -73,17 +73,17 @@ whatNWISdata <- function(siteNumbers,service="all",parameterCd="all",statCd="all
   }
   
   if(!("all" %in% parameterCd)){
-    parameterCdCheck <- all(nchar(parameterCd) == 5) & all(!is.na(suppressWarnings(as.numeric(parameterCd))))
-    
-    if(!parameterCdCheck){
-      goodIndex <- which(parameterCd %in% parameterCdFile$parameter_cd)
-      if(length(goodIndex) > 0){
-        badparameterCd <- parameterCd[-goodIndex]
+    if(any(!is.na(parameterCd))){
+      pcodeCheck <- all(nchar(parameterCd) == 5) & all(!is.na(suppressWarnings(as.numeric(parameterCd))))
+      
+      if(!pcodeCheck){
+        badIndex <- which(nchar(parameterCd) != 5 | is.na(suppressWarnings(as.numeric(parameterCd))))
+        
+        stop("The following pCodes appear mistyped:",paste(parameterCd[badIndex],collapse=","))
       } else {
-        badparameterCd <- parameterCd
+        parameterCdCheck <- readNWISpCode(parameterCd)
       }
-      message("The following parameterCds seem mistyped:",paste(badparameterCd,collapse=","), "and will be ignored.")
-      parameterCd <- parameterCd[goodIndex]
+      
     }
   }
   
@@ -95,8 +95,6 @@ whatNWISdata <- function(siteNumbers,service="all",parameterCd="all",statCd="all
   headerInfo <- comment(SiteFile)
   
   parameterCds <- unique(SiteFile$parm_cd)
-  
-  parameterCdFile <- parameterCdFile
   
   parameterCdINFO <- parameterCdFile[parameterCdFile$parameter_cd %in% parameterCds,]
   SiteFile <- merge(SiteFile,parameterCdINFO,by.x="parm_cd" ,by.y="parameter_cd",all=TRUE)

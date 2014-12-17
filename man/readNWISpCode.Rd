@@ -6,11 +6,12 @@
 readNWISpCode(parameterCd)
 }
 \arguments{
-\item{parameterCd}{character of USGS parameter codes (or multiple parameter codes).  This is usually an 5 digit number.}
+\item{parameterCd}{character of USGS parameter codes (or multiple parameter codes).  These are 5 digit number codes
+that can be found here: \url{http://help.waterdata.usgs.gov/codes-and-parameters/parameters}. To get a
+complete list of all current parameter codes in the USGS, use "all" as the input.}
 }
 \value{
-parameterData data frame with all information from the USGS about the particular parameter.
-
+parameterData data frame with the following information:
 \tabular{lll}{
   Name \tab Type \tab Description\cr
   parameter_cd \tab character \tab 5-digit USGS parameter code \cr
@@ -22,11 +23,14 @@ parameterData data frame with all information from the USGS about the particular
 }
 }
 \description{
-Imports data from NWIS about meaured parameter based on user-supplied parameter code.
+Imports data from NWIS about meaured parameter based on user-supplied parameter code or codes.
 This function gets the data from here: \url{http://nwis.waterdata.usgs.gov/nwis/pmcodes}
 }
 \examples{
 paramINFO <- readNWISpCode(c('01075','00060','00931'))
+}
+\seealso{
+\code{\link{importRDB1}}
 }
 \keyword{USGS}
 \keyword{data}

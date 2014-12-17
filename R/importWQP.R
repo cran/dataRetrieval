@@ -2,7 +2,7 @@
 #'
 #' Imports data from the Water Quality Portal based on a specified url.
 #' 
-#' @param url character URL to Water Quality Portal#' @keywords data import USGS web service
+#' @param obs_url character URL to Water Quality Portal#' @keywords data import USGS web service
 #' @param zip logical used to request the data in a zip format (TRUE)
 #' @param tz character to set timezone attribute of datetime. Default is an empty quote, which converts the 
 #' datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
@@ -13,45 +13,52 @@
 #' @export
 #' @seealso \code{\link{readWQPdata}}, \code{\link{readWQPqw}}, \code{\link{whatWQPsites}}
 #' @import RCurl
-#' @import httr
 #' @import lubridate
 #' @examples
 #' # These examples require an internet connection to run
-#' \dontrun{
+#' 
 #' ## Examples take longer than 5 seconds:
+#' \dontrun{
 #' rawSampleURL <- constructWQPURL('USGS-01594440','01075', '', '')
+#' 
 #' rawSample <- importWQP(rawSampleURL)
 #' url2 <- paste0(rawSampleURL,"&zip=yes")
 #' rawSample2 <- importWQP(url2, TRUE)
+#' 
 #' STORETex <- constructWQPURL('WIDNR_WQX-10032762','Specific conductance', '', '')
 #' STORETdata <- importWQP(STORETex)
 #' }
-importWQP <- function(url, zip=FALSE, tz=""){
-  
-  h <- basicHeaderGatherer()
-  
-  tryCatch({  
-    if(zip){
-      headerInfo <- HEAD(url)$headers
-      temp <- tempfile()
-      options(timeout = 120)
-      download.file(url,temp, quiet=TRUE, mode='wb')
+importWQP <- function(obs_url, zip=FALSE, tz=""){
+  if(zip){
+    h <- basicHeaderGatherer()
+    httpHEAD(obs_url, headerfunction = h$update)
+    
+    headerInfo <- h$value()
+    
+    temp <- tempfile()
+    options(timeout = 120)
+    
+    possibleError <- tryCatch({
+      download.file(obs_url,temp, quiet=TRUE, mode='wb')
+      },
+      error = function(e)  {
+        stop(e, "with url:", obs_url)
+      }
+    )
+    
+    if(headerInfo['status'] == "200"){
       doc <- unzip(temp)
       unlink(temp)
     } else {
-      doc <- getURL(url, headerfunction = h$update)
-      headerInfo <- h$value()
-    
+      unlink(temp)
+      stop("Status:", headerInfo['status'], ": ", headerInfo['statusMessage'], "\nFor: ", obs_url)
     }
-  }, warning = function(w) {
-    message(paste("URL caused a warning:", url))
-    message(w)
-  }, error = function(e) {
-    message(paste("URL does not seem to exist:", url))
-    message(e)
-    return(NA)
-  })
-  
+    
+  } else {
+    doc <- getWebServiceData(obs_url)
+    headerInfo <- attr(doc, "headerInfo")
+  }
+    
   if(tz != ""){
     tz <- match.arg(tz, c("America/New_York","America/Chicago",
                           "America/Denver","America/Los_Angeles",
@@ -62,7 +69,7 @@ importWQP <- function(url, zip=FALSE, tz=""){
     
   numToBeReturned <- as.numeric(headerInfo["Total-Result-Count"])
   
-  if (!is.na(numToBeReturned) | numToBeReturned != 0){
+  if (!is.na(numToBeReturned) & numToBeReturned != 0){
 
     suppressWarnings(namesData <- read.delim(if(zip) doc else textConnection(doc) , header = TRUE, quote="\"",
                                              dec=".", sep='\t',
@@ -125,9 +132,9 @@ importWQP <- function(url, zip=FALSE, tz=""){
     }
                 
     return(retval)
-    
+  
   } else {
-    warning("No data to retrieve")
+
     return(NA)
   }
 

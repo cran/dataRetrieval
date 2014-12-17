@@ -75,52 +75,34 @@ whatWQPsites <- function(...){
                urlCall,
                "&mimeType=tsv",sep = "")
   
-  retval = tryCatch({
-    h <- basicHeaderGatherer()
-    doc <- getURL(urlCall, headerfunction = h$update)
+  doc <- getWebServiceData(urlCall)
+  headerInfo <- attr(doc, "headerInfo")
     
-  }, warning = function(w) {
-    message(paste("URL caused a warning:", urlCall))
-    message(w)
-  }, error = function(e) {
-    message(paste("URL does not seem to exist:", urlCall))
-    message(e)
-    return(NA)
-  })
+  numToBeReturned <- as.numeric(headerInfo["Total-Site-Count"])
   
-  if(h$value()["Content-Type"] == "text/tab-separated-values;charset=UTF-8"){
-  
-    numToBeReturned <- as.numeric(h$value()["Total-Site-Count"])
+  if (!is.na(numToBeReturned) & numToBeReturned != 0){
+ 
+    retval <- read.delim(textConnection(doc), header = TRUE, quote="\"", 
+                         dec=".", sep='\t', 
+                         colClasses=c('character'), 
+                         fill = TRUE)    
+    actualNumReturned <- nrow(retval)
     
-    if (!is.na(numToBeReturned) | numToBeReturned != 0){
-   
-      retval <- read.delim(textConnection(doc), header = TRUE, quote="\"", 
-                           dec=".", sep='\t', 
-                           colClasses=c('character'), 
-                           fill = TRUE)    
-      actualNumReturned <- nrow(retval)
-      
-      if(actualNumReturned != numToBeReturned) warning(numToBeReturned, " sites were expected, ", actualNumReturned, " were returned")
-      
-      if("LatitudeMeasure" %in% names(retval)){
-        retval$LatitudeMeasure <- as.numeric(retval$LatitudeMeasure)
-      }
-      
-      if("LongitudeMeasure" %in% names(retval)){
-        retval$LongitudeMeasure <- as.numeric(retval$LongitudeMeasure)
-      }
-      
-      retval$queryTime <- Sys.time()
-      
-      return(retval)
-      
-    } else {
-      warning(paste("No data to retrieve from",urlCall))
-      return(NA)
+    if(actualNumReturned != numToBeReturned) warning(numToBeReturned, " sites were expected, ", actualNumReturned, " were returned")
+    
+    if("LatitudeMeasure" %in% names(retval)){
+      retval$LatitudeMeasure <- as.numeric(retval$LatitudeMeasure)
     }
+    
+    if("LongitudeMeasure" %in% names(retval)){
+      retval$LongitudeMeasure <- as.numeric(retval$LongitudeMeasure)
+    }
+    
+    retval$queryTime <- Sys.time()
+    
+    return(retval)
+    
   } else {
-    message(paste("URL caused an error:", urlCall))
-    message("Content-Type=",h$value()["Content-Type"])
     return(NA)
   }
 
