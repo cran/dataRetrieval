@@ -53,20 +53,24 @@
 #' site1 <- whatWQPsites(siteid="USGS-01594440")
 #' 
 #' type <- "Stream"
-#' sites <- whatWQPsites(statecode="US:55",countycode="US:55:025",siteType=type)
+#' sites <- whatWQPsites(countycode="US:55:025",siteType=type)
 #' }
 whatWQPsites <- function(...){
 
   matchReturn <- list(...)
   
-  options <- c("bBox","lat","long","within","countrycode","statecode","countycode","siteType","organization",
-    "siteid","huc","sampleMedia","characteristicType","characteristicName","pCode","activityId",
-    "startDateLo","startDateHi","mimeType","Zip","providers")
-
-  if(!all(names(matchReturn) %in% options)) warning(matchReturn[!(names(matchReturn) %in% options)],"is not a valid query parameter to the Water Quality Portal")
-
-  values <- sapply(matchReturn, function(x) URLencode(as.character(paste(eval(x),collapse="",sep=""))))
+  values <- sapply(matchReturn, function(x) URLencode(as.character(paste(eval(x),collapse=";",sep=""))))
   
+  values <- gsub(",","%2C",values)
+  values <- gsub("%20","+",values)
+  values <- gsub(":","%3A",values)
+  
+  if("bBox" %in% names(values)){
+    values['bBox'] <- gsub(pattern = ";", replacement = ",", x = values['bBox'])
+  }
+  
+  values <- checkWQPdates(values)
+    
   urlCall <- paste(paste(names(values),values,sep="="),collapse="&")
   
   
@@ -103,7 +107,13 @@ whatWQPsites <- function(...){
     return(retval)
     
   } else {
-    return(NA)
+    if(headerInfo['Total-Site-Count'] == "0"){
+      warning("No data returned")
+    }
+    
+    for(i in grep("Warning",names(headerInfo))){
+      warning(headerInfo[i])
+    }
   }
 
 }

@@ -89,22 +89,28 @@
 #' \dontrun{
 #' nameToUse <- "pH"
 #' pHData <- readWQPdata(siteid="USGS-04024315",characteristicName=nameToUse)
-#' pHDataExpanded <- readWQPdata(bBox="-90.10,42.67,-88.64,43.35",characteristicName=nameToUse)
+#' pHDataExpanded2 <- readWQPdata(bBox=c(-90.10,42.67,-88.64,43.35),characteristicName=nameToUse)
+#' startDate <- as.Date("2013-01-01")
+#' nutrientDaneCounty <- readWQPdata(countycode="US:55:025",startDate=startDate,
+#'                         characteristicType="Nutrient")
+#' nutrientDaneCounty <- readWQPdata(countycode="US:55:025",startDate="",
+#'                         characteristicType="Nutrient")
 #' }
 readWQPdata <- function(...){
   
   matchReturn <- list(...)
-  
-  options <- c("bBox","lat","long","within","countrycode","statecode","countycode","siteType","organization",
-               "siteid","huc","sampleMedia","characteristicType","characteristicName","pCode","activityId",
-               "startDateLo","startDateHi","mimeType","Zip","providers")
-  
-  if(!all(names(matchReturn) %in% options)) warning(matchReturn[!(names(matchReturn) %in% options)],"is not a valid query parameter to the Water Quality Portal")
-  
-  values <- sapply(matchReturn, function(x) URLencode(as.character(paste(eval(x),collapse="",sep=""))))
+
+  values <- sapply(matchReturn, function(x) URLencode(as.character(paste(eval(x),collapse=";",sep=""))))
   
   values <- gsub(",","%2C",values)
   values <- gsub("%20","+",values)
+  values <- gsub(":","%3A",values)
+
+  if("bBox" %in% names(values)){
+    values['bBox'] <- gsub(pattern = ";", replacement = ",", x = values['bBox'])
+  }
+
+  values <- checkWQPdates(values)
   
   urlCall <- paste(paste(names(values),values,sep="="),collapse="&")
   
@@ -113,7 +119,7 @@ readWQPdata <- function(...){
   urlCall <- paste0(baseURL,
                    urlCall,
                    "&mimeType=tsv")
-
+  
   retval <- importWQP(urlCall,FALSE)
   
   if(!all(is.na(retval))){
@@ -140,10 +146,16 @@ readWQPdata <- function(...){
                                stringsAsFactors=FALSE)
     
     if(any(!is.na(variableInfo$parameterCd))){
+      pcodes <- unique(variableInfo$parameterCd[!is.na(variableInfo$parameterCd)])
+      pcodes <- pcodes["" != pcodes]
+      paramINFO <- readNWISpCode(pcodes)
+      names(paramINFO)["parameter_cd" == names(paramINFO)] <- "parameterCd"
+      
       pCodeToName <- pCodeToName
       varExtras <- pCodeToName[pCodeToName$parm_cd %in% unique(variableInfo$parameterCd[!is.na(variableInfo$parameterCd)]),]
       names(varExtras)[names(varExtras) == "parm_cd"] <- "parameterCd"
-      variableInfo <- merge(variableInfo, varExtras, by="parameterCd")
+      variableInfo <- merge(variableInfo, varExtras, by="parameterCd", all = TRUE)
+      variableInfo <- merge(variableInfo, paramINFO, by="parameterCd", all = TRUE)
       variableInfo <- unique(variableInfo)
     }
     
