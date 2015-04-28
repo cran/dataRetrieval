@@ -2,8 +2,8 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrologic and Water
         Quality Data
-Version: 2.2.0
-Date: 2015-04-07
+Version: 2.2.1
+Date: 2015-04-22
 Authors@R: c( person("Robert", "Hirsch", role = c("aut"),
     email = "rhirsch@usgs.gov"),
     person("Laura", "DeCicco", role = c("aut","cre"),
@@ -29,11 +29,11 @@ VignetteBuilder: knitr
 BuildVignettes: true
 URL: https://github.com/USGS-R/dataRetrieval,
         http://pubs.usgs.gov/tm/04/a10/
-Packaged: 2015-04-09 14:43:48 UTC; ldecicco
+NeedsCompilation: no
+Packaged: 2015-04-27 18:20:23 UTC; ldecicco
 Author: Robert Hirsch [aut],
   Laura DeCicco [aut, cre],
   David Lorenz [aut]
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
-NeedsCompilation: no
 Repository: CRAN
-Date/Publication: 2015-04-10 01:06:11
+Date/Publication: 2015-04-28 00:14:49
