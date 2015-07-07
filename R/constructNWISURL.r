@@ -22,6 +22,7 @@
 #' @return url string
 #' @export
 #' @import RCurl
+#' @import utils
 #' @examples
 #' siteNumber <- '01594440'
 #' startDate <- '1985-01-01'
@@ -267,7 +268,7 @@ constructWQPURL <- function(siteNumber,parameterCd,startDate,endDate){
     url <- paste0(url, "&startDateHi=",endDate)
   }
   
-  url <- paste0(url,"&countrycode=US&mimeType=tsv")
+  url <- paste0(url,"&sorted=no&mimeType=tsv")
   return(url)
 
 }

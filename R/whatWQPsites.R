@@ -48,6 +48,7 @@
 #' * element is only in NWIS
 #' 
 #' @export
+#' @import utils
 #' @examples
 #' \dontrun{
 #' site1 <- whatWQPsites(siteid="USGS-01594440")
@@ -59,7 +60,7 @@ whatWQPsites <- function(...){
 
   matchReturn <- list(...)
   
-  values <- sapply(matchReturn, function(x) URLencode(as.character(paste(eval(x),collapse=";",sep=""))))
+  values <- sapply(matchReturn, function(x) as.character(paste(eval(x),collapse=";",sep="")))
   
   if("tz" %in% names(values)){
     values <- values[!(names(values) %in% "tz")]
@@ -79,11 +80,8 @@ whatWQPsites <- function(...){
     }
     names(values)[names(values) == "stateCd"] <- "statecode"
   }
-  
-  values <- gsub(",","%2C",values)
-  values <- gsub(";","%3B",values)
+
   values <- gsub("%20","+",values)
-  values <- gsub(":","%3A",values)
   
   if("bBox" %in% names(values)){
     values['bBox'] <- gsub(pattern = ";", replacement = ",", x = values['bBox'])
@@ -97,7 +95,7 @@ whatWQPsites <- function(...){
   baseURL <- "http://www.waterqualitydata.us/Station/search?"
   urlCall <- paste(baseURL,
                urlCall,
-               "&mimeType=tsv",sep = "")
+               "&mimeType=tsv&sorted=no",sep = "")
   
   doc <- getWebServiceData(urlCall)
   headerInfo <- attr(doc, "headerInfo")

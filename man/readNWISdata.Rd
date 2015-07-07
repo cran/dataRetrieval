@@ -82,14 +82,10 @@ qwData <- readNWISdata(bBox=c(-82.5,41.52,-81,41),startDate=as.Date("2000-01-01"
                   "drain_area_va","obs_count_nu"),service="qw")
 temp <- readNWISdata(bBox=c(-83,36.5,-81,38.5), parameterCd="00010", service="site",
                    seriesCatalogOutput=TRUE)
+wiGWL <- readNWISdata(stateCd="WI",service="gwlevels")
 }
 }
 \seealso{
 \code{\link{renameNWISColumns}},  \code{\link{importWaterML1}}, \code{\link{importRDB1}}
 }
-\keyword{NWIS}
-\keyword{data}
-\keyword{import}
-\keyword{service}
-\keyword{web}
 
