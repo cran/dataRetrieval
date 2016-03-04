@@ -73,6 +73,7 @@
 #' @export
 #' @importFrom reshape2 melt
 #' @importFrom reshape2 dcast
+#' @importFrom dplyr left_join
 #' @seealso \code{\link{readWQPdata}}, \code{\link{whatWQPsites}}, 
 #' \code{\link{readWQPqw}}, \code{\link{constructNWISURL}}
 #' @examples
@@ -130,8 +131,13 @@ readNWISqw <- function (siteNumbers,parameterCd,startDate="",endDate="",
                             endDate,"qw",expanded=expanded)    
   }
 
-  data <- importRDB1(url,asDateTime=TRUE, qw=TRUE, tz = tz)
-  originalHeader <- comment(data)
+  data <- importRDB1(url,asDateTime=TRUE, tz = tz)
+  
+  url <- attr(data, "url")
+  comment <- attr(data, "comment")
+  queryTime <- attr(data, "queryTime")
+  header <- attr(data, "header")
+
   parameterCd <- unique(data$parm_cd)
   
   if(reshape){
@@ -140,22 +146,23 @@ readNWISqw <- function (siteNumbers,parameterCd,startDate="",endDate="",
                          "sample_end_dt","sample_end_tm","sample_start_time_datum_cd","tm_datum_rlbty_cd",
                          "parm_cd","startDateTime","endDateTime","coll_ent_cd", "medium_cd","project_cd",
                          "aqfr_cd","tu_id","body_part_id", "hyd_cond_cd", "samp_type_cd",
-                         "hyd_event_cd","sample_lab_cm_tx","tz_cd","startDateTime","endDateTime")
+                         "hyd_event_cd","sample_lab_cm_tx","tz_cd","startDateTime","endDateTime",
+                         "sample_start_time_datum_cd_reported","sample_end_time_datum_cd_reported")
       measureCols <- names(data)[!(names(data) %in% columnsToMelt)]
       columnsToMelt <- names(data)[(names(data) %in% columnsToMelt)]
       dataWithPcodes <- data[data$parm_cd != "",]
       if(sum(data$parm_cd == "") > 0){
         warning("Some or all data returned without pCodes, those data will not be included in reshape")
       }
-      # longDF <- reshape2::melt(dataWithPcodes, measure.vars =  columnsToMelt)
+
       longDF <- reshape2::melt(dataWithPcodes, measure.vars =  measureCols,
                      variable.name = "variable", value.name = "value", na.rm = FALSE)
       wideDF <- reshape2::dcast(longDF, ... ~ variable + parm_cd )
       wideDF[,grep("_va_",names(wideDF))] <- sapply(wideDF[,grep("_va_",names(wideDF))], function(x) as.numeric(x))
       pCodesReturned <- unique(dataWithPcodes$parm_cd)
       groupByPCode <- as.vector(sapply(pCodesReturned, function(x) grep(x, names(wideDF)) ))
-      data <- wideDF[,c(1:length(columnsToMelt),groupByPCode)]
-      comment(data) <- originalHeader
+      data <- wideDF[,c(which(names(wideDF) %in% columnsToMelt),groupByPCode)]
+
     } else {
       warning("Reshape can only be used with expanded data. Reshape request will be ignored.")
     }
@@ -164,13 +171,21 @@ readNWISqw <- function (siteNumbers,parameterCd,startDate="",endDate="",
   
   siteInfo <- readNWISsite(siteNumbers)
   
+  if(nrow(data) > 0){
+    siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
+  }
+  
   varInfo <- readNWISpCode(parameterCd)
   
   attr(data, "siteInfo") <- siteInfo
   attr(data, "variableInfo") <- varInfo
   attr(data, "statisticInfo") <- NULL
+  
   attr(data, "url") <- url
-  attr(data, "queryTime") <- Sys.time()
+  attr(data, "comment") <- comment
+  attr(data, "queryTime") <- queryTime
+  attr(data, "header") <- header
+  
   return (data)
 
 }

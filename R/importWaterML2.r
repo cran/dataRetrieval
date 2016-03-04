@@ -3,7 +3,7 @@
 #' This function accepts a url parameter for a WaterML2 getObservation. This function is still under development,
 #' but the general functionality is correct.
 #'
-#' @param obs_url character containing the url for the retrieval
+#' @param obs_url character containing the url for the retrieval or a file path to the data file.
 #' @param asDateTime logical, if \code{TRUE} returns date and time as POSIXct, if \code{FALSE}, Date
 #' @param tz character to set timezone attribute of datetime. Default is an empty quote, which converts the 
 #' datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
@@ -11,9 +11,15 @@
 #' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
 #' @return mergedDF a data frame time, value, description, qualifier, and identifier
 #' @export
-#' @import XML
-#' @import RCurl
-#' @importFrom plyr rbind.fill.matrix
+#' @importFrom XML xmlRoot
+#' @importFrom XML xmlDoc
+#' @importFrom XML xpathApply
+#' @importFrom XML xpathSApply
+#' @importFrom XML xmlNamespaceDefinitions
+#' @importFrom XML xmlValue
+#' @importFrom XML xmlAttrs
+#' @importFrom XML xmlName
+#' @importFrom dplyr rbind_all
 #' @examples
 #' baseURL <- "http://waterservices.usgs.gov/nwis/dv/?format=waterml,2.0"
 #' URL <- paste(baseURL, "sites=01646500",
@@ -45,12 +51,11 @@ importWaterML2 <- function(obs_url, asDateTime=FALSE, tz=""){
   
   if(file.exists(obs_url)){
     rawData <- obs_url
+    doc <- xmlTreeParse(rawData, getDTD = FALSE, useInternalNodes = TRUE)
   } else {
-    rawData <- getWebServiceData(obs_url)
+    doc <- getWebServiceData(obs_url)
   }
-  
-  doc <- xmlTreeParse(rawData, getDTD = FALSE, useInternalNodes = TRUE)
-  
+
   if(tz != ""){
     tz <- match.arg(tz, c("America/New_York","America/Chicago",
                           "America/Denver","America/Los_Angeles",
@@ -77,16 +82,7 @@ importWaterML2 <- function(obs_url, asDateTime=FALSE, tz=""){
     chunk <- xmlDoc(timeSeries[[i]])
     chunk <- xmlRoot(chunk)
     chunkNS <- xmlNamespaceDefinitions(chunk, simplify = TRUE)
-    
-#     xp <- xpathApply(chunk, "//wml2:MeasurementTimeseries/wml2:point/wml2:MeasurementTVP", 
-#                      xpathSApply, ".//*[not(*)]", 
-#                      function(x) setNames(ifelse(nzchar(xmlValue(x)), 
-#                                        xmlValue(x), 
-#                                           ifelse("qualifier" == xmlName(x),
-#                                                 xpathSApply(x,"./@xlink:title",namespaces = ns),"")), #originally I had the "" as xmlAttr(x) 
-#                                                     xmlName(x)), 
-#                      namespaces = chunkNS)
-    
+
     xp <- xpathApply(chunk, "//wml2:MeasurementTimeseries/wml2:point/wml2:MeasurementTVP", 
                      xpathSApply, ".//*[not(*)]", 
                      function(x) setNames(ifelse(nzchar(xmlValue(x)), 
@@ -102,9 +98,9 @@ importWaterML2 <- function(obs_url, asDateTime=FALSE, tz=""){
       xp <- xp[-1]
     }
 
-    
-    DF2 <- do.call(rbind.fill.matrix, lapply(xp, t))
-    DF2 <- as.data.frame(DF2,stringsAsFactors=FALSE)
+    y <- lapply(xp,t)
+    z <- lapply(y, as.data.frame)
+    DF2 <- suppressWarnings(rbind_all(z))
 
     names(DF2)[grep("wml2",names(DF2))] <- sub("wml2:","",names(DF2)[grep("wml2",names(DF2))])
     
@@ -144,11 +140,7 @@ importWaterML2 <- function(obs_url, asDateTime=FALSE, tz=""){
     } else {
       DF2$qualifier <- rep(defaultQualifier,nrow(DF2))
     }
-    
-    
-#     DF2$qualifier <- ifelse("Provisional data subject to revision." == DF2$qualifier, "P",
-#                                ifelse("Approved for publication. Processing and review completed." == DF2$qualifier, "A", DF2$qualifier))
-    
+   
 #########################################
 
     id <- as.character(xpathApply(chunk, "//gml:identifier", xmlValue, namespaces = chunkNS))

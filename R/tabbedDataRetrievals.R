@@ -1,3 +1,9 @@
+.onAttach <- function(libname, pkgname) {
+  if("package:reshape" %in% search()){
+    packageStartupMessage("Caution: The reshape package interferes with some functions in the dataRetrieval package.")
+  }
+}
+
 #' Retrieval functions for USGS and EPA data
 #'
 #' \tabular{ll}{
@@ -89,10 +95,10 @@ NULL
 #'
 #' \tabular{lll}{
 #' Name \tab Type \tab Description\cr
-#' STATE \tab character \tab two-digit ANSI code  \cr
-#' STUSAB \tab character \tab State abbreviation \cr
-#' STATE_NAME \tab character \tab State full name \cr
-#' STATENS \tab character \tab State id \cr
+#' STATE \tab character \tab FIPS State Code  \cr
+#' STUSAB \tab character \tab Official United States Postal Service (USPS) Code \cr
+#' STATE_NAME \tab character \tab State Name \cr
+#' STATENS \tab character \tab  Geographic Names Information System Identifier (GNISID)\cr
 #' }
 #' @docType data
 #' @export stateCd
