@@ -1,4 +1,4 @@
-cd4fe4df2b41e171867f61decc79d821 *DESCRIPTION
+1f98070721446aec74c7f8130a138908 *DESCRIPTION
 aaf9f78db9d13c47b4fd90c47aa7d0c7 *LICENSE.note
 a7e41c93c36027fcfdcae8360dc14fdd *NAMESPACE
 79df1399b2cab16c855eb06e21459c9b *NEWS
@@ -8,9 +8,9 @@ e23c021451ce9e59f57f77f0ee07a6b3 *R/checkWQPdates.r
 96c68bdd89fcbcf4d17503dc7d89c07d *R/getWebServiceData.R
 05b19d5c46ce2a2dbf9e6ac8e384fa40 *R/importRDB1.r
 a0f974e7780467f1d7ba939577f00bd6 *R/importWQP.R
-3ad9c18dc4287c7d0d6dadda88c13cfb *R/importWaterML1.r
+32912d3c324083fb281964adc0c61a7d *R/importWaterML1.r
 4d365fc034aba1f2a5e2b72c8d985b12 *R/importWaterML2.r
-c270b29562ae1c354e5e5ea97cbfadd0 *R/readNWISdata.r
+98c0bab02a4239b92e18074005eb2ad8 *R/readNWISdata.r
 051779aa573249a840c7644ff6f603c2 *R/readNWISdv.r
 c4fe3afebd6ec2d564a441be5b136fdc *R/readNWISpCode.r
 974791d56948013b978bad979d95f5d2 *R/readNWISqw.r
@@ -23,11 +23,11 @@ cd8a884145cca61f75dedd9e86001cdc *R/setAccess.R
 f8cc82d213314a6bec5ce466fa23587d *R/sysdata.rda
 2753807fc788a341a7e341a18a56560a *R/tabbedDataRetrievals.R
 360ce4cc5b0550968e6317676ede85b2 *R/whatNWISData.r
-af12432455a9f97cf8cf0c3e58ef9417 *R/whatNWISsites.R
+8b8741e8b3fd55befe9f9e89d7b84319 *R/whatNWISsites.R
 45abafa2bb934fcaf527a8d8c3d606a7 *R/whatWQPsites.R
-139fef88e0c272f266824fd5492ff61e *R/zeroPad.r
-5ca79501597105192e4505bb5c8d0615 *README.md
-5da123f7891f29c545c76d0e7c5732da *build/vignette.rds
+c136768ac0bbfabab24bda14417ff117 *R/zeroPad.r
+0d4d0b80fe31b0446cf6f2138b0aa8a0 *README.md
+800b7ec25e599cdc6823e8e312da256a *build/vignette.rds
 fb9aa9f2cc3df9c59dd41b5addbd686c *inst/CITATION
 12ce38c4742a737b68e1ecdb8857abe9 *inst/doc/dataRetrieval.R
 ea9a0028ae837108267600047559fb42 *inst/doc/dataRetrieval.Rnw
@@ -49,7 +49,7 @@ a55e86d22ed5bda85068ef91872cce68 *man/checkWQPdates.Rd
 7cca4b47c202bc56ca5baf4461c902b8 *man/importWaterML2.Rd
 de896a329e1739bb5c3976c3607ed693 *man/pCodeToName.Rd
 7a7ec5298ed6de59362a1bfa2703a3d7 *man/parameterCdFile.Rd
-ce5629cbd137431ffed1c206e76d90e3 *man/readNWISdata.Rd
+c66f7aeac90a2358397ebdf37eb8072f *man/readNWISdata.Rd
 82e79292b14782f0cc9f962597abac47 *man/readNWISdv.Rd
 d24b22998f11703ead6710acd70ea8c0 *man/readNWISgwl.Rd
 c6cbd2c6509693128685097ab510a232 *man/readNWISmeas.Rd
