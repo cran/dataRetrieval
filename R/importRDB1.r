@@ -167,7 +167,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz=""){
         if(all(c(paste0(i,"_dt"),paste0(i,"_tm")) %in% header.names)){
           varname <- paste0(i,"_dateTime")
           
-          varval <- fast_strptime(paste(readr.data[,paste0(i,"_dt")],readr.data[,paste0(i,"_tm")]), "%Y-%m-%d %H:%M", tz = "UTC")
+          varval <- fast_strptime(paste(readr.data[,paste0(i,"_dt")],readr.data[,paste0(i,"_tm")]), "%Y-%m-%d %H:%M", tz = "UTC", lt=FALSE)
           
           if(!all(is.na(varval))){
             readr.data[,varname] <- varval
@@ -199,7 +199,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz=""){
       
       if(all(c("DATE","TIME","TZCD") %in% header.names)){
         varname <- "DATETIME"
-        varval <- fast_strptime(paste(readr.data[,"DATE"],readr.data[,"TIME"]), "%Y-%m-%d %H%M%S", tz = "UTC")
+        varval <- fast_strptime(paste(readr.data[,"DATE"],readr.data[,"TIME"]), "%Y-%m-%d %H%M%S", tz = "UTC", lt=FALSE)
         readr.data[,varname] <- varval
         readr.data <- convertTZ(readr.data,"TZCD",varname,tz, flip.cols=TRUE)
       }

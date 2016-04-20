@@ -1,4 +1,4 @@
-1f98070721446aec74c7f8130a138908 *DESCRIPTION
+52c0f7bd79debb870d0101f5497237c9 *DESCRIPTION
 aaf9f78db9d13c47b4fd90c47aa7d0c7 *LICENSE.note
 a7e41c93c36027fcfdcae8360dc14fdd *NAMESPACE
 79df1399b2cab16c855eb06e21459c9b *NEWS
@@ -6,9 +6,9 @@ a7e41c93c36027fcfdcae8360dc14fdd *NAMESPACE
 e23c021451ce9e59f57f77f0ee07a6b3 *R/checkWQPdates.r
 905d9b46c6440e2a2fc528b759f4eb30 *R/constructNWISURL.r
 96c68bdd89fcbcf4d17503dc7d89c07d *R/getWebServiceData.R
-05b19d5c46ce2a2dbf9e6ac8e384fa40 *R/importRDB1.r
+f3a7639caf4741b108487075ffe095c7 *R/importRDB1.r
 a0f974e7780467f1d7ba939577f00bd6 *R/importWQP.R
-32912d3c324083fb281964adc0c61a7d *R/importWaterML1.r
+a1b3e9523c344ecbe61e097d75e039ef *R/importWaterML1.r
 4d365fc034aba1f2a5e2b72c8d985b12 *R/importWaterML2.r
 98c0bab02a4239b92e18074005eb2ad8 *R/readNWISdata.r
 051779aa573249a840c7644ff6f603c2 *R/readNWISdv.r
@@ -26,7 +26,7 @@ f8cc82d213314a6bec5ce466fa23587d *R/sysdata.rda
 8b8741e8b3fd55befe9f9e89d7b84319 *R/whatNWISsites.R
 45abafa2bb934fcaf527a8d8c3d606a7 *R/whatWQPsites.R
 c136768ac0bbfabab24bda14417ff117 *R/zeroPad.r
-0d4d0b80fe31b0446cf6f2138b0aa8a0 *README.md
+16bfec73a382595d94df3bfa422dc30b *README.md
 800b7ec25e599cdc6823e8e312da256a *build/vignette.rds
 fb9aa9f2cc3df9c59dd41b5addbd686c *inst/CITATION
 12ce38c4742a737b68e1ecdb8857abe9 *inst/doc/dataRetrieval.R
