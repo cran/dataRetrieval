@@ -92,6 +92,18 @@ test_that("NWIS qw tests", {
   qwret <- readNWISqw("413437087150601", parameterCd = c("NUT","INN"),startDate = "",endDate = "")
   expect_that(nrow(qwret) == 0, is_true())
   
+  siteNumber <- '455638089034501'
+  wy_start <- paste0(2014, "-10-01")
+  wy_end <- paste0(2015, "-09-30")
+  
+  #No data test:
+  no.data <- readNWISqw(siteNumbers = siteNumber, 
+                  parameterCd = '00060', 
+                  startDate = wy_start, 
+                  endDat = wy_end)
+  
+  expect_that(nrow(no.data) == 0, is_true())
+  
 })
 
 context("dv")
@@ -137,4 +149,59 @@ test_that("WQP qw tests", {
   INFO2 <- readWQPqw('WIDNR_WQX-10032762',nameToUse, startDate = "", endDate = "")
   expect_is(INFO2$ActivityStartDateTime, 'POSIXct')
   
+})
+
+context("readNWISstat tests")
+test_that("readNWISstat tests", {
+  testthat::skip_on_cran()
+  data <- readNWISstat(siteNumbers=c("02171500"),parameterCd=c("00010","00060"),
+                    statReportType="daily",statType=c("mean","p75","p25"),startDate="2000",endDate="2010")
+  expect_is(data$begin_yr, 'integer')
+  expect_that(length(data) > 3, is_true())
+  
+  monthData <- readNWISstat(siteNumbers=c("02171500"),parameterCd=c("00010","00060"),
+                                                  statReportType="monthly",startDate="2000",endDate="2010")
+  expect_is(monthData$mean_va, 'numeric')
+  
+  annualData <- readNWISstat(siteNumbers=c("02171500"),parameterCd=c("00010","00060"),statReportType="annual",
+                             startDate="2000",endDate="2010")
+  expect_gt(nrow(annualData),2)
+})
+
+context("readNWISuse tests")
+test_that("readNWISuse tests", {
+  testthat::skip_on_cran()
+  dc <- readNWISuse(years=c(2000,2005,2010),stateCd = "DC", countyCd = NULL)
+  expect_that(nrow(dc)==3, is_true())
+  expect_is(dc$state_cd, 'character')
+  
+  ohio <- readNWISuse(years=2005,stateCd="OH",countyCd="ALL")
+  expect_that(nrow(ohio)==88, is_true())
+  
+  twoCounties <- readNWISuse(years=2010,stateCd="PA",countyCd=c("Cambria","Indiana"))
+  expect_that(nrow(twoCounties)==2, is_true())
+})
+
+context("state tests")
+test_that("state county tests",{
+  fullName <- stateCdLookup("wi", "fullName")
+  expect_equal(fullName, "Wisconsin")
+  
+  abbriev <- stateCdLookup("Wisconsin", "postal")
+  expect_equal(abbriev, "WI")
+  id <- stateCdLookup("WI", "id")
+  expect_equal(id, 55)
+  name <- stateCdLookup(55, "fullName")
+  expect_equal(name, "Wisconsin")
+  multipleStates <- stateCdLookup(c("West Virginia", "Wisconsin", 55, "MN"))
+  expect_equal(multipleStates, c("WV","WI","WI","MN"))
+  
+  id <- countyCdLookup(state = "WI", county = "Dane")
+  expect_equal(id, "025")
+  name <- countyCdLookup(state = "OH", county = 13, output = "fullName")
+  expect_equal(name, "Belmont County")
+  index <- countyCdLookup(state = "Pennsylvania", county = "ALLEGHENY COUNTY", output = "tableIndex")
+  expect_equal(index, 2246)
+  fromIDs <- countyCdLookup(state = 13, county = 5, output = "fullName")
+  expect_equal(fromIDs, "Bacon County")
 })

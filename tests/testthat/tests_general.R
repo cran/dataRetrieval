@@ -32,24 +32,67 @@ test_that("General NWIS retrievals working", {
   urlEmpty <- "http://nwis.waterdata.usgs.gov/nwis/qwdata?multiple_site_no=413437087150601&sort_key=site_no&group_key=NONE&inventory_output=0&begin_date=&end_date=&TZoutput=0&param_group=NUT,INN&qw_attributes=0&format=rdb&qw_sample_wide=0&rdb_qw_attributes=expanded&date_format=YYYY-MM-DD&rdb_compression=value&list_of_search_criteria=multiple_site_no"
   dv <- importRDB1(urlEmpty, asDateTime = FALSE)
   expect_that(nrow(dv) == 0, is_true())
+  
+  dailyStat <- readNWISdata(site=c("03112500","03111520"),service="stat",statReportType="daily",
+                           statType=c("p25","p50","p75","min","max"),parameterCd="00065",convertType=FALSE)
+  expect_that(length(dailyStat$min_va) > 1, is_true())
+  expect_is(dailyStat$p25_va,"character")
+  
+  waterYearStat <- readNWISdata(site=c("03112500"),service="stat",statReportType="annual",
+                                statYearType="water", missingData="on")
+  expect_is(waterYearStat$mean_va,"numeric")
+  expect_is(waterYearStat$parameter_cd,"character")
 })
 
 
 test_that("General WQP retrievals working", {
   testthat::skip_on_cran()
-  # testthat::skip_on_cran()
-  # Bring back when WQP is back
   nameToUse <- "pH"
   pHData <- readWQPdata(siteid="USGS-04024315",characteristicName=nameToUse)
   expect_is(pHData$ActivityStartDateTime, 'POSIXct')
   
   # Known slow query for WQP:
-#   pHDataExpanded2 <- readWQPdata(bBox=c(-90.1,42.9,-89.9,43.1),
-#                                  characteristicName=nameToUse)
-#   expect_is(pHDataExpanded2$ActivityStartDateTime, 'POSIXct')
+  # pHDataExpanded2 <- readWQPdata(bBox=c(-90.1,42.9,-89.9,43.1),
+  #                                characteristicName=nameToUse, querySummary = TRUE)
+  # expect_is(pHDataExpanded2, 'list')
   
   startDate <- as.Date("2013-01-01")
   nutrientDaneCounty <- readWQPdata(countycode="US:55:025",startDate=startDate,
                          characteristicType="Nutrient")
   expect_is(nutrientDaneCounty$ActivityStartDateTime, 'POSIXct')
 })
+
+test_that("WQP head query retrievals working", {
+  testthat::skip_on_cran()
+  nameToUse <- "pH"
+  pHDataQueryResults <- readWQPdata(siteid="USGS-04024315",
+                                    characteristicName=nameToUse, 
+                                    querySummary=TRUE)
+  expect_false(is.null(pHDataQueryResults$date))
+  expect_is(pHDataQueryResults$date, 'Date')
+  expect_false(is.null(pHDataQueryResults$`total-site-count`))
+  expect_is(pHDataQueryResults$`total-site-count`, 'numeric')
+  expect_false(is.null(pHDataQueryResults$`total-result-count`))
+  expect_is(pHDataQueryResults$`total-result-count`, 'numeric')
+  
+  pHDataQueryResults <- readWQPqw(siteNumbers="USGS-04024315",
+                                  parameterCd=nameToUse, 
+                                  querySummary=TRUE)
+  expect_false(is.null(pHDataQueryResults$date))
+  expect_is(pHDataQueryResults$date, 'Date')
+  expect_false(is.null(pHDataQueryResults$`total-site-count`))
+  expect_is(pHDataQueryResults$`total-site-count`, 'numeric')
+  expect_false(is.null(pHDataQueryResults$`total-result-count`))
+  expect_is(pHDataQueryResults$`total-result-count`, 'numeric')
+})
+
+test_that("zeroPad handles NAs", {
+  toPad <- c(1,5,55,NA)
+  padded <- zeroPad(toPad,3)
+  expect_true(identical(c("001","005","055",NA),padded))
+})
+
+test_that("Dates with no days can be handled", {
+  testthat::skip_on_cran()
+  expect_error(readNWISgwl("425957088141001", startDate = "1980-01-01"))
+ })

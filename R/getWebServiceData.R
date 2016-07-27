@@ -1,7 +1,7 @@
 #' Function to return data from web services
 #'
 #' This function accepts a url parameter, and returns the raw data. The function enhances
-#' \code{\link[RCurl]{getURI}} with more informative error messages.
+#' \code{\link[httr]{GET}} with more informative error messages.
 #'
 #' @param obs_url character containing the url for the retrieval
 #' @param \dots information to pass to header request
@@ -37,8 +37,14 @@ getWebServiceData <- function(obs_url, ...){
 
       if(headerInfo$`content-type` == "text/tab-separated-values;charset=UTF-8"){
         returnedDoc <- content(returnedList, type="text",encoding = "UTF-8")
-      } else if (headerInfo$`content-type` == "text/xml;charset=UTF-8"){
+      } else if (headerInfo$`content-type` %in% c("text/xml;charset=UTF-8",
+                                                  "text/xml")){
         returnedDoc <- xmlcontent(returnedList)
+      } else if (headerInfo$`content-type` == "text/html"){
+        txt <- readBin(returnedList$content, character())
+        message(txt)
+        return(txt)
+        
       } else {
         returnedDoc <- content(returnedList,encoding = "UTF-8")
         if(grepl("No sites/data found using the selection criteria specified", returnedDoc)){
@@ -72,3 +78,22 @@ xmlcontent <- function(response){
   XML::xmlTreeParse(iconv(readBin(response$content, character()), from = "UTF-8", to = "UTF-8"),
                     useInternalNodes=TRUE,getDTD = FALSE)
 }
+
+#' getting header information from a WQP query
+#'
+#'@param url the query url
+#'@importFrom httr HEAD
+#'@importFrom httr headers
+getQuerySummary <- function(url){
+  queryHEAD <- HEAD(url)
+  retquery <- headers(queryHEAD)
+  countNames <- c('total-site-count', 'nwis-site-count', 'total-result-count', 'nwis-result-count')
+  retquery[which(names(retquery) %in% countNames)] <- unlist(lapply(countNames, retquery = retquery,
+                                                                    FUN = function(c, retquery){
+                                                                      retquery[[c]] <- as.numeric(retquery[[c]])
+                                                                      return(retquery[c])
+                                                                    }))
+  retquery$date <- as.Date(retquery$date, format = "%a, %d %b %Y %H:%M:%S")
+  return(retquery)
+}
+

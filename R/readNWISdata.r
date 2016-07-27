@@ -5,9 +5,10 @@
 #' See examples below for ideas of constructing queries.
 #'
 #' @param service character. Possible values are "iv" (for instantaneous), "dv" (for daily values), "gwlevels" 
-#' (for groundwater levels), "site" (for site service), "qw" (water-quality), and "measurement". 
-#' Note: "qw" and "measurement" calls go to: 
-#' \url{http://nwis.waterdata.usgs.gov/usa/nwis} for data requests, and use different call requests schemes. 
+#' (for groundwater levels), "site" (for site service), "qw" (water-quality),"measurement", and "stat" (for 
+#' statistics service). Note: "qw" and "measurement" calls go to: 
+#' \url{http://nwis.waterdata.usgs.gov/usa/nwis} for data requests, and use different call requests schemes.
+#' The statistics service has a limited selection of arguments (see \url{http://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html}). 
 #' @param asDateTime logical, if \code{TRUE} returns date and time as POSIXct, if \code{FALSE}, Date
 #' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to dates, datetimes,
 #' numerics based on a standard algorithm. If false, everything is returned as a character
@@ -81,12 +82,31 @@
 #'                    seriesCatalogOutput=TRUE)
 #' wiGWL <- readNWISdata(stateCd="WI",service="gwlevels")
 #' meas <- readNWISdata(state_cd="WI",service="measurements",format="rdb_expanded")
+#' 
+#' waterYearStat <- readNWISdata(site=c("03112500"),service="stat",statReportType="annual",
+#'                  statYearType="water", missingData="on")
+#' monthlyStat <- readNWISdata(site=c("03112500","03111520"),
+#'                             service="stat",
+#'                             statReportType="monthly")                                   
+#' dailyStat <- readNWISdata(site=c("03112500","03111520"),
+#'                           service="stat",
+#'                           statReportType="daily",
+#'                           statType=c("p25","p50","p75","min","max"),
+#'                           parameterCd="00065")
+#' allDailyStats <- readNWISdata(site=c("03111548"),
+#'                               service="stat",
+#'                               statReportType="daily")
+#'                               service="stat",statReportType="daily",
+#'                               statType=c("p25","p50","p75","min","max"),
+#'                               parameterCd="00065")
+#'
+#'dailyWV <- readNWISdata(stateCd = "West Virginia", parameterCd = "00060")
 #' }
 readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
   
   matchReturn <- list(...)
   
-  match.arg(service, c("dv","iv","gwlevels","site", "uv","qw","measurements","qwdata"))
+  match.arg(service, c("dv","iv","gwlevels","site", "uv","qw","measurements","qwdata","stat"))
   
   if(service == "uv"){
     service <- "iv"
@@ -98,7 +118,7 @@ readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
     stop("Only one service call allowed.")
   }
   
-  values <- sapply(matchReturn, function(x) URLencode(as.character(paste(eval(x),collapse=",",sep=""))))
+  values <- sapply(matchReturn, function(x) as.character(paste(eval(x),collapse=",",sep="")))
   
   names(values)[names(values) == "startDate"] <- "startDT"
   names(values)[names(values) == "endDate"] <- "endDT"
@@ -117,10 +137,8 @@ readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
     names(values)[names(values) == "statecode"] <- "stateCd"
   }
   
-  if(service == "iv"){
-    baseURL <- "http://nwis.waterservices.usgs.gov/nwis/"
-  } else if (service %in% c("qwdata","measurements")){
-    baseURL <- "http://nwis.waterdata.usgs.gov/nwis/"
+
+  if (service %in% c("qwdata","measurements")){
 
     format.default <- "rdb"
     
@@ -166,7 +184,7 @@ readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
     tz <- ""
   }
   
-  if(service %in% c("site","gwlevels")){
+  if(service %in% c("site","gwlevels","stat")){
     format.default <- "rdb"
   }
   
@@ -174,15 +192,18 @@ readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
     values["format"] <- format.default
   }
   
-  urlCall <- paste(paste(names(values),values,sep="="),collapse="&")
+  values <- sapply(values, function(x) URLencode(x))
   
-  baseURL <- paste0(baseURL,service)
-  urlCall <- paste(baseURL,urlCall,sep="/?")
+  baseURL <- drURL(service, arg.list=values)
   
+  if(service %in% c("site","dv","iv","gwlevels")) {
+    baseURL <- appendDrURL(baseURL, Access=pkg.env$access)
+  }
+  #actually get the data
   if(length(grep("rdb",values["format"])) >0){
-    retval <- importRDB1(urlCall, tz = tz, asDateTime=asDateTime, convertType=convertType)
+    retval <- importRDB1(baseURL, tz = tz, asDateTime=asDateTime, convertType=convertType)
   } else {
-    retval <- importWaterML1(urlCall, tz= tz, asDateTime=asDateTime)
+    retval <- importWaterML1(baseURL, tz= tz, asDateTime=asDateTime)
   }
   
   if("dv" == service){
@@ -232,24 +253,69 @@ readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
 #' name <- stateCdLookup(55, "fullName")
 #' index <- stateCdLookup("WI", "tableIndex")
 #' stateCd[index,]
+#' stateCdLookup(c("West Virginia", "Wisconsin", 55, "MN"))
 stateCdLookup <- function(input, outputType="postal"){
   
   outputType <- match.arg(outputType, c("postal","fullName","tableIndex","id"))
   
-  if(is.numeric(input) | !is.na(suppressWarnings(as.numeric(input)))){
-    input <- which(input == as.numeric(stateCd$STATE))
-  } else if(nchar(input) == 2){
-    input <- which(tolower(input) == tolower(stateCd$STUSAB))
+  retVal <- NA
+  
+  for(i in input){
+    if(is.numeric(i) | !is.na(suppressWarnings(as.numeric(i)))){
+      i <- which(as.numeric(i) == as.numeric(stateCd$STATE))
+    } else if(nchar(i) == 2){
+      i <- which(tolower(i) == tolower(stateCd$STUSAB))
+    } else {
+      i <- which(tolower(i) == tolower(stateCd$STATE_NAME))
+    }
+    
+    output <- switch(outputType,
+                     postal = stateCd$STUSAB[i],
+                     fullName = stateCd$STATE_NAME[i],
+                     tableIndex = i,
+                     id = as.integer(stateCd$STATE[i])
+    )
+    
+    retVal <- c(retVal,output)
+  }
+  
+  return(retVal[-1])
+}
+
+#' County code look up 
+#'
+#' Function to simplify finding county and county code definitions. Used in \code{readNWISdata}
+#' and \code{readNWISuse}.
+#'
+#' @param state could be character (full name, abbreviation, id), or numeric (id)
+#' @param county could be character (name, with or without "County") or numeric (id)
+#' @param outputType character can be "fullName","tableIndex", "id", or "fullEntry". 
+#' @export
+#' @examples
+#' id <- countyCdLookup(state = "WI", county = "Dane")
+#' name <- countyCdLookup(state = "OH", county = 13, output = "fullName")
+#' index <- countyCdLookup(state = "Pennsylvania", county = "ALLEGHENY COUNTY", output = "tableIndex")
+#' fromIDs <- countyCdLookup(state = 13, county = 5, output = "fullName")
+countyCdLookup <- function(state, county, outputType = "id"){
+  outputType <- match.arg(outputType, c("fullName","tableIndex","id","fullEntry"))
+  
+  #first turn state into stateCd postal name
+  stateCd <- stateCdLookup(state,outputType = "postal")
+  
+  if(is.numeric(county) | !is.na(suppressWarnings(as.numeric(county)))){
+    county <- which(as.numeric(county) == as.numeric(countyCd$COUNTY) & stateCd == countyCd$STUSAB)
   } else {
-    input <- which(tolower(input) == tolower(stateCd$STATE_NAME))
+    #check if "County" was included on string - need it to match countyCd data frame
+    county <- ifelse(!grepl('(?i)\\County$',county),paste(county,"County"),county)
+    county <- which(tolower(county) == tolower(countyCd$COUNTY_NAME) & stateCd == countyCd$STUSAB)
   }
   
   retVal <- switch(outputType,
-         postal = stateCd$STUSAB[input],
-         fullName = stateCd$STATE_NAME[input],
-         tableIndex = input,
-         id = stateCd$STATE[input]
-           )
+                   fullName = countyCd$COUNTY_NAME[county],
+                   tableIndex = county,
+                   id = countyCd$COUNTY[county],
+                   fullEntry = countyCd[county,]
+  )
   
   return(retVal)
 }

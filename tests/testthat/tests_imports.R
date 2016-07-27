@@ -74,32 +74,32 @@ test_that("CRAN-friendly importWaterML1 test", {
 
 test_that("External importWaterML1 test", {
   testthat::skip_on_cran()
-  
+
   siteNumber <- "02177000"
   startDate <- "2012-09-01"
   endDate <- "2012-10-01"
   offering <- '00003'
   property <- '00060'
   obs_url <- constructNWISURL(siteNumber,property,startDate,endDate,'dv')
-  
+
   data <- importWaterML1(obs_url,TRUE)
   expect_is(data$dateTime, 'POSIXct')
-  
+
   groundWaterSite <- "431049071324301"
   startGW <- "2013-10-01"
   endGW <- "2014-06-30"
   groundwaterExampleURL <- constructNWISURL(groundWaterSite, NA,
            startGW,endGW, service="gwlevels")
   groundWater <- importWaterML1(groundwaterExampleURL)
-  
+
   expect_is(groundWater$dateTime, 'character')
-  
+
   unitDataURL <- constructNWISURL(siteNumber,property,
           "2013-11-03","2013-11-03",'uv')
   unitData <- importWaterML1(unitDataURL,TRUE)
   expect_is(unitData$dateTime, 'POSIXct')
-  
-  
+
+
   # Two sites, two pcodes, one site has two data descriptors
   siteNumber <- c('01480015',"04085427") #one site seems to have lost it's 2nd dd
   obs_url <- constructNWISURL(siteNumber,c("00060","00010"),startDate,endDate,'dv')
@@ -111,11 +111,30 @@ test_that("External importWaterML1 test", {
   inactiveSite <- constructNWISURL(inactiveSite, "00060", "2014-01-01", "2014-01-10",'dv')
   inactiveSite <- importWaterML1(inactiveSite)
   expect_that(nrow(inactiveSite) == 0, is_true())
-  
+
   inactiveAndActive <- c("07334200","05212700")
   inactiveAndActive <- constructNWISURL(inactiveAndActive, "00060", "2014-01-01", "2014-01-10",'dv')
   inactiveAndActive <- importWaterML1(inactiveAndActive)
   expect_that(length(unique(inactiveAndActive$site_no)) == 1, is_true())
+
+})
+
+context("importWaterML2")
+test_that("importWaterML2 internal test", {
+  filePath <- system.file("extdata", package="dataRetrieval")
+  fileName <- "WaterML2Example.xml"
+  fullPath <- file.path(filePath, fileName)
+  UserData <- importWaterML2(fullPath)
+  expect_is(UserData$value, 'numeric')
+  expect_is(UserData$qualifier, 'character')
+  
+test_that("importWaterML2 external test", {
+  testthat::skip_on_cran()
+  url <- "http://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=01646500&parameterCd=00060,00065"
+  data <- importWaterML2(url)
+  expect_is(data$value, 'numeric')
+  expect_gt(nrow(data),0)
+})
   
 })
 

@@ -138,23 +138,20 @@ readNWISpeak <- function (siteNumbers,startDate="",endDate="", asDateTime=TRUE, 
   
   if(nrow(data) > 0){
     if(asDateTime & convertType){
-      badDates <- which(grepl("[0-9]*-[0-9]*-00",data$peak_dt))
       
-      if(length(badDates) > 0){
-        data <- data[-badDates,]
-        if(length(badDates) > 0){
-          warning(length(badDates), " rows were thrown out due to incomplete dates")
+      if("peak_dt" %in% names(data)){
+        if(any(nchar(as.character(data$peak_dt)) <= 7) | any(grepl("[0-9]*-[0-9]*-00",data$peak_dt))){
+          stop("Not all dates could be converted to Date object. Use convertType=FALSE to retrieve the raw text")
+        } else {
+          data$peak_dt <- as.Date(data$peak_dt, format="%Y-%m-%d")
         }
       }
-      if("peak_dt" %in% names(data))  data$peak_dt <- as.Date(data$peak_dt, format="%Y-%m-%d")
+      
+      badDates <- which(grepl("[0-9]*-[0-9]*-00",data$peak_dt))
+ 
       if("ag_dt" %in% names(data))  data$ag_dt <- as.Date(data$ag_dt, format="%Y-%m-%d")
     }
-    
-#     if(convertType){
-#     data$gage_ht <- as.numeric(data$gage_ht)
-#     data$ag_gage_ht <- as.numeric(data$ag_gage_ht)
-#     data$year_last_pk <- as.numeric(data$year_last_pk)
-#     }
+
     
     siteInfo <- readNWISsite(siteNumbers)
     siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
@@ -342,8 +339,8 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="", expanded=F
 #'
 #' Reads groundwater level measurements from NWISweb. Mixed date/times come back from the service 
 #' depending on the year that the data was collected. See \url{http://waterdata.usgs.gov/usa/nwis/gw}
-#' for details about groundwater. Groundwater dates and times are returned in many different formats, therefore the 
-#' date/time information is returned as a character string. Users will need to convert to a date object.
+#' for details about groundwater. By default the returned dates are converted to date objects, unless convertType
+#' is specified as FALSE. Sites with non-standard date formats (i.e. lacking a day) can be affected (see examples).
 #' See \url{http://waterservices.usgs.gov/rest/GW-Levels-Service.html} for more information.
 #' 
 #' @param siteNumbers character USGS site number (or multiple sites).  This is usually an 8 digit number
@@ -387,6 +384,8 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="", expanded=F
 #' sites <- c("434400121275801", "375907091432201")
 #' data2 <- readNWISgwl(sites, '','')
 #' data3 <- readNWISgwl("420125073193001", '','')
+#' #handling of data where date has no day
+#' data4 <- readNWISgwl("425957088141001", startDate = "1980-01-01") 
 #' }
 readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE){  
   
@@ -394,8 +393,14 @@ readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE
   data <- importRDB1(url,asDateTime=TRUE, convertType = convertType)
 
   if(nrow(data) > 0){
-    data$lev_dt <- as.Date(data$lev_dt)
-  
+    if(convertType){
+      #check that the date includes a day, based on date string length
+      if(any(nchar(as.character(data$lev_dt)) <= 7) | any(grepl("[0-9]*-[0-9]*-00",data$lev_dt))){
+        stop("Not all dates could be converted to Date object. Use convertType=FALSE to retrieve the raw text")
+      } else {
+        data$lev_dt <- as.Date(data$lev_dt)
+      }
+    }
     siteInfo <- readNWISsite(siteNumbers)
     siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
     
@@ -405,3 +410,162 @@ readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE
   return (data)
 }
 
+#' Site statistics retrieval from USGS (NWIS) 
+#' 
+#' Retrieves site statistics from the USGS Statistics Web Service beta.  
+#' See \url{http://waterservices.usgs.gov/rest/Statistics-Service.html} for more information.
+#' 
+#' @param siteNumbers character USGS site number (or multiple sites).  This is usually an 8 digit number.
+#' @param parameterCd character USGS parameter code.  This is usually a 5 digit number.  
+#' @param startDate character starting date for data retrieval in the form YYYY, YYYY-MM, or YYYY-MM-DD. Dates cannot 
+#' be more specific than the statReportType, i.e. startDate for monthly statReportTypes cannot include days, and annual
+#' statReportTypes cannot include days or months.  Months and days are optional for the daily statReportType. 
+#' Default is "" which indicates retrieval for the earliest possible record.  For daily data, this indicates the 
+#' start of the period the statistics will be computed over.
+#' @param endDate character ending date for data retrieval in the form YYYY, YYYY-MM, or YYYY-MM-DD. Default is "" 
+#' which indicates retrieval for the latest possible record.  For daily data, this indicates the end of the period 
+#' the statistics will be computed over.  The same restrictions as startDate apply.  
+#' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to
+#' numerics based on a standard algorithm. Years, months, and days (if appliccable) are also returned as numerics
+#' in separate columns.  If convertType is false, everything is returned as a character.
+#' @param statReportType character time division for statistics: daily, monthly, or annual.  Default is daily.
+#' Note that daily provides statistics for each calendar day over the specified range of water years, i.e. no more than 366
+#' data points will be returned for each site/parameter.  Use readNWISdata or readNWISdv for daily averages. 
+#' Also note that 'annual' returns statistics for the calendar year.  Use readNWISdata for water years. Monthly and yearly 
+#' provide statistics for each month and year within the range indivually.
+#' @param statType character type(s) of statistics to output for daily values.  Default is mean, which is the only
+#' option for monthly and yearly report types. See the statistics service documentation 
+#' at \url{http://waterservices.usgs.gov/rest/Statistics-Service.html#statType} for a full list of codes.  
+#' @return A data frame with the following columns:
+#' \tabular{lll}{
+#' Name \tab Type \tab Description \cr
+#' agency_cd \tab character \tab The NWIS code for the agency reporting the data\cr
+#' site_no \tab character \tab The USGS site number \cr
+#' parameter_cd \tab character \tab The USGS parameter code \cr
+#' 
+#' Other columns will be present depending on statReportType and statType
+#' }
+#' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
+#' @export
+#' @importFrom dplyr left_join
+#' @examples
+#' \dontrun{
+#' #all the annual mean discharge data for two sites
+#' x <- readNWISstat(siteNumbers=c("02319394","02171500"),
+#'                   parameterCd=c("00010","00060"),
+#'                   statReportType="annual")
+#' 
+#' #Request p25, p75, and mean values for temperature and discharge for the 2000s
+#' #Note that p25 and p75 were not available for temperature, and return NAs
+#' x <- readNWISstat(siteNumbers=c("02171500"),
+#'                   parameterCd=c("00010","00060"),
+#'                   statReportType="daily",
+#'                   statType=c("mean","median"),
+#'                   startDate="2000",endDate="2010")
+#' }
+readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "", convertType = TRUE, 
+                          statReportType = "daily", statType = "mean"){
+  #check for NAs in site numbers
+  if(any(is.na(siteNumbers))){
+    siteNumbers <- siteNumbers[!is.na(siteNumbers)]
+    if(length(siteNumbers)==0){
+      stop("siteNumbers was all NAs")
+    }
+    warning("NAs were passed in siteNumbers; they were ignored")
+  }
+  url <- constructNWISURL(siteNumbers,parameterCd,startDate,endDate,service = "stat",format = "rdb", 
+                          statType = statType, statReportType = statReportType)
+  data <- importRDB1(url,asDateTime=TRUE, convertType = convertType)
+  
+  siteInfo <- readNWISsite(siteNumbers)
+  siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
+  attr(data, "siteInfo") <- siteInfo
+  
+  return (data)
+}
+
+#' Water use data retrieval from USGS (NWIS)
+#' 
+#' Retrieves water use data from USGS Water Use Data for the Nation.  See \url{http://waterdata.usgs.gov/nwis/wu} for 
+#' more information.  All available use categories for the supplied arguments are retrieved. 
+#' 
+#' @param  stateCd could be character (full name, abbreviation, id), or numeric (id). Only one is accepted per query.  
+#' @param countyCd could be character (name, with or without "County", or "ALL"), numeric (id), or code{NULL}, which will 
+#' return state or national data depending on the stateCd argument.  \code{ALL} may also be supplied, which will return data 
+#' for every county in a state. Can be a vector of counties in the same state.  
+#' @param years integer Years for data retrieval. Must be years ending in 0 or 5. Default is all available years.
+#' @param categories character categories of water use.  Defaults to \code{ALL}.  Specific categories must be supplied as two-
+#' letter abbreviations as seen in the URL when using the NWIS water use web interface.
+#' @param convertType logical defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to
+#' numerics based on a standard algorithm. Years, months, and days (if appliccable) are also returned as numerics
+#' in separate columns.  If convertType is false, everything is returned as a character.
+#' @param transform logical only intended for use with national data.  Defaults to \code{FALSE}, with data being returned as 
+#' presented by the web service.  If \code{TRUE}, data will be transformed and returned with column names, which will reformat
+#' national data to be similar to state data.  
+#' @return A data frame with at least the year of record, and all available statistics for the given geographic parameters.
+#' County and state fields will be included as appropriate.
+#' 
+#' @export
+#' @examples 
+#' \dontrun{
+#' #All data for a county
+#' allegheny <- readNWISuse(stateCd = "Pennsylvania",countyCd = "Allegheny")
+#' 
+#' #Data for an entire state for certain years
+#' ohio <- readNWISuse(years=c(2000,2005,2010),stateCd = "OH", countyCd = NULL)
+#' 
+#' #Data for an entire state, county by county
+#' pr <- readNWISuse(years=c(2000,2005,2010),stateCd = "PR",countyCd="ALL")
+#' 
+#' #All national-scale data, transforming data frame to named columns from named rows
+#' national <- readNWISuse(stateCd = NULL, countyCd = NULL, transform = TRUE)
+#' 
+#' #Washington, DC data
+#' dc <- readNWISuse(stateCd = "DC",countyCd = NULL)
+#' 
+#' #data for multiple counties, with different input formatting
+#' paData <- readNWISuse(stateCd = "42",countyCd = c("Allegheny County", "BUTLER", 1, "031"))
+#' 
+#' #retrieving two specific categories for an entire state
+#' ks <- readNWISuse(stateCd = "KS", countyCd = NULL, categories = c("IT","LI"))
+#' }
+readNWISuse <- function(stateCd, countyCd, years = "ALL", categories = "ALL", convertType = TRUE, transform = FALSE){
+ 
+  countyID <- NULL
+  if(!is.null(countyCd) && toupper(countyCd) != "ALL" && countyCd != ""){
+    for(c in countyCd){
+      code <- countyCdLookup(state = stateCd, county = c, outputType = "id")
+      countyID <- c(countyID,code)
+    }
+  }
+  
+  if(!is.null(countyCd) && toupper(countyCd) == "ALL"){
+    countyID <- toupper(countyID)
+  } #case sensitive in URL
+  
+  years <- .capitalALL(years)
+  categories <- .capitalALL(categories)
+  
+  url <- constructUseURL(years,stateCd,countyID,categories)
+  data <- importRDB1(url,convertType=convertType)  
+  
+  #for total country data arriving in named rows
+  if(transform){
+    cmmnt <- comment(data)
+    data <- t(data)
+    colnames(data) <- data[1,]
+    data <- as.data.frame(data[-1,],stringsAsFactors=FALSE)
+    data <- cbind(Year=as.integer(substr(rownames(data),2,5)),data)
+    rownames(data) <- NULL
+    comment(data) <- cmmnt
+    if(nchar(stateCd) != 0 && !is.null(stateCd)){warning("transform = TRUE is only intended for national data")}
+  }
+  return(data)
+}
+
+.capitalALL <- function(input){
+  if(any(grepl("(?i)all",input))){
+    input <- toupper(input)
+  }
+  return(input)
+}
