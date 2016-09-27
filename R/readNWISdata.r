@@ -118,7 +118,7 @@ readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
     stop("Only one service call allowed.")
   }
   
-  values <- sapply(matchReturn, function(x) as.character(paste(eval(x),collapse=",",sep="")))
+  values <- convertDots(matchReturn) 
   
   names(values)[names(values) == "startDate"] <- "startDT"
   names(values)[names(values) == "endDate"] <- "endDT"
@@ -186,6 +186,12 @@ readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
   
   if(service %in% c("site","gwlevels","stat")){
     format.default <- "rdb"
+  }
+  
+  if(service == "stat"){
+    message("Please be aware the NWIS data service feeding this function is in BETA.\n
+          Data formatting could be changed at any time, and is not guaranteed")
+    
   }
   
   if(!("format" %in% names(values))){
@@ -317,5 +323,11 @@ countyCdLookup <- function(state, county, outputType = "id"){
                    fullEntry = countyCd[county,]
   )
   
+  return(retVal)
+}
+
+# convert variables in dots to usable format
+convertDots <- function(matchReturn){
+  retVal <- sapply(matchReturn, function(x) as.character(paste0(eval(x),collapse=",")))
   return(retVal)
 }

@@ -12,7 +12,8 @@
 #' retrieval for the latest possible record.
 #' @param statCd string or vector USGS statistic code only used for daily value service. This is usually 5 digits.  Daily mean (00003) is the default.
 #' @param service string USGS service to call. Possible values are "dv" (daily values), "uv" (unit/instantaneous values), 
-#'  "qw" (water quality data), "gwlevels" (groundwater),and "rating" (rating curve), "peak", "meas" (discrete streamflow measurements).
+#'  "qw" (water quality data), "gwlevels" (groundwater),and "rating" (rating curve), "peak", "meas" (discrete streamflow measurements),
+#'  "stat" (statistics web service BETA).
 #' @param format string, can be "tsv" or "xml", and is only applicable for daily and unit value requests.  "tsv" returns results faster, but there is a possiblitiy that an incomplete file is returned without warning. XML is slower, 
 #' but will offer a warning if the file was incomplete (for example, if there was a momentary problem with the internet connection). It is possible to safely use the "tsv" option, 
 #' but the user must carefully check the results to see if the data returns matches what is expected. The default is therefore "xml". 
@@ -22,7 +23,7 @@
 #' Note that daily provides statistics for each calendar day over the specified range of water years, i.e. no more than 366
 #' data points will be returned for each site/parameter.  Use readNWISdata or readNWISdv for daily averages. 
 #' Also note that 'annual' returns statistics for the calendar year.  Use readNWISdata for water years. Monthly and yearly 
-#' provide statistics for each month and year within the range indivually.
+#' provide statistics for each month and year within the range individually.
 #' @param statType character Only used for statistics service requests. Type(s) of statistics to output for daily values.  Default is mean, which is the only
 #' option for monthly and yearly report types. See the statistics service documentation 
 #' at \url{http://waterservices.usgs.gov/rest/Statistics-Service.html#statType} for a full list of codes.
@@ -96,9 +97,10 @@ constructNWISURL <- function(siteNumber,parameterCd="00060",startDate="",endDate
              
              searchCriteria <- paste(searchCriteria, "multiple_parameter_cds", sep=",")
              searchCriteria <- paste("list_of_search_criteria",searchCriteria,sep="=")
-             baseURL <- "http://nwis.waterdata.usgs.gov/nwis/qwdata"
+
+             baseURL <- drURL("qwdata")
              
-             url <- paste(baseURL,siteNumber,sep="?")
+             url <- paste0(baseURL,siteNumber)
              url <- paste(url, pCodes,searchCriteria,
                           "group_key=NONE&sitefile_output_format=html_table&column_name=agency_cd",
                           "column_name=site_no&column_name=station_nm&inventory_output=0&rdb_inventory_output=file",
@@ -106,52 +108,56 @@ constructNWISURL <- function(siteNumber,parameterCd="00060",startDate="",endDate
                           "format=rdb&rdb_qw_attributes=0&date_format=YYYY-MM-DD",
                           "rdb_compression=value", sep = "&")
              if(expanded){
-               url <- paste0(url,"&qw_sample_wide=0")
+               url <- appendDrURL(url,qw_sample_wide="0")
                url <- gsub("rdb_qw_attributes=0","rdb_qw_attributes=expanded",url)
              } else {
-               url <- paste0(url,"&qw_sample_wide=separated_wide")
+               url <- appendDrURL(url,qw_sample_wide="separated_wide")
              }
              
              if (nzchar(startDate)) {
-               url <- paste(url,"&begin_date=",startDate,sep="")
+               url <- appendDrURL(url,begin_date=startDate)
              }
              
              if (nzchar(endDate)) {
-               url <- paste(url,"&end_date=",endDate,sep="")
+               url <- appendDrURL(url,end_date=endDate)
              }
            },
         rating = {
           ratingType <- match.arg(ratingType, c("base", "corr", "exsa"))
-          url <- paste0("http://waterdata.usgs.gov/nwisweb/get_ratings?site_no=",
-                siteNumber, "&file_type=", ratingType)
+          url <- drURL("rating", site_no=siteNumber,file_type=ratingType)
         },
         peak = {
-          url <- paste0("http://nwis.waterdata.usgs.gov/usa/nwis/peak/?site_no=", siteNumber,
-                "&range_selection=date_range&format=rdb")
+          url <- drURL("peak", site_no=siteNumber,
+                       range_selection="date_range",
+                       format="rdb")
           if (nzchar(startDate)) {
-            url <- paste0(url,"&begin_date=",startDate)
-          }
+            url <- appendDrURL(url,begin_date=startDate)
+          } 
           if(nzchar(endDate)){
-            url <- paste0(url, "&end_date=", endDate)
+            url <- appendDrURL(url, end_date=endDate)
           }
         },
         meas = {
-          url <- paste0("http://waterdata.usgs.gov/nwis/measurements?site_no=", siteNumber,
-                "&range_selection=date_range")
+          url <- drURL("measurements", site_no=siteNumber,
+                       range_selection="date_range")
           if (nzchar(startDate)) {
-            url <- paste0(url,"&begin_date=",startDate)
+            url <- appendDrURL(url,begin_date=startDate)
           }
           if(nzchar(endDate)){
-            url <- paste0(url, "&end_date=", endDate)
+            url <- appendDrURL(url, end_date=endDate)
           }
           if(expanded){
-            url <- paste0(url,"&format=rdb_expanded")
+            url <- appendDrURL(url,format="rdb_expanded")
           } else {
-            url <- paste0(url,"&format=rdb")
+            url <- appendDrURL(url,format="rdb")
           }
 
         },
         stat = { #for statistics service
+          
+          message("Please be aware the NWIS data service feeding this function is in BETA.\n
+          Data formatting could be changed at any time, and is not guaranteed")
+          
           #make sure only statTypes allowed for the statReportType are being requested
           if(!grepl("(?i)daily",statReportType) && !all(grepl("(?i)mean",statType)) && !all(grepl("(?i)all",statType))){
             stop("Monthly and annual report types can only provide means")
@@ -167,16 +173,18 @@ constructNWISURL <- function(siteNumber,parameterCd="00060",startDate="",endDate
           }
           statType <- paste(statType,collapse=",")
           parameterCd <- paste(parameterCd,collapse=",")
-          url <- paste0("http://waterservices.usgs.gov/nwis/stat/?format=rdb&sites=",siteNumber,
-                        "&statType=",statType,"&statReportType=",statReportType,"&parameterCd=",parameterCd)
+          url <- drURL("stat", sites=siteNumber,
+                       statType=statType,
+                       statReportType=statReportType,
+                       parameterCd=parameterCd)
           if (nzchar(startDate)) {
-            url <- paste0(url,"&startDT=",startDate)
+            url <- appendDrURL(url,startDT=startDate)
           }
           if (nzchar(endDate)) {
-            url <- paste0(url,"&endDT=",endDate)
+            url <- appendDrURL(url,endDT=endDate)
           }
           if (!grepl("(?i)daily",statReportType)){
-            url <- paste0(url,"&missingData=off")
+            url <- appendDrURL(url,missingData="off")
           }
           
         },

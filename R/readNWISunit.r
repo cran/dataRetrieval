@@ -306,7 +306,7 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="", expanded=F
     
     if(convertType){
       data$measurement_dateTime <- data$measurement_dt
-      data$measurement_dt <- as.Date(data$measurement_dateTime)
+      data$measurement_dt <- suppressWarnings(as.Date(data$measurement_dateTime))
       data$measurement_tm <- strftime(data$measurement_dateTime, "%H:%M")
       data$measurement_tm[is.na(data$tz_cd_reported)] <- ""
       indexDT <- which("measurement_dt" == names(data))
@@ -350,6 +350,10 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="", expanded=F
 #' retrieval for the latest possible record.
 #' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to dates, datetimes,
 #' numerics based on a standard algorithm. If false, everything is returned as a character
+#' @param tz character to set timezone attribute of dateTime. Default is an empty quote, which converts the 
+#' dateTimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+#' Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
+#' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
 #' @return A data frame with the following columns:
 #' \tabular{lll}{
 #' Name \tab Type \tab Description \cr
@@ -387,10 +391,10 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="", expanded=F
 #' #handling of data where date has no day
 #' data4 <- readNWISgwl("425957088141001", startDate = "1980-01-01") 
 #' }
-readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE){  
+readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE, tz=""){  
   
   url <- constructNWISURL(siteNumbers,NA,startDate,endDate,"gwlevels",format="tsv")
-  data <- importRDB1(url,asDateTime=TRUE, convertType = convertType)
+  data <- importRDB1(url,asDateTime=TRUE, convertType = convertType, tz=tz)
 
   if(nrow(data) > 0){
     if(convertType){
@@ -450,8 +454,12 @@ readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE
 #' @importFrom dplyr left_join
 #' @examples
 #' \dontrun{
+#' x1 <- readNWISstat(siteNumbers=c("02319394"),
+#'                   parameterCd=c("00060"),
+#'                   statReportType="annual") 
+#' 
 #' #all the annual mean discharge data for two sites
-#' x <- readNWISstat(siteNumbers=c("02319394","02171500"),
+#' x2 <- readNWISstat(siteNumbers=c("02319394","02171500"),
 #'                   parameterCd=c("00010","00060"),
 #'                   statReportType="annual")
 #' 
@@ -465,6 +473,7 @@ readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE
 #' }
 readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "", convertType = TRUE, 
                           statReportType = "daily", statType = "mean"){
+
   #check for NAs in site numbers
   if(any(is.na(siteNumbers))){
     siteNumbers <- siteNumbers[!is.na(siteNumbers)]
