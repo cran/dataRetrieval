@@ -51,17 +51,16 @@ siteInfo \tab data.frame \tab A data frame containing information on the request
 }
 }
 \description{
-Reads peak flow from NWISweb. Data is retrieved from \url{http://waterdata.usgs.gov/nwis}.
+Reads peak flow from NWISweb. Data is retrieved from \url{https://waterdata.usgs.gov/nwis}.
 In some cases, the specific date of the peak data is not know. This function will default to
-converting the complete dates, dropping rows with incomplete dates. If those incomplete dates are
-needed, set the `asDateTime` argument to FALSE. No rows will be removed, and no dates will be converted
-to R Date objects.
+converting complete dates to a "Date" object, and converting incomplete dates to "NA". If those incomplete dates are
+needed, set the `asDateTime` argument to FALSE. No dates will be converted to R Date objects.
 }
 \examples{
-siteNumbers <- c('01594440','040851325')
+site_ids <- c('01594440','040851325')
 \dontrun{
-data <- readNWISpeak(siteNumbers)
-data2 <- readNWISpeak(siteNumbers, asDateTime=FALSE)
+data <- readNWISpeak(site_ids)
+data2 <- readNWISpeak(site_ids, asDateTime=FALSE)
 stations<-c("06011000")
 peakdata<-readNWISpeak(stations,convertType=FALSE)
 }
@@ -69,4 +68,3 @@ peakdata<-readNWISpeak(stations,convertType=FALSE)
 \seealso{
 \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 }
-

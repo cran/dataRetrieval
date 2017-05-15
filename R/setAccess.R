@@ -41,7 +41,7 @@ access = match.arg(access, c('public','internal','cooperator','USGS'))
   }
   
   pkg.env$site = "https://waterservices.usgs.gov/nwis/site/"
-  pkg.env$iv = "https://waterservices.usgs.gov/nwis/iv/"
+  pkg.env$iv = "https://nwis.waterservices.usgs.gov/nwis/iv/"
   pkg.env$dv =  "https://waterservices.usgs.gov/nwis/dv/"
   pkg.env$gwlevels = "https://waterservices.usgs.gov/nwis/gwlevels/"
   pkg.env$measurements = "https://waterdata.usgs.gov/nwis/measurements/"
@@ -49,7 +49,17 @@ access = match.arg(access, c('public','internal','cooperator','USGS'))
   pkg.env$rating = "https://waterdata.usgs.gov/nwisweb/get_ratings/"
   pkg.env$qwdata = "https://nwis.waterdata.usgs.gov/nwis/qwdata"
   pkg.env$stat = "https://waterservices.usgs.gov/nwis/stat/"
+  pkg.env$useNat = "https://waterdata.usgs.gov/nwis/water_use"
+  pkg.env$pCode = "https://nwis.waterdata.usgs.gov/nwis/pmcodes/pmcodes"
+  # NOTE: state water use are still in: constructUseURL
 
+  pkg.env$wqpData = "https://www.waterqualitydata.us/Result/search"
+  pkg.env$wqpStation = "https://www.waterqualitydata.us/Station/search"
+  pkg.env$wqpActivity = "https://www.waterqualitydata.us/Activity/search"
+  pkg.env$wqpMetrics = "https://www.waterqualitydata.us/ActivityMetric/search"
+  
+  pkg.env$NGWMN = "https://cida.usgs.gov/ngwmn_cache/sos"
+  
   options(Access.dataRetrieval = access)
 }
 
@@ -73,5 +83,10 @@ drQueryArgs <- function(..., arg.list){
 appendDrURL <- function(url, ..., arg.list=NULL){
   
   queryString <- drQueryArgs(..., arg.list=arg.list)
-  return(paste0(url, "&", queryString))
+  if(length(strsplit(url,"\\?")[[1]]) > 1){
+    return_url <- paste0(url, "&", queryString)
+  } else {
+    return_url <- paste0(url, queryString)
+  }
+  return(return_url)
 }

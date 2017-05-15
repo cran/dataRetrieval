@@ -4,8 +4,8 @@
 \alias{readWQPqw}
 \title{Raw Data Import for Water Quality Portal}
 \usage{
-readWQPqw(siteNumbers, parameterCd, startDate = "", endDate = "", tz = "",
-  querySummary = FALSE)
+readWQPqw(siteNumbers, parameterCd, startDate = "", endDate = "",
+  tz = "UTC", querySummary = FALSE)
 }
 \arguments{
 \item{siteNumbers}{character site number. This needs to include the full agency code prefix.}
@@ -19,11 +19,12 @@ retrieval for the earliest possible record. Date arguments are always specified 
 \item{endDate}{character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 retrieval for the latest possible record. Date arguments are always specified in local time.}
 
-\item{tz}{character to set timezone attribute of datetime. Default is an empty quote, which converts the 
-datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+\item{tz}{character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
 Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-"America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
-querySummary logical to look at number of records and unique sites that will be returned from this query.}
+"America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+"America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+for more information on time zones.}
 
 \item{querySummary}{logical to look at number of records and unique sites that will be returned from this query.}
 }
@@ -111,7 +112,7 @@ queryTime \tab POSIXct \tab The time the data was returned \cr
 \description{
 Imports data from the Water Quality Portal. 
 This function gets the data from here: \url{https://www.waterqualitydata.us}. There
-are four required input arguments: siteNumber, parameterCd, startDate, and endDate.
+are four required input arguments: siteNumbers, parameterCd, startDate, and endDate.
 parameterCd can either be a USGS 5-digit code, or a characteristic name. The sites can be 
 either USGS, or other Water Quality Portal offered sites. It is required to use the 'full'
 site name, such as 'USGS-01234567'.
@@ -135,4 +136,3 @@ nwisEx.summary <- readWQPqw('USGS-04024000',c('34247','30234','32104','34220'),
 \keyword{import}
 \keyword{service}
 \keyword{web}
-

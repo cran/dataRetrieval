@@ -5,7 +5,7 @@
 \title{Instantaneous value data retrieval from USGS (NWIS)}
 \usage{
 readNWISuv(siteNumbers, parameterCd, startDate = "", endDate = "",
-  tz = "")
+  tz = "UTC")
 }
 \arguments{
 \item{siteNumbers}{character USGS site number (or multiple sites).  This is usually an 8 digit number}
@@ -14,16 +14,18 @@ readNWISuv(siteNumbers, parameterCd, startDate = "", endDate = "",
 
 \item{startDate}{character starting date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 retrieval for the earliest possible record. Simple date arguments are specified in local time.
-See more information here: \url{http://waterservices.usgs.gov/rest/IV-Service.html#Specifying}.}
+See more information here: \url{https://waterservices.usgs.gov/rest/IV-Service.html#Specifying}.}
 
 \item{endDate}{character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 retrieval for the latest possible record. Simple date arguments are specified in local time.
-See more information here: \url{http://waterservices.usgs.gov/rest/IV-Service.html#Specifying}.}
+See more information here: \url{https://waterservices.usgs.gov/rest/IV-Service.html#Specifying}.}
 
-\item{tz}{character to set timezone attribute of dateTime. Default is an empty quote, which converts the 
-dateTimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+\item{tz}{character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
 Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-"America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
+"America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+"America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+for more information on time zones.}
 }
 \value{
 A data frame with the following columns:
@@ -53,28 +55,28 @@ queryTime \tab POSIXct \tab The time the data was returned \cr
 }
 }
 \description{
-Imports data from NWIS web service. This function gets the data from here: \url{http://waterservices.usgs.gov/}
-A list of parameter codes can be found here: \url{http://nwis.waterdata.usgs.gov/nwis/pmcodes/}
-A list of statistic codes can be found here: \url{http://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}.
-More information on the web service can be found here: \url{http://waterservices.usgs.gov/rest/IV-Service.html}.
+Imports data from NWIS web service. This function gets the data from here: \url{https://waterservices.usgs.gov/}
+A list of parameter codes can be found here: \url{https://nwis.waterdata.usgs.gov/nwis/pmcodes/}
+A list of statistic codes can be found here: \url{https://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}.
+More information on the web service can be found here: \url{https://waterservices.usgs.gov/rest/IV-Service.html}.
 }
 \examples{
-siteNumber <- '05114000'
+site_id <- '05114000'
 parameterCd <- '00060'
 startDate <- "2014-10-10"
 endDate <- "2014-10-10"
 \dontrun{
-rawData <- readNWISuv(siteNumber,parameterCd,startDate,endDate)
+rawData <- readNWISuv(site_id,parameterCd,startDate,endDate)
 
 timeZoneChange <- readNWISuv(c('04024430','04024000'),parameterCd,
          "2013-11-03","2013-11-03")
  
-centralTime <- readNWISuv(siteNumber,parameterCd,
+centralTime <- readNWISuv(site_id,parameterCd,
                            "2014-10-10T12:00", "2014-10-10T23:59",
                            tz="America/Chicago")
 
 # Adding 'Z' to the time indicates to the web service to call the data with UTC time:
-GMTdata <- readNWISuv(siteNumber,parameterCd,
+GMTdata <- readNWISuv(site_id,parameterCd,
                            "2014-10-10T00:00Z", "2014-10-10T23:59Z")
 }
 
@@ -87,4 +89,3 @@ GMTdata <- readNWISuv(siteNumber,parameterCd,
 \keyword{import}
 \keyword{service}
 \keyword{web}
-

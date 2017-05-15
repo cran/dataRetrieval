@@ -1,18 +1,24 @@
 #' General Data Import from NWIS
 #'
 #' Returns data from the NWIS web service.
-#' Arguments to the function should be based on \url{http://waterservices.usgs.gov} service calls.
+#' Arguments to the function should be based on \url{https://waterservices.usgs.gov} service calls.
 #' See examples below for ideas of constructing queries.
 #'
-#' @param service character. Possible values are "iv" (for instantaneous), "dv" (for daily values), "gwlevels" 
-#' (for groundwater levels), "site" (for site service), "qw" (water-quality),"measurement", and "stat" (for 
-#' statistics service). Note: "qw" and "measurement" calls go to: 
-#' \url{http://nwis.waterdata.usgs.gov/usa/nwis} for data requests, and use different call requests schemes.
-#' The statistics service has a limited selection of arguments (see \url{http://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html}). 
 #' @param asDateTime logical, if \code{TRUE} returns date and time as POSIXct, if \code{FALSE}, Date
 #' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to dates, datetimes,
 #' numerics based on a standard algorithm. If false, everything is returned as a character
-#' @param \dots see \url{http://waterservices.usgs.gov/rest/Site-Service.html#Service} for a complete list of options
+#' @param tz character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+#' date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
+#' Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
+#' "America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+#' "America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+#' for more information on time zones.
+#' @param \dots see \url{https://waterservices.usgs.gov/rest/Site-Service.html#Service} for a complete list of options.  A list of arguments can also be supplied. 
+#' One important argument to include is 'service'. Possible values are "iv" (for instantaneous), "dv" (for daily values), "gwlevels" 
+#' (for groundwater levels), "site" (for site service), "qw" (water-quality),"measurement", and "stat" (for 
+#' statistics service). Note: "qw" and "measurement" calls go to: 
+#' \url{https://nwis.waterdata.usgs.gov/usa/nwis} for data requests, and use different call requests schemes.
+#' The statistics service has a limited selection of arguments (see \url{https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html}). 
 #' @import utils
 #' @import stats
 #' @return A data frame with the following columns:
@@ -95,110 +101,37 @@
 #'                           parameterCd="00065")
 #' allDailyStats <- readNWISdata(site=c("03111548"),
 #'                               service="stat",
-#'                               statReportType="daily")
-#'                               service="stat",statReportType="daily",
+#'                               statReportType="daily",
 #'                               statType=c("p25","p50","p75","min","max"),
-#'                               parameterCd="00065")
+#'                               parameterCd="00060")
 #'
-#'dailyWV <- readNWISdata(stateCd = "West Virginia", parameterCd = "00060")
+#' dailyWV <- readNWISdata(stateCd = "West Virginia", parameterCd = "00060")
+#'
+#' arg.list <- list(site="03111548",
+#'                  statReportType="daily",
+#'                  statType=c("p25","p50","p75","min","max"),
+#'                  parameterCd="00060")
+#' allDailyStats_2 <- readNWISdata(arg.list, service="stat")
+#'
+#' #' # use county names to get data
+#' dailyStaffordVA <- readNWISdata(stateCd = "Virginia",
+#'                                 countyCd="Stafford",
+#'                                 parameterCd = "00060",
+#'                                 startDate = "2015-01-01",
+#'                                 endDate = "2015-01-30")
+#' va_counties <- c("51001","51003","51005","51007","51009","51011","51013","51015")
+#' va_counties_data <- readNWISdata(startDate = "2015-01-01", endDate = "2015-12-31", 
+#' parameterCd = "00060", countycode = va_counties)
 #' }
-readNWISdata <- function(service="dv", ..., asDateTime=TRUE,convertType=TRUE){
+readNWISdata <- function(..., asDateTime=TRUE,convertType=TRUE,tz="UTC"){
   
-  matchReturn <- list(...)
+  tz <- match.arg(tz, OlsonNames())
   
-  match.arg(service, c("dv","iv","gwlevels","site", "uv","qw","measurements","qwdata","stat"))
+  valuesList <- readNWISdots(...)
   
-  if(service == "uv"){
-    service <- "iv"
-  } else if (service == "qw"){
-    service <- "qwdata"
-  }
+  service <- valuesList$service
   
-  if(length(service) > 1){
-    stop("Only one service call allowed.")
-  }
-  
-  values <- sapply(matchReturn, function(x) as.character(paste(eval(x),collapse=",",sep="")))
-  
-  names(values)[names(values) == "startDate"] <- "startDT"
-  names(values)[names(values) == "endDate"] <- "endDT"
-  names(values)[names(values) == "siteNumber"] <- "sites"
-  names(values)[names(values) == "siteNumbers"] <- "sites"
-  
-  format.default <- "waterml,1.1"
-  baseURL <- "http://waterservices.usgs.gov/nwis/"
-  
-  if("stateCd" %in% names(values)){
-    values["stateCd"] <- stateCdLookup(values["stateCd"], "postal")
-  }
-  
-  if("statecode" %in% names(values)){
-    values["statecode"] <- stateCdLookup(values["statecode"], "postal")
-    names(values)[names(values) == "statecode"] <- "stateCd"
-  }
-  
-
-  if (service %in% c("qwdata","measurements")){
-
-    format.default <- "rdb"
-    
-    names(values)[names(values) == "startDT"] <- "begin_date"
-    names(values)[names(values) == "endDT"] <- "end_date"
-    
-    if("bBox" %in% names(values)){
-      values["nw_longitude_va"] <- as.character(matchReturn$bBox[1])
-      values["nw_latitude_va"] <- as.character(matchReturn$bBox[2])
-      values["se_longitude_va"] <- as.character(matchReturn$bBox[3])
-      values["se_latitude_va"] <- as.character(matchReturn$bBox[4])
-      values["coordinate_format"] <- "decimal_degrees"
-      values <- values[-which("bBox" %in% names(values))] 
-    }
-    
-    values["date_format"] <- "YYYY-MM-DD"
-    values["rdb_inventory_output"] <- "file"
-    values["TZoutput"] <- "0"
-    
-    if(all(c("begin_date","end_date") %in% names(values))){
-      values["range_selection"] <- "date_range"
-    }
-    
-    if(service == "qwdata"){
-      values["qw_sample_wide"] <- "wide"
-    }
-    
-  } 
-  
-  if("tz" %in% names(values)){
-    tz <- values["tz"]
-    if(tz != ""){
-      rTZ <- c("America/New_York","America/Chicago",
-               "America/Denver","America/Los_Angeles",
-               "America/Anchorage","America/Honolulu",
-               "America/Jamaica","America/Managua",
-               "America/Phoenix","America/Metlakatla","UTC")
-      tz <- match.arg(tz, rTZ)
-      if("UTC" == tz) tz <- ""
-    }
-    values <- values[!(names(values) %in% "tz")]
-  } else {
-    tz <- ""
-  }
-  
-  if(service %in% c("site","gwlevels","stat")){
-    format.default <- "rdb"
-  }
-  
-  if(service == "stat"){
-    message("Please be aware the NWIS data service feeding this function is in BETA.\n
-          Data formatting could be changed at any time, and is not guaranteed")
-    
-  }
-  
-  if(!("format" %in% names(values))){
-    values["format"] <- format.default
-  }
-  
-  values <- sapply(values, function(x) URLencode(x))
+  values <- sapply(valuesList$values, function(x) URLencode(x))
   
   baseURL <- drURL(service, arg.list=values)
   
@@ -285,6 +218,10 @@ stateCdLookup <- function(input, outputType="postal"){
     retVal <- c(retVal,output)
   }
   
+  if(length(retVal[-1]) == 0){
+    paste("Could not find", input, "in the state lookup table. See `stateCd` for complete list.")
+  }
+  
   return(retVal[-1])
 }
 
@@ -302,26 +239,164 @@ stateCdLookup <- function(input, outputType="postal"){
 #' name <- countyCdLookup(state = "OH", county = 13, output = "fullName")
 #' index <- countyCdLookup(state = "Pennsylvania", county = "ALLEGHENY COUNTY", output = "tableIndex")
 #' fromIDs <- countyCdLookup(state = 13, county = 5, output = "fullName")
+#' already_correct <- countyCdLookup(county = "51001")
 countyCdLookup <- function(state, county, outputType = "id"){
   outputType <- match.arg(outputType, c("fullName","tableIndex","id","fullEntry"))
+  
+  if(missing(state)){
+    return(county)
+  }
+  
+  if(missing(county)){
+    stop("No county code provided")
+  }
   
   #first turn state into stateCd postal name
   stateCd <- stateCdLookup(state,outputType = "postal")
   
   if(is.numeric(county) | !is.na(suppressWarnings(as.numeric(county)))){
-    county <- which(as.numeric(county) == as.numeric(countyCd$COUNTY) & stateCd == countyCd$STUSAB)
+    county_i <- which(as.numeric(county) == as.numeric(countyCd$COUNTY) & stateCd == countyCd$STUSAB)
   } else {
-    #check if "County" was included on string - need it to match countyCd data frame
-    county <- ifelse(!grepl('(?i)\\County$',county),paste(county,"County"),county)
-    county <- which(tolower(county) == tolower(countyCd$COUNTY_NAME) & stateCd == countyCd$STUSAB)
+    # if no suffix was added, this will figure out what it should be (or throw a helpful error)
+    allSuffixes <- unique(tolower(unlist(lapply(strsplit(countyCd$COUNTY_NAME,split=" "), tail, 1))))
+    
+    county_i <- unlist(lapply(allSuffixes, function(suffix, stateCd, county){
+      currentSuffixExistsInString <- grepl(paste0('(?i)\\', suffix, '$'), tolower(county))
+      retCounty <- ifelse(currentSuffixExistsInString, county, paste(county, suffix))
+      retCounty_i <- which(tolower(retCounty) == tolower(countyCd$COUNTY_NAME) & stateCd == countyCd$STUSAB)
+      return(retCounty_i)
+    }, stateCd, county))
+    
+    if(length(county_i) == 0){
+      stop(paste("Could not find", county, "(county),", stateCd, 
+                 "(state) in the county lookup table. See `countyCd` for complete list."))
+    } else if(length(county_i) > 1){
+      stop(paste(county, "(county),", stateCd, "(state) matched more than one county. See `countyCd` for complete list."))
+    } 
+    
   }
   
   retVal <- switch(outputType,
-                   fullName = countyCd$COUNTY_NAME[county],
-                   tableIndex = county,
-                   id = countyCd$COUNTY[county],
-                   fullEntry = countyCd[county,]
+                   fullName = countyCd$COUNTY_NAME[county_i],
+                   tableIndex = county_i,
+                   id = countyCd$COUNTY[county_i],
+                   fullEntry = countyCd[county_i,]
   )
   
   return(retVal)
 }
+
+#' 
+#' Format and organize NWIS arguments that are passed in as \code{...}.
+#'
+#' @keywords internal
+readNWISdots <- function(...){
+  
+  if(length(list(...)) == 0){
+    stop("No arguments supplied")
+  }
+  
+  matchReturn <- convertLists(...)
+  
+  if("service" %in% names(matchReturn)){
+    service <- matchReturn$service
+    matchReturn$service <- NULL
+  } else {
+    service <- "dv"
+  }
+  
+  match.arg(service, c("dv","iv","gwlevels","site", "uv","qw","measurements","qwdata","stat"))
+  
+  if(service == "uv"){
+    service <- "iv"
+  } else if (service == "qw"){
+    service <- "qwdata"
+  }
+  
+  if(length(service) > 1){
+    stop("Only one service call allowed.")
+  }
+  
+  values <- sapply(matchReturn, function(x) as.character(paste(eval(x),collapse=",",sep="")))
+  
+  names(values)[names(values) == "startDate"] <- "startDT"
+  names(values)[names(values) == "endDate"] <- "endDT"
+  names(values)[names(values) == "siteNumber"] <- "sites"
+  names(values)[names(values) == "siteNumbers"] <- "sites"
+  
+  format.default <- "waterml,1.1"
+  
+  names(values)[names(values) == "statecode"] <- "stateCd"
+  if("stateCd" %in% names(values)){
+    values["stateCd"] <- stateCdLookup(values["stateCd"], "postal")
+    values[["stateCd"]][values["stateCd"] == "AS"] <- "AQ" #Leaving the correct abb in stateCd
+    if(values["stateCd"] == "UM"){
+      stop("NWIS does not include U.S. Minor Outlying Islands")
+    }
+  }
+  
+  names(values)[names(values) == "countycode"] <- "countyCd"
+  if("countyCd" %in% names(values)){
+    if("stateCd" %in% names(values)){
+      values["countyCd"] <- paste0(stateCdLookup(values["stateCd"], "id"), 
+                                   countyCdLookup(values["stateCd"], values["countyCd"], "id"))
+      values <- values[names(values) != "stateCd"]      
+    }
+  }
+  
+  if (service %in% c("qwdata","measurements")){
+    
+    format.default <- "rdb"
+    
+    names(values)[names(values) == "startDT"] <- "begin_date"
+    names(values)[names(values) == "endDT"] <- "end_date"
+    
+    if("bBox" %in% names(values)){
+      values["nw_longitude_va"] <- as.character(matchReturn$bBox[1])
+      values["nw_latitude_va"] <- as.character(matchReturn$bBox[2])
+      values["se_longitude_va"] <- as.character(matchReturn$bBox[3])
+      values["se_latitude_va"] <- as.character(matchReturn$bBox[4])
+      values["coordinate_format"] <- "decimal_degrees"
+      values <- values[-which("bBox" %in% names(values))] 
+    }
+    
+    values["date_format"] <- "YYYY-MM-DD"
+    values["rdb_inventory_output"] <- "file"
+    values["TZoutput"] <- "0"
+    
+    if(all(c("begin_date","end_date") %in% names(values))){
+      values["range_selection"] <- "date_range"
+    }
+    
+    if(service == "qwdata"){
+      values["qw_sample_wide"] <- "wide"
+    }
+  } 
+  
+  if(service %in% c("site","gwlevels","stat")){
+    format.default <- "rdb"
+  }
+  
+  if(service == "stat"){
+    message("Please be aware the NWIS data service feeding this function is in BETA.\n
+            Data formatting could be changed at any time, and is not guaranteed")
+    
+  }
+  
+  if(!("format" %in% names(values))){
+    values["format"] <- format.default
+  }
+  
+  return(list(values=values, service=service))
+}
+
+#' convert variables in dots to usable format
+#' 
+#' @keywords internal
+convertLists <- function(...){
+  matchReturn <- c(do.call("c",list(...)[sapply(list(...), class) == "list"]), #get the list parts
+                   list(...)[sapply(list(...), class) != "list"]) # get the non-list parts
+  return(matchReturn)
+  
+}
+

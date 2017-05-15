@@ -4,11 +4,11 @@
 \alias{readNWISdv}
 \title{Daily Value USGS NWIS Data Retrieval}
 \usage{
-readNWISdv(siteNumber, parameterCd, startDate = "", endDate = "",
+readNWISdv(siteNumbers, parameterCd, startDate = "", endDate = "",
   statCd = "00003")
 }
 \arguments{
-\item{siteNumber}{character USGS site number.  This is usually an 8 digit number. Multiple sites can be requested with a character vector.}
+\item{siteNumbers}{character USGS site number.  This is usually an 8 digit number. Multiple sites can be requested with a character vector.}
 
 \item{parameterCd}{character of USGS parameter code(s).  This is usually an 5 digit number.}
 
@@ -47,16 +47,16 @@ queryTime \tab POSIXct \tab The time the data was returned \cr
 }
 }
 \description{
-Imports data from NWIS web service. This function gets the data from here: \url{http://waterservices.usgs.gov/}
+Imports data from NWIS web service. This function gets the data from here: \url{https://waterservices.usgs.gov/}
 }
 \examples{
-siteNumber <- '04085427'
+site_id <- '04085427'
 startDate <- '2012-01-01'
 endDate <- '2012-06-30'
 pCode <- '00060'
 \dontrun{
-rawDailyQ <- readNWISdv(siteNumber,pCode, startDate, endDate)
-rawDailyQAndTempMeanMax <- readNWISdv(siteNumber,c('00010','00060'),
+rawDailyQ <- readNWISdv(site_id,pCode, startDate, endDate)
+rawDailyQAndTempMeanMax <- readNWISdv(site_id,c('00010','00060'),
        startDate, endDate, statCd=c('00001','00003'))
 rawDailyQAndTempMeanMax <- renameNWISColumns(rawDailyQAndTempMeanMax)
 rawDailyMultiSites<- readNWISdv(c("01491000","01645000"),c('00010','00060'),
@@ -79,4 +79,3 @@ notActive <- readNWISdv(site, "00060", "2014-01-01","2014-01-07")
 \keyword{import}
 \keyword{service}
 \keyword{web}
-

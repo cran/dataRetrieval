@@ -4,7 +4,7 @@
 \alias{readNWISmeas}
 \title{Surface-water measurement data retrieval from USGS (NWIS)}
 \usage{
-readNWISmeas(siteNumbers, startDate = "", endDate = "", tz = "",
+readNWISmeas(siteNumbers, startDate = "", endDate = "", tz = "UTC",
   expanded = FALSE, convertType = TRUE)
 }
 \arguments{
@@ -16,10 +16,12 @@ retrieval for the earliest possible record.}
 \item{endDate}{character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 retrieval for the latest possible record.}
 
-\item{tz}{character to set timezone attribute of dateTime. Default is an empty quote, which converts the 
-dateTimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+\item{tz}{character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
 Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-"America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
+"America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+"America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+for more information on time zones.}
 
 \item{expanded}{logical. Whether or not (TRUE or FALSE) to call the expanded data.}
 
@@ -38,8 +40,8 @@ measurement_dt_time column are added to the returned data frame.   \cr
 tz_cd \tab character \tab The time zone code for the measurement_dt column \cr
 }
  
-See \url{http://waterdata.usgs.gov/usa/nwis/sw} for details about surface water, and 
-\url{http://waterdata.usgs.gov/nwis/help?output_formats_help#streamflow_measurement_data}
+See \url{https://waterdata.usgs.gov/usa/nwis/sw} for details about surface water, and 
+\url{https://waterdata.usgs.gov/nwis/help?output_formats_help#streamflow_measurement_data}
 for help on the columns and codes.
 
 There are also several useful attributes attached to the data frame:
@@ -53,13 +55,13 @@ tz_cd_reported \tab The originally reported time zone \cr
 }
 }
 \description{
-Reads surface-water measurement data from NWISweb. Data is retrieved from \url{http://waterdata.usgs.gov/nwis}.
-See \url{http://waterdata.usgs.gov/usa/nwis/sw} for details about surface water.
+Reads surface-water measurement data from NWISweb. Data is retrieved from \url{https://waterdata.usgs.gov/nwis}.
+See \url{https://waterdata.usgs.gov/usa/nwis/sw} for details about surface water.
 }
 \examples{
-siteNumbers <- c('01594440','040851325')
+site_ids <- c('01594440','040851325')
 \dontrun{
-data <- readNWISmeas(siteNumbers)
+data <- readNWISmeas(site_ids)
 Meas05316840 <- readNWISmeas("05316840")
 Meas05316840.ex <- readNWISmeas("05316840",expanded=TRUE)
 Meas07227500.ex <- readNWISmeas("07227500",expanded=TRUE)
@@ -69,4 +71,3 @@ Meas07227500.exRaw <- readNWISmeas("07227500",expanded=TRUE, convertType = FALSE
 \seealso{
 \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 }
-

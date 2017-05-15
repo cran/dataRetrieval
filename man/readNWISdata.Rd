@@ -4,21 +4,27 @@
 \alias{readNWISdata}
 \title{General Data Import from NWIS}
 \usage{
-readNWISdata(service = "dv", ..., asDateTime = TRUE, convertType = TRUE)
+readNWISdata(..., asDateTime = TRUE, convertType = TRUE, tz = "UTC")
 }
 \arguments{
-\item{service}{character. Possible values are "iv" (for instantaneous), "dv" (for daily values), "gwlevels" 
+\item{\dots}{see \url{https://waterservices.usgs.gov/rest/Site-Service.html#Service} for a complete list of options.  A list of arguments can also be supplied. 
+One important argument to include is 'service'. Possible values are "iv" (for instantaneous), "dv" (for daily values), "gwlevels" 
 (for groundwater levels), "site" (for site service), "qw" (water-quality),"measurement", and "stat" (for 
 statistics service). Note: "qw" and "measurement" calls go to: 
-\url{http://nwis.waterdata.usgs.gov/usa/nwis} for data requests, and use different call requests schemes.
-The statistics service has a limited selection of arguments (see \url{http://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html}).}
+\url{https://nwis.waterdata.usgs.gov/usa/nwis} for data requests, and use different call requests schemes.
+The statistics service has a limited selection of arguments (see \url{https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html}).}
 
 \item{asDateTime}{logical, if \code{TRUE} returns date and time as POSIXct, if \code{FALSE}, Date}
 
 \item{convertType}{logical, defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to dates, datetimes,
 numerics based on a standard algorithm. If false, everything is returned as a character}
 
-\item{\dots}{see \url{http://waterservices.usgs.gov/rest/Site-Service.html#Service} for a complete list of options}
+\item{tz}{character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
+Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
+"America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+"America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+for more information on time zones.}
 }
 \value{
 A data frame with the following columns:
@@ -53,7 +59,7 @@ queryTime \tab POSIXct \tab The time the data was returned \cr
 }
 \description{
 Returns data from the NWIS web service.
-Arguments to the function should be based on \url{http://waterservices.usgs.gov} service calls.
+Arguments to the function should be based on \url{https://waterservices.usgs.gov} service calls.
 See examples below for ideas of constructing queries.
 }
 \examples{
@@ -104,15 +110,29 @@ dailyStat <- readNWISdata(site=c("03112500","03111520"),
                           parameterCd="00065")
 allDailyStats <- readNWISdata(site=c("03111548"),
                               service="stat",
-                              statReportType="daily")
-                              service="stat",statReportType="daily",
+                              statReportType="daily",
                               statType=c("p25","p50","p75","min","max"),
-                              parameterCd="00065")
+                              parameterCd="00060")
 
 dailyWV <- readNWISdata(stateCd = "West Virginia", parameterCd = "00060")
+
+arg.list <- list(site="03111548",
+                 statReportType="daily",
+                 statType=c("p25","p50","p75","min","max"),
+                 parameterCd="00060")
+allDailyStats_2 <- readNWISdata(arg.list, service="stat")
+
+#' # use county names to get data
+dailyStaffordVA <- readNWISdata(stateCd = "Virginia",
+                                countyCd="Stafford",
+                                parameterCd = "00060",
+                                startDate = "2015-01-01",
+                                endDate = "2015-01-30")
+va_counties <- c("51001","51003","51005","51007","51009","51011","51013","51015")
+va_counties_data <- readNWISdata(startDate = "2015-01-01", endDate = "2015-12-31", 
+parameterCd = "00060", countycode = va_counties)
 }
 }
 \seealso{
 \code{\link{renameNWISColumns}},  \code{\link{importWaterML1}}, \code{\link{importRDB1}}
 }
-

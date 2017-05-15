@@ -7,10 +7,11 @@
 #'
 #' @param obs_url character containing the url for the retrieval or a file path to the data file.
 #' @param asDateTime logical, if \code{TRUE} returns date and time as POSIXct, if \code{FALSE}, Date
-#' @param tz character to set timezone attribute of datetime. Default is an empty quote, which converts the 
-#' datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
-#' Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-#' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
+#' @param tz character to set timezone attribute of datetime. Default converts the datetimes to UTC 
+#' (properly accounting for daylight savings times based on the data's provided tz_cd column).
+#' Recommended US values include "UTC","America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
+#' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla".
+#' For a complete list, see \url{https://en.wikipedia.org/wiki/List_of_tz_database_time_zones}
 #' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to dates, datetimes,
 #' numerics based on a standard algorithm. If false, everything is returned as a character
 #' @return A data frame with the following columns:
@@ -43,19 +44,19 @@
 #' @export
 #' @import utils
 #' @import stats
-#' @import lubridate
+#' @importFrom lubridate parse_date_time
 #' @importFrom dplyr left_join
 #' @importFrom readr read_lines
 #' @importFrom readr read_delim
 #' @importFrom readr problems
 #' @examples
-#' siteNumber <- "02177000"
+#' site_id <- "02177000"
 #' startDate <- "2012-09-01"
 #' endDate <- "2012-10-01"
 #' offering <- "00003"
 #' property <- "00060"
 #' 
-#' obs_url <- constructNWISURL(siteNumber,property,
+#' obs_url <- constructNWISURL(site_id,property,
 #'          startDate,endDate,"dv",format="tsv")
 #' \dontrun{
 #' data <- importRDB1(obs_url)
@@ -63,7 +64,7 @@
 #' urlMultiPcodes <- constructNWISURL("04085427",c("00060","00010"),
 #'          startDate,endDate,"dv",statCd=c("00003","00001"),"tsv")
 #' multiData <- importRDB1(urlMultiPcodes)
-#' unitDataURL <- constructNWISURL(siteNumber,property,
+#' unitDataURL <- constructNWISURL(site_id,property,
 #'          "2013-11-03","2013-11-03","uv",format="tsv") #includes timezone switch
 #' unitData <- importRDB1(unitDataURL, asDateTime=TRUE)
 #' qwURL <- constructNWISURL(c('04024430','04024000'),
@@ -83,16 +84,13 @@
 #' fullPath <- file.path(filePath, fileName)
 #' importUserRDB <- importRDB1(fullPath)
 #' 
-importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz=""){
+importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
   
-  if(tz != ""){
-    tz <- match.arg(tz, c("America/New_York","America/Chicago",
-                          "America/Denver","America/Los_Angeles",
-                          "America/Anchorage","America/Honolulu",
-                          "America/Jamaica","America/Managua",
-                          "America/Phoenix","America/Metlakatla","UTC"))
+  if(tz == ""){
+    tz <- "UTC" 
   }
   
+  tz <- match.arg(tz, OlsonNames())
 
   if(file.exists(obs_url)){
     doc <- obs_url
@@ -113,7 +111,8 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz=""){
   readr.meta <- readr.total[grep("^#", readr.total)]
   meta.rows <- length(readr.meta)
   header.names <- strsplit(readr.total[meta.rows+1],"\t")[[1]]
-
+  types.names <- strsplit(readr.total[meta.rows+2],"\t")[[1]]
+  
   if(convertType){
     readr.data <- suppressWarnings(read_delim(doc, skip = (meta.rows+2),delim="\t",col_names = FALSE))
   #defaults to time in seconds in readr 0.2.2.9??  
@@ -177,6 +176,20 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz=""){
       readr.data[,vaCols] <- sapply(readr.data[,vaCols], as.numeric)
     }
   
+    columnTypes <- sapply(readr.data, typeof)
+    columnsThatMayBeWrong <- grep("n",types.names)[which(!(columnTypes[grep("n",types.names)] %in% c("double","integer")))]
+
+    for(i in columnsThatMayBeWrong){
+      readr.data[[i]] <- tryCatch({
+          as.numeric(readr.data[[i]])
+        },
+        warning=function(cond) {
+          message(paste("Column",i,"contains characters that cannot be automatically converted to numeric."))
+          return(readr.data[[i]])
+        }
+      )
+    }
+    
     comment(readr.data) <- readr.meta
     problems.orig <- problems(readr.data)
     

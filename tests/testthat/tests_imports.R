@@ -46,6 +46,15 @@ test_that("External importRDB1 tests", {
 #   
 #   iceNoConvert <- importRDB1(urlIce, convertType=FALSE)
 #   expect_that(sum(iceNoConvert$X01_00060 == "Ice") > 0, is_true())
+  
+  
+  site <- "05427850"
+
+  url <- constructNWISURL(site,"00060","2015-01-01", "","dv",
+                          format="tsv",
+                          statCd = "laksjd")
+  # And....now there's data there:
+  expect_error(importRDB1(url))
 })
 
 context("importRDB")
@@ -115,10 +124,13 @@ test_that("External importWaterML1 test", {
   expect_that(nrow(inactiveSite) == 0, is_true())
 
   inactiveAndActive <- c("07334200","05212700")
-  inactiveAndActive <- constructNWISURL(inactiveAndActive, "00060", "2014-01-01", "2014-01-10",'dv')
+  inactiveAndActive <- constructNWISURL(inactiveAndActive, "00060", 
+                                        "2014-01-01", "2014-12-31",'dv')
   inactiveAndActive <- importWaterML1(inactiveAndActive)
   # saveRDS(inactiveAndActive, "rds/inactiveAndActive.rds")
-  expect_that(length(unique(inactiveAndActive$site_no)) == 1, is_true())
+  # 
+  expect_true(length(unique(inactiveAndActive$site_no)) < 2)
+  
   
   #raw XML
   url <- constructNWISURL(service = 'dv', siteNumber = '02319300', parameterCd = "00060", 
@@ -140,6 +152,27 @@ test_that("External importWaterML1 test", {
   data <- importWaterML1(url, tz = "America/New_York", asDateTime = TRUE)
   expect_true(data.class(data$dateTime) == "POSIXct")
   expect_true(nrow(data) > 0)
+  
+  expect_error(readNWISdata(sites="05114000", 
+                              service="iv",
+                              parameterCd="00060",
+                              startDate="2014-05-01T00:00",
+                              endDate="2014-05-01T12:00",
+                              tz="blah"))
+
+  arg.list <- list(sites="05114000", 
+                   parameterCd="00060",
+                   startDate="2014-05-01T00:00",
+                   endDate="2014-05-01T12:00")
+  
+  chi_iv <- readNWISdata(arg.list, 
+                         service="iv",
+                         tz="America/Chicago")
+  
+  expect_true(all(chi_iv$tz_cd == "America/Chicago"))
+  expect_equal(chi_iv$dateTime[1], as.POSIXct("2014-05-01T00:00", format = "%Y-%m-%dT%H:%M", tz="America/Chicago"))
+  expect_equal(chi_iv$dateTime[nrow(chi_iv)], as.POSIXct("2014-05-01T12:00", format = "%Y-%m-%dT%H:%M", tz="America/Chicago"))
+  
 })
 
 context("importWaterML2")
@@ -151,17 +184,17 @@ test_that("importWaterML2 internal test", {
   UserData <- importWaterML2(fullPath)
   # saveRDS(UserData, "rds/UserData.rds")
   expect_is(UserData$value, 'numeric')
-  expect_is(UserData$qualifier, 'character')
+  # expect_is(UserData$qualifier, 'character')
   
 })
 
 test_that("importWaterML2 external test", {
   testthat::skip_on_cran()
-  url <- "http://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=01646500&parameterCd=00060,00065"
-  data <- importWaterML2(url)
+  url <- "https://waterservices.usgs.gov/nwis/iv/?format=waterml,2.0&sites=01646500&parameterCd=00060,00065"
+  exData <- importWaterML2(url)
   # saveRDS(data, "rds/externalML2.rds")
-  expect_is(data$value, 'numeric')
-  expect_gt(nrow(data),0)
+  expect_is(exData$value, 'numeric')
+  expect_gt(nrow(exData),0)
 })
   
 

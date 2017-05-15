@@ -5,7 +5,7 @@
 \title{Raw Data Import for USGS NWIS QW Data}
 \usage{
 readNWISqw(siteNumbers, parameterCd, startDate = "", endDate = "",
-  expanded = TRUE, reshape = FALSE, tz = "")
+  expanded = TRUE, reshape = FALSE, tz = "UTC")
 }
 \arguments{
 \item{siteNumbers}{character of USGS site numbers.  This is usually an 8 digit number}
@@ -29,10 +29,12 @@ sufficient information for unbiased statistical analysis.}
 If \code{FALSE} (default), then return a long data frame with each water-quality result in a single row. This
 argument is only applicable to expanded data. Data requested using \code{expanded=FALSE} is always returned in the wide format.}
 
-\item{tz}{character to set timezone attribute of output columns: startDateTime and endDateTime. Default is an empty quote, which converts the 
-datetimes to UTC (properly accounting for daylight savings times).
+\item{tz}{character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
 Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-"America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
+"America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+"America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+for more information on time zones.}
 }
 \value{
 A data frame with at least the following columns:
@@ -61,9 +63,9 @@ variableInfo \tab data frame \tab A data frame containing information on the req
 }
 }
 \description{
-Imports data from NWIS web service. This function gets the data from here: \url{http://nwis.waterdata.usgs.gov/nwis/qwdata}
-A list of parameter codes can be found here: \url{http://nwis.waterdata.usgs.gov/nwis/pmcodes/}
-A list of statistic codes can be found here: \url{http://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}
+Imports data from NWIS web service. This function gets the data from here: \url{https://nwis.waterdata.usgs.gov/nwis/qwdata}
+A list of parameter codes can be found here: \url{https://nwis.waterdata.usgs.gov/nwis/pmcodes/}
+A list of statistic codes can be found here: \url{https://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}
 }
 \details{
 Valid parameter code groups are "All," or group codes:
@@ -89,24 +91,24 @@ POP \tab Population/community \cr
 If more than one parameter group is requested, only sites that data for all requested groups are returned.
 }
 \examples{
-siteNumbers <- c('04024430','04024000')
+site_ids <- c('04024430','04024000')
 startDate <- '2010-01-01'
 endDate <- ''
 parameterCd <- c('34247','30234','32104','34220')
 \dontrun{
-rawNWISqwData <- readNWISqw(siteNumbers,parameterCd,startDate,endDate)
-rawNWISqwDataReshaped <- readNWISqw(siteNumbers,parameterCd,
+rawNWISqwData <- readNWISqw(site_ids,parameterCd,startDate,endDate)
+rawNWISqwDataReshaped <- readNWISqw(site_ids,parameterCd,
           startDate,endDate,reshape=TRUE)
 parameterCd <- "all"
-rawNWISall <- readNWISqw(siteNumbers,parameterCd,
+rawNWISall <- readNWISqw(site_ids,parameterCd,
           startDate,endDate)
 pgroup <- c("NUT")
-rawNWISNutrients <- readNWISqw(siteNumbers,pgroup,
+rawNWISNutrients <- readNWISqw(site_ids,pgroup,
           startDate,endDate)
 groups <- c("NUT","OPE")
-rawNWISNutOpe <- readNWISqw(siteNumbers,groups,
+rawNWISNutOpe <- readNWISqw(site_ids,groups,
           startDate,endDate) 
-rawNWISOpe <- readNWISqw(siteNumbers,"OPE",
+rawNWISOpe <- readNWISqw(site_ids,"OPE",
           startDate,endDate) 
          } 
 }
@@ -119,4 +121,3 @@ rawNWISOpe <- readNWISqw(siteNumbers,"OPE",
 \keyword{import}
 \keyword{service}
 \keyword{web}
-

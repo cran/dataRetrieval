@@ -5,7 +5,7 @@
 \title{Groundwater level measurements retrieval from USGS (NWIS)}
 \usage{
 readNWISgwl(siteNumbers, startDate = "", endDate = "", convertType = TRUE,
-  tz = "")
+  tz = "UTC")
 }
 \arguments{
 \item{siteNumbers}{character USGS site number (or multiple sites).  This is usually an 8 digit number}
@@ -19,10 +19,12 @@ retrieval for the latest possible record.}
 \item{convertType}{logical, defaults to \code{TRUE}. If \code{TRUE}, the function will convert the data to dates, datetimes,
 numerics based on a standard algorithm. If false, everything is returned as a character}
 
-\item{tz}{character to set timezone attribute of dateTime. Default is an empty quote, which converts the 
-dateTimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+\item{tz}{character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
 Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-"America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
+"America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+"America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+for more information on time zones.}
 }
 \value{
 A data frame with the following columns:
@@ -51,17 +53,17 @@ siteInfo \tab data.frame \tab A data frame containing information on the request
 }
 \description{
 Reads groundwater level measurements from NWISweb. Mixed date/times come back from the service 
-depending on the year that the data was collected. See \url{http://waterdata.usgs.gov/usa/nwis/gw}
+depending on the year that the data was collected. See \url{https://waterdata.usgs.gov/usa/nwis/gw}
 for details about groundwater. By default the returned dates are converted to date objects, unless convertType
 is specified as FALSE. Sites with non-standard date formats (i.e. lacking a day) can be affected (see examples).
-See \url{http://waterservices.usgs.gov/rest/GW-Levels-Service.html} for more information.
+See \url{https://waterservices.usgs.gov/rest/GW-Levels-Service.html} for more information.
 }
 \examples{
-siteNumber <- "434400121275801"
+site_id <- "434400121275801"
 \dontrun{
-data <- readNWISgwl(siteNumber, '','')
+data <- readNWISgwl(site_id, '','')
 sites <- c("434400121275801", "375907091432201")
-data2 <- readNWISgwl(sites, '','')
+data2 <- readNWISgwl(site_id, '','')
 data3 <- readNWISgwl("420125073193001", '','')
 #handling of data where date has no day
 data4 <- readNWISgwl("425957088141001", startDate = "1980-01-01") 
@@ -70,4 +72,3 @@ data4 <- readNWISgwl("425957088141001", startDate = "1980-01-01")
 \seealso{
 \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 }
-

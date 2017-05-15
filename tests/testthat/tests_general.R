@@ -8,6 +8,8 @@ test_that("General NWIS retrievals working", {
   expect_is(multiSite$dateTime, 'POSIXct')
   # saveRDS(multiSite, "rds/multiSite.rds")
   
+  expect_error(readNWISdata(), "No arguments supplied")
+  
   bBoxEx <- readNWISdata(bBox=c(-83,36.5,-81,38.5), parameterCd="00010")
   expect_that(length(unique(bBoxEx$site_no)) > 1, is_true())
   # saveRDS(bBoxEx, "rds/bBoxEx.rds")
@@ -31,10 +33,10 @@ test_that("General NWIS retrievals working", {
   # saveRDS(qwData, "rds/qwData.rds")
   expect_is(qwData$startDateTime, "POSIXct")
   
-  url <- "http://waterservices.usgs.gov/nwis/dv/?site=09037500&format=rdb&ParameterCd=00060&StatCd=00003&startDT=1985-10-02&endDT=2012-09-06"
+  url <- "https://waterservices.usgs.gov/nwis/dv/?site=09037500&format=rdb&ParameterCd=00060&StatCd=00003&startDT=1985-10-02&endDT=2012-09-06"
   dv <- importRDB1(url, asDateTime = FALSE)
   
-  urlEmpty <- "http://nwis.waterdata.usgs.gov/nwis/qwdata?multiple_site_no=413437087150601&sort_key=site_no&group_key=NONE&inventory_output=0&begin_date=&end_date=&TZoutput=0&param_group=NUT,INN&qw_attributes=0&format=rdb&qw_sample_wide=0&rdb_qw_attributes=expanded&date_format=YYYY-MM-DD&rdb_compression=value&list_of_search_criteria=multiple_site_no"
+  urlEmpty <- "https://nwis.waterdata.usgs.gov/nwis/qwdata?multiple_site_no=413437087150601&sort_key=site_no&group_key=NONE&inventory_output=0&begin_date=&end_date=&TZoutput=0&param_group=NUT,INN&qw_attributes=0&format=rdb&qw_sample_wide=0&rdb_qw_attributes=expanded&date_format=YYYY-MM-DD&rdb_compression=value&list_of_search_criteria=multiple_site_no"
   dv <- importRDB1(urlEmpty, asDateTime = FALSE)
   # saveRDS(dv, "rds/emptyDV.rds")
   expect_that(nrow(dv) == 0, is_true())
@@ -50,6 +52,42 @@ test_that("General NWIS retrievals working", {
   # saveRDS(waterYearStat, "rds/waterYearStat.rds")
   expect_is(waterYearStat$mean_va,"numeric")
   expect_is(waterYearStat$parameter_cd,"character")
+  
+  #2 data descriptors, but some random empty "values" tag:
+  urlTest <- "https://nwis.waterservices.usgs.gov/nwis/iv/?site=11447650&format=waterml,1.1&ParameterCd=63680&startDT=2016-12-13&endDT=2016-12-13"
+  x <- importWaterML1(urlTest)
+  expect_equal(ncol(x), 8)
+  
+  #Test list:
+  args <- list(sites="05114000", service="iv", 
+               parameterCd="00060", 
+               startDate="2014-05-01T00:00Z",
+               endDate="2014-05-01T12:00Z")
+  
+  instData <- readNWISdata(args)
+  
+  args <- list(sites="05114000", service="dv", 
+               parameterCd="00060", 
+               startDate="2014-05-01",
+               endDate="2014-05-01")
+  
+  dailyData <- readNWISdata(args)
+  expect_lt(nrow(dailyData), nrow(instData))
+  args <- list(stateCd="OH",parameterCd="00665")
+  sites <- whatNWISsites(args)
+  expect_type(sites, "list")
+  
+  #Test counties:
+  dailyStaffordVA <- readNWISdata(stateCd = "Virginia",
+                                  countyCd="Stafford",
+                                  parameterCd = "00060",
+                                  startDate = "2015-01-01",
+                                  endDate = "2015-01-30")
+  expect_gt(nrow(dailyStaffordVA),1)
+  
+  AS <- readNWISdata(stateCd = "AS", service="site")
+  expect_gt(nrow(AS),0)
+  
 })
 
 
@@ -59,6 +97,50 @@ test_that("General WQP retrievals working", {
   pHData <- readWQPdata(siteid="USGS-04024315",characteristicName=nameToUse)
   expect_is(pHData$ActivityStartDateTime, 'POSIXct')
   
+  #testing lists:
+  startDate <- as.Date("2013-01-01")
+  secchi.names = c("Depth, Secchi disk depth",
+                   "Depth, Secchi disk depth (choice list)",
+                   "Secchi Reading Condition (choice list)",
+                   "Secchi depth",
+                   "Water transparency, Secchi disc")
+  args_2 <- list('startDateLo' = startDate,
+               'startDateHi' = "2013-12-31",
+                statecode="WI",
+                characteristicName=secchi.names)
+
+  wqp.summary <- readWQPdata(args_2, querySummary = TRUE)
+  expect_true("list" %in% class(wqp.summary))
+  
+  #pretty sloooow:
+  wqp.data <- readWQPdata(args_2, querySummary = FALSE)
+  expect_false("list" %in% class(wqp.data))
+  
+  # Testing multiple lists:
+  arg_3 <- list('startDateLo' = startDate,
+               'startDateHi' = "2013-12-31")
+  arg_4 <- list(statecode="WI",
+                characteristicName=secchi.names)
+  wqp.summary <- readWQPdata(arg_3, arg_4, querySummary=TRUE)
+  expect_true("list" %in% class(wqp.summary))
+  
+  lakeSites <- whatWQPsites(args_2)
+  expect_type(lakeSites, "list")
+  
+  # Test county code:
+   dailyLexingtonVA <- readWQPdata(statecode = "Virginia", 
+                                   countycode="Lexington", 
+                                   parameterCd = "00010")
+   
+   expect_equal(ncol(dailyLexingtonVA),65)
+  
+   bioData <- readWQPdata(statecode = "WI",
+                          countycode = "Dane",
+                          providers = "BIODATA")
+   
+   expect_equal(attr(bioData, "url"), "https://www.waterqualitydata.us/Result/search?statecode=US%3A55&countycode=US%3A55%3A025&providers=BIODATA&zip=no&sorted=no&mimeType=tsv")
+   expect_gt(nrow(bioData), 1)
+   
   # Known slow query for WQP:
   # pHDataExpanded2 <- readWQPdata(bBox=c(-90.1,42.9,-89.9,43.1),
   #                                characteristicName=nameToUse, querySummary = TRUE)
@@ -106,6 +188,39 @@ test_that("Dates with no days can be handled", {
   expect_error(readNWISgwl("425957088141001", startDate = "1980-01-01"))
  })
 
+context("whatWQPsamples")
+test_that("whatWQPsamples working", {
+  testthat::skip_on_cran()
+  siteInfo <- whatWQPsamples(siteid="USGS-01594440")
+  expect_true(nrow(siteInfo) > 0)
+  
+  })
+
+context("whatWQPmetrics")
+test_that("whatWQPmetrics working", {
+  testthat::skip_on_cran()
+  type <- "Stream"
+  siteInfo <- whatWQPmetrics(countycode="US:55:025",siteType=type)
+  expect_true(ncol(siteInfo) >= 21)
+  
+})
+
+context("whatWQPdata")
+test_that("whatWQPdata working", {
+  testthat::skip_on_cran()
+  
+  site1 <- whatWQPdata(siteid="USGS-01594440")
+  expect_is(site1, "data.frame")
+  expect_equal(1, nrow(site1))
+  
+  type <- "Stream"
+  sites <- whatWQPdata(countycode="US:55:025",siteType=type)
+  expect_gt(nrow(sites), 1)
+  
+  lakeSites <- whatWQPdata(siteType = "Lake, Reservoir, Impoundment", statecode = "US:55")
+  expect_is(lakeSites$activityCount, "numeric")
+})
+
 context("whatNWISsites")
 test_that("whatNWISsites working", {
   testthat::skip_on_cran()
@@ -116,4 +231,109 @@ test_that("whatNWISsites working", {
   bboxSites <- whatNWISsites(bbox = c(-92.5, 45.4, -87, 47), parameterCd="00060")
   expect_true(nrow(bboxSites) > 0)
   expect_true(is.numeric(bboxSites$dec_lat_va))
-  })
+})
+
+context("readWQPdots")
+test_that("readWQPdots working", {
+  testthat::skip_on_cran()
+  
+  # bbox vector turned into single string with coords separated by semicolons
+  formArgs_bbox <- dataRetrieval:::readWQPdots(bbox = c(-92.5, 45.4, -87, 47))
+  expect_true(length(formArgs_bbox) == 2)
+  expect_true(length(gregexpr(";", formArgs_bbox)[[1]]) == 3)
+  
+  # NWIS names (siteNumber) converted to WQP expected names (siteid)
+  formArgs_site <- dataRetrieval:::readWQPdots(siteNumber="04010301")
+  expect_true(length(formArgs_site) == 2)
+  expect_true("siteid" %in% names(formArgs_site))
+  expect_false("siteNumber" %in% names(formArgs_site))
+  
+  # NWIS names (stateCd) converted to WQP expected names (statecode)
+  formArgs <- dataRetrieval:::readWQPdots(stateCd="OH",parameterCd="00665")
+  expect_true(length(formArgs) == 3)
+  expect_true("statecode" %in% names(formArgs))
+  expect_false("stateCd" %in% names(formArgs))
+})
+
+context("NGWMN")
+test_that("NGWMN functions working", {
+  testthat::skip_on_cran()
+  noDataSite <- "UTGS.401544112060301"
+  noDataSite <- readNGWMNlevels(siteNumbers = noDataSite)
+  expect_true(is.data.frame(noDataSite))
+  
+  #bounding box and a bigger request
+  bboxSites <- readNGWMNdata(service = "featureOfInterest", bbox = c(30, -99, 31, 102))
+  expect_gt(nrow(bboxSites), 0)
+  siteInfo <- readNGWMNsites(bboxSites$site[1:3])
+  expect_equal(nrow(siteInfo), 3)	  
+  
+  #one site
+  site <- "USGS.430427089284901"
+  oneSite <- readNGWMNlevels(siteNumbers = site)
+  siteInfo <- readNGWMNsites(site)
+  expect_true(is.numeric(oneSite$value))
+  expect_true(is.character(oneSite$site))
+  expect_true(is.data.frame(siteInfo))
+  expect_true(nrow(siteInfo) > 0)
+  expect_true(nrow(oneSite) > 0)
+  
+  #non-USGS site
+  data <- readNGWMNlevels(siteNumbers = "MBMG.1388")
+  expect_true(nrow(data) > 1)
+  expect_true(is.numeric(oneSite$value))
+  
+  #sites with colons and NAs work
+  
+  na_colons <- c(NA, bboxSites$site[200:212], NA, NA)
+  returnDF <- readNGWMNdata(service = "observation", 
+                            siteNumbers = na_colons, asDateTime = FALSE)
+  expect_is(returnDF, "data.frame")
+  expect_true(nrow(returnDF) > 1)
+  expect_true(!is.null(attributes(returnDF)$siteInfo))
+  
+  sites <- c("USGS:424427089494701", NA)
+  siteInfo <- readNGWMNsites(sites)
+  expect_is(siteInfo, "data.frame")
+  expect_true(nrow(siteInfo) == 1)
+  
+  #time zones
+  tzSite <- "USGS.385111104214403"
+  tzDataUTC <- readNGWMNlevels(tzSite, asDateTime = TRUE) 
+  tzDataMT <- readNGWMNlevels(tzSite, asDateTime = TRUE, 
+                              tz = "US/Mountain")
+  expect_gt(nrow(tzDataMT), 1)
+  expect_gt(nrow(tzDataUTC), 1)
+  expect_is(tzDataUTC$dateTime, "POSIXct")
+  expect_is(tzDataMT$dateTime, "POSIXct")
+  expect_equal(attr(tzDataMT$dateTime, 'tzone'), "US/Mountain")
+  expect_warning(tzDataUTC$dateTime == tzDataMT$dateTime)
+})
+
+context("getWebServiceData")
+test_that("long urls use POST", {
+  url <- paste0(rep("reallylongurl", 200), collapse = '')
+  with_mock(
+    RETRY = function(method, ...) {
+      return(method == "POST")
+    },
+    status_code = function(resp) 200,
+    headers = function(resp) list(`content-type` = "logical"),
+    content = function(resp, encoding) resp,
+    expect_true(getWebServiceData(url)),
+    .env = "httr"
+  )
+})
+test_that("ngwmn urls don't use post", {
+  url <- paste0(rep("urlwithngwmn", 200), collapse = '')
+  with_mock(
+    RETRY = function(method, ...) {
+      return(method == "POST")
+    },
+    status_code = function(resp) 200,
+    headers = function(resp) list(`content-type` = "logical"),
+    content = function(resp, encoding) resp,
+    expect_false(getWebServiceData(url)),
+    .env = "httr"
+  )
+})

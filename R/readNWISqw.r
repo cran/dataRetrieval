@@ -1,8 +1,8 @@
 #' Raw Data Import for USGS NWIS QW Data
 #'
-#' Imports data from NWIS web service. This function gets the data from here: \url{http://nwis.waterdata.usgs.gov/nwis/qwdata}
-#' A list of parameter codes can be found here: \url{http://nwis.waterdata.usgs.gov/nwis/pmcodes/}
-#' A list of statistic codes can be found here: \url{http://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}
+#' Imports data from NWIS web service. This function gets the data from here: \url{https://nwis.waterdata.usgs.gov/nwis/qwdata}
+#' A list of parameter codes can be found here: \url{https://nwis.waterdata.usgs.gov/nwis/pmcodes/}
+#' A list of statistic codes can be found here: \url{https://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}
 #'
 #' @details Valid parameter code groups are "All," or group codes:
 #'\tabular{ll}{
@@ -41,10 +41,12 @@
 #' @param reshape logical, reshape the expanded data. If \code{TRUE}, then return a wide data frame with all water-quality in a single row for each sample. 
 #' If \code{FALSE} (default), then return a long data frame with each water-quality result in a single row. This
 #' argument is only applicable to expanded data. Data requested using \code{expanded=FALSE} is always returned in the wide format.
-#' @param tz character to set timezone attribute of output columns: startDateTime and endDateTime. Default is an empty quote, which converts the 
-#' datetimes to UTC (properly accounting for daylight savings times).
+#' @param tz character to set timezone attribute of dateTime. Default is "UTC", and converts the 
+#' date times to UTC, properly accounting for daylight savings times based on the data's provided tz_cd column.
 #' Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-#' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
+#' "America/Anchorage", as well as the following which do not use daylight savings time: "America/Honolulu",
+#' "America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
+#' for more information on time zones.
 #' @keywords data import USGS web service
 #' @return A data frame with at least the following columns:
 #' \tabular{lll}{
@@ -77,28 +79,28 @@
 #' @seealso \code{\link{readWQPdata}}, \code{\link{whatWQPsites}}, 
 #' \code{\link{readWQPqw}}, \code{\link{constructNWISURL}}
 #' @examples
-#' siteNumbers <- c('04024430','04024000')
+#' site_ids <- c('04024430','04024000')
 #' startDate <- '2010-01-01'
 #' endDate <- ''
 #' parameterCd <- c('34247','30234','32104','34220')
 #' \dontrun{
-#' rawNWISqwData <- readNWISqw(siteNumbers,parameterCd,startDate,endDate)
-#' rawNWISqwDataReshaped <- readNWISqw(siteNumbers,parameterCd,
+#' rawNWISqwData <- readNWISqw(site_ids,parameterCd,startDate,endDate)
+#' rawNWISqwDataReshaped <- readNWISqw(site_ids,parameterCd,
 #'           startDate,endDate,reshape=TRUE)
 #' parameterCd <- "all"
-#' rawNWISall <- readNWISqw(siteNumbers,parameterCd,
+#' rawNWISall <- readNWISqw(site_ids,parameterCd,
 #'           startDate,endDate)
 #' pgroup <- c("NUT")
-#' rawNWISNutrients <- readNWISqw(siteNumbers,pgroup,
+#' rawNWISNutrients <- readNWISqw(site_ids,pgroup,
 #'           startDate,endDate)
 #' groups <- c("NUT","OPE")
-#' rawNWISNutOpe <- readNWISqw(siteNumbers,groups,
+#' rawNWISNutOpe <- readNWISqw(site_ids,groups,
 #'           startDate,endDate) 
-#' rawNWISOpe <- readNWISqw(siteNumbers,"OPE",
+#' rawNWISOpe <- readNWISqw(site_ids,"OPE",
 #'           startDate,endDate) 
 #'          } 
 readNWISqw <- function (siteNumbers,parameterCd,startDate="",endDate="",
-                        expanded=TRUE,reshape=FALSE,tz=""){  
+                        expanded=TRUE,reshape=FALSE,tz="UTC"){  
   
   pgrp <- c("INF", "PHY", "INM", "INN", "NUT", "MBI", "BIO", "IMM", "IMN", "TOX",
                            "OPE", "OPC", "OOT", "RAD", "XXX", "SED", "POP")
@@ -106,7 +108,7 @@ readNWISqw <- function (siteNumbers,parameterCd,startDate="",endDate="",
   if(any(parameterCd == "all") | any(parameterCd == "All") ){
     
     siteNumbers <- paste(siteNumbers, collapse=",")
-    url <- paste0("http://nwis.waterdata.usgs.gov/nwis/qwdata?multiple_site_no=", siteNumbers,
+    url <- paste0("https://nwis.waterdata.usgs.gov/nwis/qwdata?multiple_site_no=", siteNumbers,
            "&sort_key=site_no&group_key=NONE&inventory_output=0",
            "&begin_date=", startDate, "&end_date=", endDate,
            "&TZoutput=0",
@@ -116,7 +118,7 @@ readNWISqw <- function (siteNumbers,parameterCd,startDate="",endDate="",
   } else if (all(parameterCd %in% pgrp)){
     siteNumbers <- paste(siteNumbers, collapse=",")
     groups <- paste(parameterCd, collapse=",")
-    url <- paste0("http://nwis.waterdata.usgs.gov/nwis/qwdata?multiple_site_no=", siteNumbers,
+    url <- paste0("https://nwis.waterdata.usgs.gov/nwis/qwdata?multiple_site_no=", siteNumbers,
                   "&sort_key=site_no&group_key=NONE&inventory_output=0",
                   "&begin_date=", startDate, "&end_date=", endDate,
                   "&TZoutput=0&param_group=", groups,

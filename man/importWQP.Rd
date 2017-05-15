@@ -4,21 +4,20 @@
 \alias{importWQP}
 \title{Basic Water Quality Portal Data parser}
 \usage{
-importWQP(obs_url, zip = FALSE, tz = "")
+importWQP(obs_url, zip = FALSE, tz = "UTC")
 }
 \arguments{
 \item{obs_url}{character URL to Water Quality Portal#' @keywords data import USGS web service}
 
 \item{zip}{logical to request data via downloading zip file. Default set to FALSE.}
 
-\item{tz}{character to set timezone attribute of datetime. Default is an empty quote, which converts the 
-datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
-Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
+\item{tz}{character to set timezone attribute of datetime. Default is UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+Possible values include "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
 "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
 }
 \value{
 retval dataframe raw data returned from the Water Quality Portal. Additionally, a POSIXct dateTime column is supplied for 
-start and end times, and converted to UTC. See \url{http://www.waterqualitydata.us/portal_userguide/} for more information.
+start and end times, and converted to UTC. See \url{https://www.waterqualitydata.us/portal_userguide/} for more information.
 }
 \description{
 Imports data from the Water Quality Portal based on a specified url.
@@ -42,4 +41,3 @@ STORETdata <- importWQP(STORETex)
 \seealso{
 \code{\link{readWQPdata}}, \code{\link{readWQPqw}}, \code{\link{whatWQPsites}}
 }
-

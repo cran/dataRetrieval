@@ -1,10 +1,11 @@
 #' Site Data Import from NWIS
 #'
-#' Returns a list of sites from the NWIS web service. This function gets the data from: \url{http://waterservices.usgs.gov/rest/Site-Test-Tool.html}.
-#' Arguments to the function should be based on \url{http://waterservices.usgs.gov/rest/Site-Service.html#Service}
+#' Returns a list of sites from the NWIS web service. This function gets the data from: \url{https://waterservices.usgs.gov/rest/Site-Test-Tool.html}.
+#' Arguments to the function should be based on \url{https://waterservices.usgs.gov/rest/Site-Service.html#Service}
 #' Mapper format is used
 #'
-#' @param \dots see \url{http://waterservices.usgs.gov/rest/Site-Service.html#Service} for a complete list of options
+#' @param \dots see \url{https://waterservices.usgs.gov/rest/Site-Service.html#Service} for a complete list of options. A 
+#' list (or lists) can also be supplied.
 #' @import utils
 #' @return A data frame with at least the following columns:
 #' \tabular{lll}{
@@ -33,16 +34,18 @@
 #' @examples
 #' \dontrun{
 #' siteListPhos <- whatNWISsites(stateCd="OH",parameterCd="00665")
+#' oneSite <- whatNWISsites(sites="05114000")
 #' }
 whatNWISsites <- function(...){
   
-  matchReturn <- list(...)
-  values <- sapply(matchReturn, function(x) URLencode(as.character(paste(eval(x),collapse=",",sep=""))))
+  values <- readNWISdots(...)
   
-  names(values)[names(values) == "siteNumber"] <- "sites"
-  names(values)[names(values) == "siteNumbers"] <- "sites"
-  
-  urlCall <- drURL('site',Access=pkg.env$access, format="mapper", arg.list = values)
+  valuesList <- readNWISdots(...)
+
+  values <- sapply(valuesList$values, function(x) URLencode(x))
+  values["format"] <- "mapper" 
+
+  urlCall <- drURL('site',Access=pkg.env$access, arg.list = values)
 
   rawData <- getWebServiceData(urlCall, encoding='gzip')
 
@@ -76,9 +79,14 @@ whatNWISsites <- function(...){
   }
   
   retVal <- retVal[!duplicated(retVal),]
-  retVal$queryTime <- Sys.time()
+
   attr(retVal, "url") <- urlCall
-  attr(retVal, "queryTime") <- Sys.time()
+  
+  timenow <- Sys.time()
+  
+  attr(retVal, "queryTime") <- timenow
+  # Backwards compatible, might remove later:
+  retVal$queryTime <- timenow
   
   return(retVal)
 }

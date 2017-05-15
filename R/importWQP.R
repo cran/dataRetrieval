@@ -6,12 +6,11 @@
 #' 
 #' @param obs_url character URL to Water Quality Portal#' @keywords data import USGS web service
 #' @param zip logical to request data via downloading zip file. Default set to FALSE.
-#' @param tz character to set timezone attribute of datetime. Default is an empty quote, which converts the 
-#' datetimes to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
-#' Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
+#' @param tz character to set timezone attribute of datetime. Default is UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
+#' Possible values include "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
 #' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
 #' @return retval dataframe raw data returned from the Water Quality Portal. Additionally, a POSIXct dateTime column is supplied for 
-#' start and end times, and converted to UTC. See \url{http://www.waterqualitydata.us/portal_userguide/} for more information.
+#' start and end times, and converted to UTC. See \url{https://www.waterqualitydata.us/portal_userguide/} for more information.
 #' @export
 #' @seealso \code{\link{readWQPdata}}, \code{\link{readWQPqw}}, \code{\link{whatWQPsites}}
 #' @import utils
@@ -44,14 +43,12 @@
 #' STORETex <- constructWQPURL('WIDNR_WQX-10032762','Specific conductance', '', '')
 #' STORETdata <- importWQP(STORETex)
 #' }
-importWQP <- function(obs_url, zip=FALSE, tz=""){
+importWQP <- function(obs_url, zip=FALSE, tz="UTC"){
   
   if(tz != ""){
-    tz <- match.arg(tz, c("America/New_York","America/Chicago",
-                          "America/Denver","America/Los_Angeles",
-                          "America/Anchorage","America/Honolulu",
-                          "America/Jamaica","America/Managua",
-                          "America/Phoenix","America/Metlakatla"))
+    tz <- match.arg(tz, OlsonNames())
+  } else {
+    tz <- "UTC"
   }
   
   if(!file.exists(obs_url)){
@@ -60,41 +57,26 @@ importWQP <- function(obs_url, zip=FALSE, tz=""){
       message("zip encoding access still in development")
       temp <- tempfile()
       temp <- paste0(temp,".zip")
-      doc <- GET(obs_url, user_agent(default_ua()), 
-                          write_disk(temp))
-
+      doc <- getWebServiceData(obs_url, write_disk(temp))
       headerInfo <- headers(doc)
-      
+      doc <- unzip(temp, exdir=tempdir())
+      unlink(temp)
+      on.exit(unlink(doc))
     } else {
       doc <- getWebServiceData(obs_url)
       headerInfo <- attr(doc, "headerInfo")
     }
-    
-    numToBeReturned <- 0
-    sitesToBeReturned <- 0
-    
-    if("total-result-count" %in% names(headerInfo)){
-      numToBeReturned <- as.numeric(headerInfo["total-result-count"])
-    } 
-    
-    if("total-site-count" %in% names(headerInfo)){
-      sitesToBeReturned <- as.numeric(headerInfo["total-site-count"])
-    }
-    
-    
-    totalReturned <- sum(numToBeReturned, sitesToBeReturned,na.rm = TRUE)
-    
-    if(is.na(totalReturned) | totalReturned == 0){
+
+    headerInfo[grep("-count",names(headerInfo))] <- as.numeric(headerInfo[grep("-count",names(headerInfo))])
+
+    totalPossible <- sum(unlist(headerInfo[grep("-count",names(headerInfo))]), na.rm = TRUE)
+    if(is.na(totalPossible) | totalPossible == 0){
       for(i in grep("Warning",names(headerInfo))){
         warning(headerInfo[i])
       }
       emptyReturn <- data.frame(NA)
       attr(emptyReturn, "headerInfo") <- headerInfo
       return(emptyReturn)
-    }  
-    
-    if(zip){
-      doc <- unzip(temp)
     }
     
   } else {
@@ -119,13 +101,11 @@ importWQP <- function(obs_url, zip=FALSE, tz=""){
                                         `HUCEightDigitCode` = col_character()),
                        quote = "", delim = "\t"))
     
-  if(zip) unlink(doc)
-    
   if(!file.exists(obs_url)){
     actualNumReturned <- nrow(retval)
     
-    if(actualNumReturned != numToBeReturned & actualNumReturned != sitesToBeReturned){
-      warning(totalReturned, " sample results were expected, ", actualNumReturned, " were returned")
+    if(!(actualNumReturned %in% unlist(headerInfo[grep("-count",names(headerInfo))]))){
+      warning("Number of rows returned not matched in header")
     } 
   }
   

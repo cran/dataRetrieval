@@ -4,17 +4,18 @@
 \alias{importWaterML1}
 \title{Function to return data from the NWISWeb WaterML1.1 service}
 \usage{
-importWaterML1(obs_url, asDateTime = FALSE, tz = "")
+importWaterML1(obs_url, asDateTime = FALSE, tz = "UTC")
 }
 \arguments{
 \item{obs_url}{character or raw, containing the url for the retrieval or a file path to the data file, or raw XML.}
 
 \item{asDateTime}{logical, if \code{TRUE} returns date and time as POSIXct, if \code{FALSE}, Date}
 
-\item{tz}{character to set timezone attribute of . Default is an empty quote, which converts the 
-s to UTC (properly accounting for daylight savings times based on the data's provided tz_cd column).
-Possible values to provide are "America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
-"America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"}
+\item{tz}{character to set timezone attribute of datetime. Default converts the datetimes to UTC 
+(properly accounting for daylight savings times based on the data's provided tz_cd column).
+Recommended US values include "UTC","America/New_York","America/Chicago", "America/Denver","America/Los_Angeles",
+"America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla".
+For a complete list, see \url{https://en.wikipedia.org/wiki/List_of_tz_database_time_zones}}
 }
 \value{
 A data frame with the following columns:
@@ -49,12 +50,12 @@ This function accepts a url parameter that already contains the desired
 NWIS site, parameter code, statistic, startdate and enddate.
 }
 \examples{
-siteNumber <- "02177000"
+site_id <- "02177000"
 startDate <- "2012-09-01"
 endDate <- "2012-10-01"
 offering <- '00003'
 property <- '00060'
-obs_url <- constructNWISURL(siteNumber,property,startDate,endDate,'dv')
+obs_url <- constructNWISURL(site_id,property,startDate,endDate,'dv')
 \dontrun{
 data <- importWaterML1(obs_url, asDateTime=TRUE)
 
@@ -66,7 +67,7 @@ groundwaterExampleURL <- constructNWISURL(groundWaterSite, NA,
 groundWater <- importWaterML1(groundwaterExampleURL)
 groundWater2 <- importWaterML1(groundwaterExampleURL, asDateTime=TRUE)
 
-unitDataURL <- constructNWISURL(siteNumber,property,
+unitDataURL <- constructNWISURL(site_id,property,
          "2013-11-03","2013-11-03",'uv')
 unitData <- importWaterML1(unitDataURL,TRUE)
 
@@ -107,4 +108,3 @@ importFile <- importWaterML1(fullPath,TRUE)
 \seealso{
 \code{\link{renameNWISColumns}}
 }
-
