@@ -2,7 +2,7 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrologic and Water
         Quality Data
-Version: 2.7.0
+Version: 2.7.1
 Date: 2017-05-05
 Authors@R: c(person("Robert", "Hirsch", role = c("aut"),
     email = "rhirsch@usgs.gov"),
@@ -30,14 +30,14 @@ Copyright: This software is in the public domain because it contains
 Depends: R (>= 3.0)
 Imports: httr (>= 1.0.0), curl, reshape2, lubridate (>= 1.5.0), stats,
         utils, dplyr, xml2, readr (>= 1.0.0), jsonlite
-Suggests: xtable, knitr, testthat
-VignetteBuilder: knitr
+Suggests: htmlTable, knitr, testthat
 BuildVignettes: true
+VignetteBuilder: knitr
 BugReports: https://github.com/USGS-R/dataRetrieval/issues
 URL: https://pubs.usgs.gov/tm/04/a10/
 RoxygenNote: 6.0.1
 NeedsCompilation: no
-Packaged: 2017-05-15 19:56:05 UTC; ldecicco
+Packaged: 2017-05-19 20:08:14 UTC; ldecicco
 Author: Robert Hirsch [aut],
   Laura DeCicco [aut, cre],
   David Lorenz [aut],
@@ -47,4 +47,4 @@ Author: Robert Hirsch [aut],
   David Watkins [aut]
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2017-05-15 22:26:46 UTC
+Date/Publication: 2017-05-19 20:51:47 UTC
