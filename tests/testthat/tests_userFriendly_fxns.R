@@ -17,6 +17,13 @@ test_that("Unit value data returns correct types", {
   
   expect_true(min(spreadOver120$dateTime) < as.POSIXct(Sys.Date(), tz="UTC"))
   
+  recent_uv <- readNWISuv(siteNumber,parameterCd,
+                          as.Date(Sys.Date()-10),
+                          Sys.Date())
+  expect_equal(grep(x = attr(recent_uv, "url"), pattern = "https://waterservices.usgs.gov/nwis/iv/"),1)
+  expect_equal(grep(x = attr(spreadOver120, "url"),pattern = "https://nwis.waterservices.usgs.gov/nwis/iv/"),1)
+  expect_equal(attr(rawData, "url"),"https://nwis.waterservices.usgs.gov/nwis/iv/?site=05114000&format=waterml,1.1&ParameterCd=00060&startDT=2014-10-10&endDT=2014-10-10")
+  
   timeZoneChange <- readNWISuv(c('04024430','04024000'),parameterCd,
                                "2013-11-03","2013-11-03", 
                                tz="America/Chicago")
@@ -35,10 +42,12 @@ test_that("Unit value data returns correct types", {
   startDate <- "2012-07-10"
   endDate <- "2012-07-17"
   dd_2 <- readNWISuv(site, pCode, startDate, endDate)
-  expect_true(all(names(dd_2) %in% c("agency_cd","site_no",                   
-                                 "dateTime","X_.YSI.6136.UP._63680_00000",   
-                                 "X_YSI.6136.DOWN_63680_00000","X_.YSI.6136.UP._63680_00000_cd",
-                                 "X_YSI.6136.DOWN_63680_00000_cd","tz_cd")))
+  expect_true(any(names(dd_2) %in% c("agency_cd","site_no",                   
+                                 "dateTime",
+                                 "X_63680_00000","X_63680_00000_cd",
+                                 "X_.YSI.6136.UP._63680_00000",   
+                                 "X_.YSI.6136.UP._63680_00000_cd",
+                                 "tz_cd")))
   
   noData <- readNWISuv("01196500","00010", "2016-06-15", "2016-06-15")
   # expect_equal(noData$X_00010_00000[1], as.numeric(NA))
@@ -73,8 +82,7 @@ test_that("peak, rating curves, surface-water measurements", {
   expect_is(Meas07227500.ex$measurement_dt, 'Date')
   expect_is(Meas07227500.ex$measurement_dateTime, 'POSIXct')
   
-  emptyDF <- whatNWISdata("10312000",parameterCd = "50286")
-  expect_that(nrow(emptyDF) == 0, is_true())
+  expect_error(whatNWISdata(siteNumber = "10312000",parameterCd = "50286"))
   
   url <- "https://waterservices.usgs.gov/nwis/site/?format=rdb&seriesCatalogOutput=true&sites=05114000"
   x <- importRDB1(url)
