@@ -129,7 +129,6 @@ readNWISuv <- function (siteNumbers,parameterCd,startDate="",endDate="", tz="UTC
 #' }
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @importFrom dplyr left_join
 #' @examples
 #' site_ids <- c('01594440','040851325')
 #' \dontrun{
@@ -166,7 +165,7 @@ readNWISpeak <- function (siteNumbers,startDate="",endDate="", asDateTime=TRUE, 
 
     
     siteInfo <- readNWISsite(siteNumbers)
-    siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
+    siteInfo <- dplyr::left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
     
     attr(data, "siteInfo") <- siteInfo
     attr(data, "variableInfo") <- NULL
@@ -291,7 +290,6 @@ readNWISrating <- function (siteNumber,type="base",convertType = TRUE){
 #' }
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @importFrom dplyr left_join
 #' @examples
 #' site_ids <- c('01594440','040851325')
 #' \dontrun{
@@ -334,7 +332,7 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="UTC", expande
 
 
     siteInfo <- readNWISsite(siteNumbers)
-    siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
+    siteInfo <- dplyr::left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
     
     attr(data, "url") <- url
     attr(data, "comment") <- comment
@@ -396,7 +394,6 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="UTC", expande
 #' 
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @importFrom dplyr left_join
 #' @examples
 #' site_id <- "434400121275801"
 #' \dontrun{
@@ -416,13 +413,13 @@ readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE
     if(convertType){
       #check that the date includes a day, based on date string length
       if(any(nchar(as.character(data$lev_dt)) <= 7) | any(grepl("[0-9]*-[0-9]*-00",data$lev_dt))){
-        stop("Not all dates could be converted to Date object. Use convertType=FALSE to retrieve the raw text")
+        message("Not all dates were converted to Date object. Returning raw text for date columns.")
       } else {
         data$lev_dt <- as.Date(data$lev_dt)
       }
     }
     siteInfo <- readNWISsite(siteNumbers)
-    siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
+    siteInfo <- dplyr::left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
     
     attr(data, "siteInfo") <- siteInfo
   }
@@ -467,7 +464,6 @@ readNWISgwl <- function (siteNumbers,startDate="",endDate="", convertType = TRUE
 #' }
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @importFrom dplyr left_join
 #' @examples
 #' \dontrun{
 #' x1 <- readNWISstat(siteNumbers=c("02319394"),
@@ -503,7 +499,11 @@ readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "",
   data <- importRDB1(url,asDateTime=TRUE, convertType = convertType)
   
   siteInfo <- readNWISsite(siteNumbers)
-  siteInfo <- left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
+  
+  if(nrow(data) > 0){
+    siteInfo <- dplyr::left_join(unique(data[,c("agency_cd","site_no")]),siteInfo, by=c("agency_cd","site_no"))
+  }
+  
   attr(data, "siteInfo") <- siteInfo
   
   return (data)
@@ -558,14 +558,14 @@ readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "",
 readNWISuse <- function(stateCd, countyCd, years = "ALL", categories = "ALL", convertType = TRUE, transform = FALSE){
  
   countyID <- NULL
-  if(!is.null(countyCd) && toupper(countyCd) != "ALL" && countyCd != ""){
+  if(exists("countyCd") && toupper(countyCd) != "ALL" && countyCd != ""){
     for(c in countyCd){
       code <- countyCdLookup(state = stateCd, county = c, outputType = "id")
       countyID <- c(countyID,code)
     }
   }
   
-  if(!is.null(countyCd) && toupper(countyCd) == "ALL"){
+  if(exists("countyCd") && toupper(countyCd) == "ALL"){
     countyID <- toupper(countyID)
   } #case sensitive in URL
   
@@ -584,7 +584,7 @@ readNWISuse <- function(stateCd, countyCd, years = "ALL", categories = "ALL", co
     data <- cbind(Year=as.integer(substr(rownames(data),2,5)),data)
     rownames(data) <- NULL
     comment(data) <- cmmnt
-    if(nchar(stateCd) != 0 && !is.null(stateCd)){warning("transform = TRUE is only intended for national data")}
+    if(exists("stateCd") && all(nchar(stateCd) != 0)){warning("transform = TRUE is only intended for national data")}
   }
   return(data)
 }

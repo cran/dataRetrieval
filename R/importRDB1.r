@@ -44,8 +44,6 @@
 #' @export
 #' @import utils
 #' @import stats
-#' @importFrom lubridate parse_date_time
-#' @importFrom dplyr left_join
 #' @importFrom readr read_lines
 #' @importFrom readr read_delim
 #' @importFrom readr problems
@@ -112,9 +110,11 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
   meta.rows <- length(readr.meta)
   header.names <- strsplit(readr.total[meta.rows+1],"\t")[[1]]
   types.names <- strsplit(readr.total[meta.rows+2],"\t")[[1]]
+  data.rows <- total.rows - meta.rows - 2
   
   if(convertType){
-    readr.data <- suppressWarnings(read_delim(doc, skip = (meta.rows+2),delim="\t",col_names = FALSE))
+    readr.data <- read_delim_check_quote(file = doc, skip = (meta.rows+2),delim="\t",col_names = FALSE, total.rows = data.rows)
+    
   #defaults to time in seconds in readr 0.2.2.9??  
     if(length(grep("hms",lapply(readr.data, class))) > 0){
       colHMS <- grep("hms",lapply(readr.data, class))
@@ -122,13 +122,16 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
       colList <- as.list(rep("c",length(colHMS)))
       names(colList) <- paste0("X",colHMS)
 
-      readr.data <- suppressWarnings(read_delim(doc, skip = (meta.rows+2),delim="\t",
-                                                col_names = FALSE, 
-                                                col_types = colList))
+      readr.data <- read_delim_check_quote(file = doc, skip = (meta.rows+2),delim="\t",
+                                           col_names = FALSE, 
+                                           col_types = colList, 
+                                           total.rows = data.rows)
     }
 
   } else {
-    readr.data <- read_delim(doc, skip = (meta.rows+2),delim="\t",col_names = FALSE, col_types = cols(.default = "c"))
+    
+    readr.data <- read_delim_check_quote(file = doc,skip = (meta.rows+2),delim="\t",col_names = FALSE, col_types = cols(.default = "c"), total.rows = data.rows)
+
   }
   
   if(nrow(readr.data) > 0){
@@ -136,6 +139,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
     
     char.names <- c(header.names[grep("_cd",header.names)],
                     header.names[grep("_id",header.names)],
+                    header.names[grep("_tx",header.names)],
                     header.names[header.names == "site_no"])
     
     if(length(char.names) > 0){
@@ -146,8 +150,8 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
     } 
     
     if(nrow(problems(readr.data)) > 0 | length(char.names) > 0){
-      readr.data.char <- read_delim(doc, skip = (meta.rows+2),delim="\t",col_names = FALSE, 
-                                    col_types = cols(.default = "c"))
+      readr.data.char <- read_delim_check_quote(file = doc, skip = (meta.rows+2),delim="\t",col_names = FALSE, 
+                                                col_types = cols(.default = "c"), total.rows = data.rows)
       names(readr.data.char) <- header.names    
     }
     
@@ -161,7 +165,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
     
     if(length(badCols) > 0){
       readr.data <- fixErrors(readr.data, readr.data.char, "no trailing characters", as.numeric)
-      readr.data <- fixErrors(readr.data, readr.data.char, "date like", parse_date_time, c("%Y-%m-%d %H:%M:%S","%Y-%m-%d","%Y"))
+      readr.data <- fixErrors(readr.data, readr.data.char, "date like", lubridate::parse_date_time, c("%Y-%m-%d %H:%M:%S","%Y-%m-%d","%Y"))
     }
     
     if(length(grep("_va", names(readr.data))) > 0  && 
@@ -203,7 +207,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
         
         if(all(c(paste0(i,"_dt"),paste0(i,"_tm")) %in% header.names)){
           varname <- paste0(i,"_dateTime")
-          varval <- suppressWarnings(parse_date_time(paste(readr.data[,paste0(i,"_dt")],readr.data[,paste0(i,"_tm")]), c("%Y-%m-%d %H:%M:%S","%Y-%m-%d %H:%M"), tz = "UTC"))
+          varval <- suppressWarnings(lubridate::parse_date_time(paste(readr.data[,paste0(i,"_dt")],readr.data[,paste0(i,"_tm")]), c("%Y-%m-%d %H:%M:%S","%Y-%m-%d %H:%M"), tz = "UTC"))
         
           if(!all(is.na(varval))){
             readr.data[,varname] <- varval
@@ -221,7 +225,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
           }
         }
       }
-      
+
       if("tz_cd" %in% header.names){
         date.time.cols <- which(sapply(readr.data, function(x) inherits(x, "POSIXct")))
         if(length(date.time.cols) > 0){
@@ -230,17 +234,17 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
       }
       
       if("DATE" %in% header.names){
-        readr.data[,"DATE"] <- parse_date_time(readr.data[,"DATE"], "Ymd")
+        readr.data[,"DATE"] <- lubridate::parse_date_time(readr.data[,"DATE"], "Ymd")
       }
       
       if(all(c("DATE","TIME","TZCD") %in% header.names)){
         varname <- "DATETIME"
-        varval <- as.POSIXct(fast_strptime(paste(readr.data[,"DATE"],readr.data[,"TIME"]), "%Y-%m-%d %H%M%S", tz = "UTC"))
+        varval <- as.POSIXct(lubridate::fast_strptime(paste(readr.data[,"DATE"],readr.data[,"TIME"]), "%Y-%m-%d %H%M%S", tz = "UTC"))
         readr.data[,varname] <- varval
         readr.data <- convertTZ(readr.data,"TZCD",varname,tz, flip.cols=TRUE)
       }
       
-      if("sample_start_time_datum_cd" %in% header.names){
+      if(all(c("sample_start_time_datum_cd","sample_dateTime") %in% header.names)){
         readr.data <- convertTZ(readr.data,"sample_start_time_datum_cd","sample_dateTime",tz)
         
         if(!("sample_end_time_datum_cd" %in% header.names) & "sample_end_dateTime" %in% names(readr.data)){
@@ -285,7 +289,7 @@ convertTZ <- function(df, tz.name, date.time.cols, tz, flip.cols=TRUE){
                               code=c("EST","EDT","CST","CDT","MST","MDT","PST","PDT","AKST","AKDT","HAST","HST","", NA),
                               stringsAsFactors = FALSE)
   
-  offset <- left_join(df[,tz.name,drop=FALSE],offsetLibrary, by=setNames("code",tz.name))
+  offset <- dplyr::left_join(df[,tz.name,drop=FALSE],offsetLibrary, by=setNames("code",tz.name))
   offset <- offset$offset
   df[,paste0(tz.name,"_reported")] <- df[,tz.name,drop=FALSE]
   
@@ -336,5 +340,16 @@ fixErrors <- function(readr.data, readr.data.char, message.text, FUN, ...){
     }
   }
   return(readr.data)
+}
+
+read_delim_check_quote <- function(..., total.rows){
+  rdb.data <- suppressWarnings(read_delim(...))
+  
+  if(nrow(rdb.data) < total.rows){
+    rdb.data <- suppressWarnings(read_delim(..., quote = ""))
+  }
+  
+  return(rdb.data)
+  
 }
 

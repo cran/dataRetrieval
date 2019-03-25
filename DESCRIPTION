@@ -2,12 +2,14 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrologic and Water
         Quality Data
-Version: 2.7.3
-Date: 2017-09-27
-Authors@R: c(person("Robert", "Hirsch", role = c("aut"),
-    email = "rhirsch@usgs.gov"),
+Version: 2.7.4
+Authors@R: c(
     person("Laura", "DeCicco", role = c("aut","cre"),
-    email = "ldecicco@usgs.gov"),
+    email = "ldecicco@usgs.gov",
+    comment=c(ORCID="0000-0002-3915-9487")),
+    person("Robert", "Hirsch", role = c("aut"),
+    email = "rhirsch@usgs.gov",
+    comment=c(ORCID="0000-0002-4534-075X")),
     person("David","Lorenz", role=c("aut")),
     person("Jordan", "Read", role = c("ctb"),
     email = "jread@usgs.gov"),
@@ -16,7 +18,8 @@ Authors@R: c(person("Robert", "Hirsch", role = c("aut"),
     person("Lindsay","Carr", role=c("ctb"),
     email = "lcarr@usgs.gov"),
     person("David","Watkins", role=c("aut"),
-    email = "wwatkins@usgs.gov"))
+    email = "wwatkins@usgs.gov",
+    comment=c(ORCID="0000-0002-7544-0700")))
 Description: Collection of functions to help retrieve U.S. Geological Survey
     (USGS) and U.S. Environmental Protection Agency (EPA) water quality and
     hydrology data from web services. USGS web services are discovered from 
@@ -35,16 +38,16 @@ BuildVignettes: true
 VignetteBuilder: knitr
 BugReports: https://github.com/USGS-R/dataRetrieval/issues
 URL: https://pubs.usgs.gov/tm/04/a10/
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2017-09-28 14:59:21 UTC; ldecicco
-Author: Robert Hirsch [aut],
-  Laura DeCicco [aut, cre],
+Packaged: 2019-03-25 15:08:30 UTC; ldecicco
+Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
+  Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>),
   David Lorenz [aut],
   Jordan Read [ctb],
   Jordan Walker [ctb],
   Lindsay Carr [ctb],
-  David Watkins [aut]
+  David Watkins [aut] (<https://orcid.org/0000-0002-7544-0700>)
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2017-09-28 16:30:59 UTC
+Date/Publication: 2019-03-25 23:08:49 UTC

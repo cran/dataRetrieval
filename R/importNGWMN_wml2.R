@@ -18,7 +18,6 @@
 #' @importFrom xml2 xml_text
 #' @importFrom xml2 xml_attr
 #' @importFrom xml2 xml_find_first
-#' @importFrom lubridate parse_date_time
 #' @examples
 #' \dontrun{
 #' obs_url <- paste("http://cida.usgs.gov/ngwmn_cache/sos?request=GetObservation",
@@ -77,7 +76,7 @@ importNGWMN <- function(input, asDateTime=FALSE, tz="UTC"){
         mergedDF <- df
       } else {
         similarNames <- intersect(colnames(mergedDF), colnames(df))
-        mergedDF <- full_join(mergedDF, df, by=similarNames)
+        mergedDF <- dplyr::full_join(mergedDF, df, by=similarNames)
       }
     }
     
@@ -137,7 +136,6 @@ importNGWMN <- function(input, asDateTime=FALSE, tz="UTC"){
 #' "America/Anchorage","America/Honolulu","America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla"
 #' @importFrom xml2 xml_attr xml_find_all xml_text 
 #' @importFrom dplyr mutate
-#' @importFrom lubridate parse_date_time
 #' @export
 #' @examples 
 #' baseURL <- "https://waterservices.usgs.gov/nwis/dv/?format=waterml,2.0"
@@ -161,10 +159,13 @@ importWaterML2 <- function(input, asDateTime=FALSE, tz="UTC") {
                       time = character(0), dateTime = character(0), value = numeric(0),
                       uom = character(0), comment = character(0), stringsAsFactors = FALSE))
   }
-  rawTime <- xml_text(xml_find_all(TVP,".//wml2:time"))
+  rawTime <- xml_text(xml_find_all(returnedDoc, "./wml2:point/wml2:MeasurementTVP/wml2:time"))
   
-  valueNodes <- xml_find_all(TVP,".//wml2:value")
-  values <- as.numeric(xml_text(valueNodes))
+  valueNodes <- xml_find_all(returnedDoc,"./wml2:point/wml2:MeasurementTVP/wml2:value")
+  charValues <- xml_text(valueNodes)
+  nilValues <- as.logical(xml_attr(valueNodes, "nil"))
+  charValues[nilValues] <- NA
+  values <- as.numeric(charValues)
   nVals <- length(values)
   
   #df of date, time, dateTime
@@ -184,7 +185,7 @@ importWaterML2 <- function(input, asDateTime=FALSE, tz="UTC") {
     timeDF$dateTime[logicVec] <- rawTime[logicVec]
   }
   if(asDateTime){
-    timeDF$dateTime <- parse_date_time(timeDF$dateTime, c("%Y","%Y-%m-%d","%Y-%m-%dT%H:%M","%Y-%m-%dT%H:%M:%S",
+    timeDF$dateTime <- lubridate::parse_date_time(timeDF$dateTime, c("%Y","%Y-%m-%d","%Y-%m-%dT%H:%M","%Y-%m-%dT%H:%M:%S",
                                                           "%Y-%m-%dT%H:%M:%OS","%Y-%m-%dT%H:%M:%OS%z"), exact = TRUE)
     #^^setting tz in as.POSIXct just sets the attribute, does not convert the time!
     attr(timeDF$dateTime, 'tzone') <- tz
@@ -192,9 +193,13 @@ importWaterML2 <- function(input, asDateTime=FALSE, tz="UTC") {
   
   uom <- xml_attr(valueNodes, "uom", default = NA)
   
-  source <- xml_attr(xml_find_all(TVP, ".//wml2:source"), "title")
-  comment <- xml_text(xml_find_all(TVP, ".//wml2:comment"))
-  tvpQuals <- xml_text(xml_find_all(TVP, ".//swe:description"))
+  source <- xml_attr(xml_find_all(returnedDoc, 
+                                  "./wml2:point/wml2:MeasurementTVP/wml2:metadata/wml2:source"), 
+                     "title")
+  comment <- xml_text(xml_find_all(returnedDoc, 
+                  "./wml2:point/wml2:MeasurementTVP/wml2:metadata/wml2:comment"))
+  tvpQuals <- xml_text(xml_find_all(returnedDoc, 
+                        "./wml2:point/wml2:MeasurementTVP/wml2:metadata/swe:description"))
   defaultMeta <- xml_find_all(returnedDoc, ".//wml2:DefaultTVPMeasurementMetadata")
   defaultQuals <- xml_text(xml_find_all(defaultMeta, ".//swe:description"))
   defaultUOM <- xml_attr(xml_find_all(defaultMeta, ".//wml2:uom"), "title", default = NA)
@@ -203,7 +208,7 @@ importWaterML2 <- function(input, asDateTime=FALSE, tz="UTC") {
                   uom = uom, comment = comment)
   df_use <- df_vars[sapply(df_vars, function(x){length(x) > 0 && !all(is.na(x))})]
   df <- data.frame(df_use, stringsAsFactors = FALSE)
-  
+  if(!"value" %in% names(df)) {df$value <- NA_real_}
   #from the default metadata section
   #append to existing attributes if they aren't empty
    mdAttribs <- list(defaultQualifier=defaultQuals, defaultUOM=defaultUOM, 
