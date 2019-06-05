@@ -12,33 +12,34 @@
 #' "America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
 #' for more information on time zones.
 #' @import utils
-#' @importFrom dplyr mutate
 #' @export
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' #one site
 #' site <- "USGS.430427089284901"
-#' oneSite <- readNGWMNdata(siteNumbers = site, service = "observation")
+#' # oneSite <- readNGWMNdata(siteNumbers = site, service = "observation")
 #' 
 #' #multiple sites
 #' sites <- c("USGS.272838082142201","USGS.404159100494601", "USGS.401216080362703")
-#' multiSiteData <- readNGWMNdata(siteNumbers = sites, service = "observation")
-#' attributes(multiSiteData)
+#' # Very slow:
+#' # multiSiteData <- readNGWMNdata(siteNumbers = sites, service = "observation")
+#' # attributes(multiSiteData)
 #' 
 #' #non-USGS site
 #' #accepts colon or period between agency and ID
 #' site <- "MBMG:702934"
-#' data <- readNGWMNdata(siteNumbers = site, service = "featureOfInterest")
+#' # data <- readNGWMNdata(siteNumbers = site, service = "featureOfInterest")
 #' 
 #' #site with no data returns empty data frame
 #' noDataSite <- "UTGS.401544112060301"
-#' noDataSite <- readNGWMNdata(siteNumbers = noDataSite, service = "observation")
+#' # noDataSite <- readNGWMNdata(siteNumbers = noDataSite, service = "observation")
 #' 
 #' #bounding box
-#' bboxSites <- readNGWMNdata(service = "featureOfInterest", bbox = c(30, -102, 31, 99))
+#' #bboxSites <- readNGWMNdata(service = "featureOfInterest", bbox = c(30, -102, 31, 99))
 #' #retrieve  sites.  Set asDateTime to false since one site has an invalid date
-#' bboxData <- readNGWMNdata(service = "observation", siteNumbers = bboxSites$site[1:3], 
-#' asDateTime = FALSE)
+#' # Very slow:
+#' #bboxData <- readNGWMNdata(service = "observation", siteNumbers = bboxSites$site[1:3], 
+#' #asDateTime = FALSE)
 #' }
 #' 
 readNGWMNdata <- function(service, ..., asDateTime = TRUE, tz = "UTC"){
@@ -61,8 +62,8 @@ readNGWMNdata <- function(service, ..., asDateTime = TRUE, tz = "UTC"){
       obsFID <- retrieveObservation(featureID = f, asDateTime, attrs, tz = tz)
       obsFIDattr <- saveAttrs(attrs, obsFID)
       obsFID <- removeAttrs(attrs, obsFID)
-      allObs <- dplyr::bind_rows(allObs, obsFID)
-      allAttrs <- dplyr::bind_rows(allAttrs, obsFIDattr)
+      allObs <- r_bind_dr(allObs, obsFID)
+      allAttrs <- r_bind_dr(allAttrs, obsFIDattr)
       
     }
     
@@ -114,22 +115,22 @@ readNGWMNdata <- function(service, ..., asDateTime = TRUE, tz = "UTC"){
 #' @export
 #' 
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' #one site
 #' site <- "USGS.430427089284901"
-#' oneSite <- readNGWMNlevels(siteNumbers = site)
+#' #oneSite <- readNGWMNlevels(siteNumbers = site)
 #' 
 #' #multiple sites
 #' sites <- c("USGS:272838082142201","USGS:404159100494601", "USGS:401216080362703")
-#' multiSiteData <- readNGWMNlevels(sites)
+#' #multiSiteData <- readNGWMNlevels(sites)
 #' 
 #' #non-USGS site
-#' site <- "MBMG.892195"
-#' data <- readNGWMNlevels(siteNumbers = site, asDateTime = FALSE)
+#' site <- "MBMG.103306"
+#' #data <- readNGWMNlevels(siteNumbers = site, asDateTime = FALSE)
 #' 
 #' #site with no data returns empty data frame
 #' noDataSite <- "UTGS.401544112060301"
-#' noDataSite <- readNGWMNlevels(siteNumbers = noDataSite)
+#' #noDataSite <- readNGWMNlevels(siteNumbers = noDataSite)
 #' }
 readNGWMNlevels <- function(siteNumbers, asDateTime = TRUE, tz = "UTC"){
   data <- readNGWMNdata(siteNumbers = siteNumbers, service = "observation",
@@ -151,17 +152,13 @@ readNGWMNlevels <- function(siteNumbers, asDateTime = TRUE, tz = "UTC"){
 #' dec_lat_va, dec_lon_va \tab numeric \tab Site latitude and longitude \cr
 #' }
 #' @examples 
-#' \dontrun{
+#' \donttest{
 #' #one site
 #' site <- "USGS.430427089284901"
 #' oneSite <- readNGWMNsites(siteNumbers = site)
 #' 
-#' #multiple sites
-#' sites <- c("USGS:272838082142201","USGS:404159100494601", "USGS:401216080362703")
-#' multiSiteInfo <- readNGWMNsites(sites)
-#' 
 #' #non-USGS site
-#' site <- "MBMG.892195"
+#' site <- "MBMG.103306"
 #' siteInfo <- readNGWMNsites(siteNumbers = site)
 #' 
 #' }
@@ -187,7 +184,7 @@ retrieveObservation <- function(featureID, asDateTime, attrs, tz){
   if(nrow(returnData) > 0){
     #tack on site number
     siteNum <- rep(sub('.*\\.', '', featureID), nrow(returnData))
-    returnData <- mutate(returnData, site = siteNum)
+    returnData$site <- siteNum
     numCol <- ncol(returnData)
     returnData <- returnData[,c(numCol,1:(numCol - 1))] #move siteNum to the left
   }

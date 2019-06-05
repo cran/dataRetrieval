@@ -4,8 +4,7 @@
 \alias{constructWQPURL}
 \title{Construct WQP url for data retrieval}
 \usage{
-constructWQPURL(siteNumbers, parameterCd, startDate, endDate,
-  zip = FALSE)
+constructWQPURL(siteNumbers, parameterCd, startDate, endDate, zip = TRUE)
 }
 \arguments{
 \item{siteNumbers}{string or vector of strings USGS site number.  This is usually an 8 digit number}
@@ -18,7 +17,7 @@ retrieval for the earliest possible record.}
 \item{endDate}{character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 retrieval for the latest possible record.}
 
-\item{zip}{logical to request data via downloading zip file. Default set to FALSE.}
+\item{zip}{logical to request data via downloading zip file. Default set to TRUE.}
 }
 \value{
 url string
@@ -34,6 +33,16 @@ pCode <- c("00060","00010")
 url_wqp <- constructWQPURL(paste("USGS",site_id,sep="-"),
            c('01075','00029','00453'),
            startDate,endDate)
+url_wqp
+charNames <- c("Temperature",
+               "Temperature, sample",
+               "Temperature, water",
+               "Temperature, water, deg F")
+obs_url_orig <- constructWQPURL(siteNumbers = c("IIDFG-41WSSPAHS",
+                                                "USGS-02352560"), 
+                                parameterCd = charNames,
+                                startDate,"")
+obs_url_orig
 }
 \keyword{WQP}
 \keyword{data}

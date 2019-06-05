@@ -93,7 +93,7 @@
 #' }
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' nameToUse <- "pH"
 #' pHData <- readWQPdata(siteid="USGS-04024315",characteristicName=nameToUse)
 #' pHData_summary <- readWQPdata(bBox=c(-90.10,42.67,-88.64,43.35),
@@ -153,17 +153,22 @@ readWQPdata <- function(..., querySummary=FALSE, tz="UTC"){
   baseURL <- drURL("wqpData")
   urlCall <- paste0(baseURL,
                    urlCall,
-                   "&sorted=no&mimeType=tsv")
+                   "&mimeType=tsv")
 
   if(querySummary){
     retquery <- getQuerySummary(urlCall)
     return(retquery)
   } else {
   
-    retval <- importWQP(urlCall,zip=values["zip"] == "yes", tz=tz)
+    retval <- importWQP(urlCall, zip= values["zip"] == "yes", tz=tz)
     
     if(!all(is.na(retval))){
-      siteInfo <- whatWQPsites(...)
+      
+      # When POST is working:
+      site_list <- unique(retval$MonitoringLocationIdentifier)
+      siteInfo <- whatWQPsites(siteid=site_list, zip="yes")
+      
+      # siteInfo <- whatWQPsites(...)
       
       siteInfoCommon <- data.frame(station_nm=siteInfo$MonitoringLocationName,
                                    agency_cd=siteInfo$OrganizationIdentifier,

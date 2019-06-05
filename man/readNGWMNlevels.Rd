@@ -25,21 +25,21 @@ for more information on time zones.}
 Retrieve groundwater levels from the National Ground Water Monitoring Network \url{http://cida.usgs.gov/ngwmn/}.
 }
 \examples{
-\dontrun{
+\donttest{
 #one site
 site <- "USGS.430427089284901"
-oneSite <- readNGWMNlevels(siteNumbers = site)
+#oneSite <- readNGWMNlevels(siteNumbers = site)
 
 #multiple sites
 sites <- c("USGS:272838082142201","USGS:404159100494601", "USGS:401216080362703")
-multiSiteData <- readNGWMNlevels(sites)
+#multiSiteData <- readNGWMNlevels(sites)
 
 #non-USGS site
-site <- "MBMG.892195"
-data <- readNGWMNlevels(siteNumbers = site, asDateTime = FALSE)
+site <- "MBMG.103306"
+#data <- readNGWMNlevels(siteNumbers = site, asDateTime = FALSE)
 
 #site with no data returns empty data frame
 noDataSite <- "UTGS.401544112060301"
-noDataSite <- readNGWMNlevels(siteNumbers = noDataSite)
+#noDataSite <- readNGWMNlevels(siteNumbers = noDataSite)
 }
 }

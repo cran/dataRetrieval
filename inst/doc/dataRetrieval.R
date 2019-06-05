@@ -10,14 +10,6 @@ knitr::opts_chunk$set(echo = TRUE,
                       fig.height = 7,
                       fig.width = 7)
 
-opts_chunk$set(highlight=TRUE, 
-               tidy=TRUE, 
-               keep.space=TRUE,
-               keep.blank.space=FALSE,
-               keep.comment=TRUE)
-knit_hooks$set(inline = function(x) {
-   if (is.numeric(x)) round(x, 3)})
-
 ## ----workflow, echo=TRUE,eval=FALSE-----------------------
 #  library(dataRetrieval)
 #  # Choptank River near Greensboro, MD

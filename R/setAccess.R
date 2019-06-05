@@ -15,7 +15,7 @@
 #'
 #'@examples
 #'
-#'\dontrun{
+#'\donttest{
 #'setAccess('internal')
 #'
 #'setAccess('public')
@@ -24,7 +24,8 @@
 #'
 #' @export
 setAccess = function(access="public"){
-access = match.arg(access, c('public','internal','cooperator','USGS'))
+  
+  access = match.arg(access, c('public','internal','cooperator','USGS'))
   
   if(access=="internal"){
     pkg.env$access = '3'
@@ -58,10 +59,9 @@ access = match.arg(access, c('public','internal','cooperator','USGS'))
   pkg.env$wqpStation = "https://www.waterqualitydata.us/Station/search"
   pkg.env$wqpActivity = "https://www.waterqualitydata.us/Activity/search"
   pkg.env$wqpMetrics = "https://www.waterqualitydata.us/ActivityMetric/search"
-  
+  pkg.env$wqpSiteSummary = "https://www.waterqualitydata.us/data/summary/monitoringLocation/search"
   pkg.env$NGWMN = "https://cida.usgs.gov/ngwmn_cache/sos"
-  
-  options(Access.dataRetrieval = access)
+
 }
 
 drURL <- function(base.name, ..., arg.list=NULL){

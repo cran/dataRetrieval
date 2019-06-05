@@ -44,9 +44,6 @@
 #' @export
 #' @import utils
 #' @import stats
-#' @importFrom readr read_lines
-#' @importFrom readr read_delim
-#' @importFrom readr problems
 #' @examples
 #' site_id <- "02177000"
 #' startDate <- "2012-09-01"
@@ -56,7 +53,7 @@
 #' 
 #' obs_url <- constructNWISURL(site_id,property,
 #'          startDate,endDate,"dv",format="tsv")
-#' \dontrun{
+#' \donttest{
 #' data <- importRDB1(obs_url)
 #' 
 #' urlMultiPcodes <- constructNWISURL("04085427",c("00060","00010"),
@@ -104,7 +101,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
     }
   }
   
-  readr.total <- read_lines(doc)
+  readr.total <- readr::read_lines(doc)
   total.rows <- length(readr.total)
   readr.meta <- readr.total[grep("^#", readr.total)]
   meta.rows <- length(readr.meta)
@@ -130,7 +127,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
 
   } else {
     
-    readr.data <- read_delim_check_quote(file = doc,skip = (meta.rows+2),delim="\t",col_names = FALSE, col_types = cols(.default = "c"), total.rows = data.rows)
+    readr.data <- read_delim_check_quote(file = doc,skip = (meta.rows+2),delim="\t",col_names = FALSE, col_types = readr::cols(.default = "c"), total.rows = data.rows)
 
   }
   
@@ -140,6 +137,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
     char.names <- c(header.names[grep("_cd",header.names)],
                     header.names[grep("_id",header.names)],
                     header.names[grep("_tx",header.names)],
+                    header.names[grep("_tm",header.names)],
                     header.names[header.names == "site_no"])
     
     if(length(char.names) > 0){
@@ -149,9 +147,9 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
       char.names <- NULL
     } 
     
-    if(nrow(problems(readr.data)) > 0 | length(char.names) > 0){
+    if(nrow(readr::problems(readr.data)) > 0 | length(char.names) > 0){
       readr.data.char <- read_delim_check_quote(file = doc, skip = (meta.rows+2),delim="\t",col_names = FALSE, 
-                                                col_types = cols(.default = "c"), total.rows = data.rows)
+                                                col_types = readr::cols(.default = "c"), total.rows = data.rows)
       names(readr.data.char) <- header.names    
     }
     
@@ -195,7 +193,7 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
     }
     
     comment(readr.data) <- readr.meta
-    problems.orig <- problems(readr.data)
+    problems.orig <- readr::problems(readr.data)
     
     
     if (asDateTime & convertType){
@@ -285,11 +283,13 @@ importRDB1 <- function(obs_url, asDateTime=TRUE, convertType = TRUE, tz="UTC"){
 
 convertTZ <- function(df, tz.name, date.time.cols, tz, flip.cols=TRUE){
   
-  offsetLibrary <- data.frame(offset=c(5, 4, 6, 5, 7, 6, 8, 7, 9, 8, 10, 10, 0, 0),
-                              code=c("EST","EDT","CST","CDT","MST","MDT","PST","PDT","AKST","AKDT","HAST","HST","", NA),
+  offsetLibrary <- data.frame(offset=c(5, 4, 6, 5, 7, 6, 8, 7, 9, 8, 10, 10, 0, 0, 0, 0),
+                              code=c("EST","EDT","CST","CDT","MST","MDT","PST","PDT","AKST","AKDT","HAST","HST","UTC","", NA, "GMT"),
                               stringsAsFactors = FALSE)
   
-  offset <- dplyr::left_join(df[,tz.name,drop=FALSE],offsetLibrary, by=setNames("code",tz.name))
+  offset <- merge(x = df[,tz.name,drop=FALSE], 
+                  y = offsetLibrary, by.x=tz.name, by.y = "code", 
+                  all.x = TRUE)
   offset <- offset$offset
   df[,paste0(tz.name,"_reported")] <- df[,tz.name,drop=FALSE]
   
@@ -343,10 +343,10 @@ fixErrors <- function(readr.data, readr.data.char, message.text, FUN, ...){
 }
 
 read_delim_check_quote <- function(..., total.rows){
-  rdb.data <- suppressWarnings(read_delim(...))
+  rdb.data <- suppressWarnings(readr::read_delim(...))
   
   if(nrow(rdb.data) < total.rows){
-    rdb.data <- suppressWarnings(read_delim(..., quote = ""))
+    rdb.data <- suppressWarnings(readr::read_delim(..., quote = ""))
   }
   
   return(rdb.data)

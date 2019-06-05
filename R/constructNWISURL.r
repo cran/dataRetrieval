@@ -200,16 +200,30 @@ constructNWISURL <- function(siteNumbers,parameterCd="00060",startDate="",endDat
           format <- match.arg(format, c("xml","tsv","wml1","wml2","rdb"))
           
           formatURL <- switch(format,
-            xml = {if ("gwlevels" == service) {
+            xml = {
+              if ("gwlevels" == service) {
                 "waterml"
               } else {
                 "waterml,1.1"
               }
             },
-            rdb = "rdb,1.0",
-            tsv = "rdb,1.0",
+            rdb = {
+              if("gwlevels" == service){
+                  "rdb"
+                } else {
+                  "rdb,1.0"
+                }
+              },
+            tsv = {
+              if("gwlevels" == service){
+                "rdb"
+              } else {
+                "rdb,1.0"
+              }
+            },
             wml2 = "waterml,2.0",
-            wml1 = {if ("gwlevels" == service) {
+            wml1 = {
+              if ("gwlevels" == service) {
                 "waterml"
               } else {
                 "waterml,1.1"
@@ -262,7 +276,7 @@ constructNWISURL <- function(siteNumbers,parameterCd="00060",startDate="",endDat
 #' retrieval for the earliest possible record.
 #' @param endDate character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 #' retrieval for the latest possible record.
-#' @param zip logical to request data via downloading zip file. Default set to FALSE.
+#' @param zip logical to request data via downloading zip file. Default set to TRUE.
 #' @keywords data import WQP web service
 #' @return url string
 #' @export
@@ -274,7 +288,17 @@ constructNWISURL <- function(siteNumbers,parameterCd="00060",startDate="",endDat
 #' url_wqp <- constructWQPURL(paste("USGS",site_id,sep="-"),
 #'            c('01075','00029','00453'),
 #'            startDate,endDate)
-constructWQPURL <- function(siteNumbers,parameterCd,startDate,endDate,zip=FALSE){
+#' url_wqp
+#' charNames <- c("Temperature",
+#'                "Temperature, sample",
+#'                "Temperature, water",
+#'                "Temperature, water, deg F")
+#' obs_url_orig <- constructWQPURL(siteNumbers = c("IIDFG-41WSSPAHS",
+#'                                                 "USGS-02352560"), 
+#'                                 parameterCd = charNames,
+#'                                 startDate,"")
+#' obs_url_orig
+constructWQPURL <- function(siteNumbers,parameterCd,startDate,endDate,zip=TRUE){
   
   multipleSites <- length(siteNumbers) > 1
   multiplePcodes <- length(parameterCd)>1
@@ -284,7 +308,7 @@ constructWQPURL <- function(siteNumbers,parameterCd,startDate,endDate,zip=FALSE)
     suppressWarnings(pCodeLogic <- all(!is.na(as.numeric(parameterCd))))
   } else {
     pCodeLogic <- FALSE
-    parameterCd <- URLencode(parameterCd, reserved = TRUE)
+    parameterCd <- sapply(parameterCd, URLencode, USE.NAMES = FALSE, reserved = TRUE)
   }
   
   if(multiplePcodes){
@@ -306,10 +330,12 @@ constructWQPURL <- function(siteNumbers,parameterCd,startDate,endDate,zip=FALSE)
     url <- paste0(url, "&startDateHi=",endDate)
   }
   
-  url <- paste0(url,"&sorted=no&mimeType=tsv")
+  url <- paste0(url,"&mimeType=tsv")
   
   if(zip){
     url <- paste0(url,"&zip=yes")
+  } else {
+    url <- paste0(url,"&zip=no")
   }
   
   return(url)

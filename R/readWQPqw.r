@@ -105,7 +105,7 @@
 #' @seealso \code{\link{readWQPdata}}, \code{\link{whatWQPsites}}, 
 #' \code{\link{readNWISqw}}, and \code{\link{importWQP}}
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' rawPcode <- readWQPqw('USGS-01594440','01075', '', '')
 #' rawCharacteristicName <- readWQPqw('WIDNR_WQX-10032762','Specific conductance', '', '')
 #' rawPHsites <- readWQPqw(c('USGS-05406450', 'USGS-05427949','WIDNR_WQX-133040'), 'pH','','')
@@ -116,13 +116,13 @@
 readWQPqw <- function(siteNumbers,parameterCd,startDate="",endDate="",tz="UTC", querySummary=FALSE){
 
   url <- constructWQPURL(siteNumbers,parameterCd,startDate,endDate)
-  
+
   if(querySummary){
     retquery <- getQuerySummary(url)
     return(retquery)
   } else {
     
-    retval <- importWQP(url, tz = tz)
+    retval <- importWQP(url, zip = TRUE, tz = tz)
     
     pcodeCheck <- all(nchar(parameterCd) == 5) & all(!is.na(suppressWarnings(as.numeric(parameterCd))))
     

@@ -30,7 +30,7 @@
 #' @importFrom xml2 xml_attr
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' siteListPhos <- whatNWISsites(stateCd="OH",parameterCd="00665")
 #' oneSite <- whatNWISsites(sites="05114000")
 #' }
@@ -69,8 +69,8 @@ whatNWISsites <- function(...){
     
     if(is.null(retVal)){
       retVal <- df
-    }else{
-      retVal <- dplyr::bind_rows(retVal, df)
+    } else {
+      retVal <- r_bind_dr(retVal, df)
     }
   }
   

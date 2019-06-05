@@ -56,7 +56,7 @@
 #' @seealso \code{\link{renameNWISColumns}},  \code{\link{importWaterML1}}, \code{\link{importRDB1}}
 #' @export
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Examples not run for time considerations
 #' dataTemp <- readNWISdata(stateCd="OH",parameterCd="00010", service="dv")
 #' instFlow <- readNWISdata(sites="05114000", service="iv", 
@@ -374,7 +374,7 @@ readNWISdots <- function(...){
   names(values)[names(values) == "countycode"] <- "countyCd"
   if("countyCd" %in% names(values)){
     if("stateCd" %in% names(values)){
-      values["countyCd"] <- paste0(stateCdLookup(values["stateCd"], "id"), 
+      values["countyCd"] <- paste0(zeroPad(stateCdLookup(values["stateCd"], "id"), padTo = 2), 
                                    countyCdLookup(values["stateCd"], values["countyCd"], "id"))
       values <- values[names(values) != "stateCd"]      
     }

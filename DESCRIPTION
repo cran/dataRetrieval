@@ -2,7 +2,7 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrologic and Water
         Quality Data
-Version: 2.7.4
+Version: 2.7.5
 Authors@R: c(
     person("Laura", "DeCicco", role = c("aut","cre"),
     email = "ldecicco@usgs.gov",
@@ -31,8 +31,8 @@ Copyright: This software is in the public domain because it contains
         Geological Survey, an agency of the United States Department of
         Interior.
 Depends: R (>= 3.0)
-Imports: httr (>= 1.0.0), curl, reshape2, lubridate (>= 1.5.0), stats,
-        utils, dplyr, xml2, readr (>= 1.0.0), jsonlite
+Imports: httr (>= 1.0.0), curl, lubridate (>= 1.5.0), stats, utils,
+        xml2, readr (>= 1.0.0), jsonlite
 Suggests: htmlTable, knitr, testthat
 BuildVignettes: true
 VignetteBuilder: knitr
@@ -40,7 +40,7 @@ BugReports: https://github.com/USGS-R/dataRetrieval/issues
 URL: https://pubs.usgs.gov/tm/04/a10/
 RoxygenNote: 6.1.1
 NeedsCompilation: no
-Packaged: 2019-03-25 15:08:30 UTC; ldecicco
+Packaged: 2019-06-05 21:09:29 UTC; ldecicco
 Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
   Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>),
   David Lorenz [aut],
@@ -50,4 +50,4 @@ Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
   David Watkins [aut] (<https://orcid.org/0000-0002-7544-0700>)
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2019-03-25 23:08:49 UTC
+Date/Publication: 2019-06-05 21:40:04 UTC
