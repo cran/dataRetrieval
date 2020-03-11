@@ -85,10 +85,22 @@ importWQP <- function(obs_url, zip=TRUE, tz="UTC", csv=FALSE){
                        col_types = readr::cols(`ActivityStartTime/Time` = readr::col_character(),
                                         `ActivityEndTime/Time` = readr::col_character(),
                                         USGSPCode = readr::col_character(),
-                                        ResultCommentText=readr::col_character(),
+                                        ResultCommentText = readr::col_character(),
+                                        ResultSampleFractionText = readr::col_character(),
+                                        ActivityDepthAltitudeReferencePointText = readr::col_character(),
+                                        ActivityConductingOrganizationText = readr::col_character(),
+                                        ActivityCommentText = readr::col_character(),
+                                        ResultWeightBasisText = readr::col_character(),
+                                        ResultTimeBasisText = readr::col_character(),
+                                        ResultParticleSizeBasis  = readr::col_character(),
+                                        ResultDepthAltitudeReferencePointText = readr::col_character(),
+                                        ResultLaboratoryCommentText = readr::col_character(),
+                                        ResultTemperatureBasisText = readr::col_character(),
+                                        ResultDetectionConditionText = readr::col_character(),
+                                        ResultParticleSizeBasisText = readr::col_character(),
                                         `ActivityDepthHeightMeasure/MeasureValue` = readr::col_number(),
                                         `DetectionQuantitationLimitMeasure/MeasureValue` = readr::col_number(),
-                                        ResultMeasureValue = readr::col_number(),
+                                        # ResultMeasureValue = readr::col_number(),
                                         `WellDepthMeasure/MeasureValue` = readr::col_number(),
                                         `WellHoleDepthMeasure/MeasureValue` = readr::col_number(),
                                         `HUCEightDigitCode` = readr::col_character(), 
@@ -112,8 +124,8 @@ importWQP <- function(obs_url, zip=TRUE, tz="UTC", csv=FALSE){
       retval[,tzCols] <- sapply(retval[,tzCols], as.character)
     }
     
-    offsetLibrary <- data.frame(offset=c(5, 4, 6, 5, 7, 6, 8, 7, 9, 8, 10, 10, 0, 0, NA, 0, 0),
-                                code=c("EST","EDT","CST","CDT","MST","MDT","PST","PDT","AKST","AKDT","HAST","HST","", NA, NA, "UTC","GMT"),
+    offsetLibrary <- data.frame(offset=c(5, 4, 6, 5, 7, 6, 8, 7, 9, 8, 10, 10, 0, NA, 0, 0),
+                                code=c("EST","EDT","CST","CDT","MST","MDT","PST","PDT","AKST","AKDT","HAST","HST","", NA, "UTC","GMT"),
                                 stringsAsFactors = FALSE)
     original_order <- names(retval)
     retval <- merge(x = retval, 
@@ -123,7 +135,7 @@ importWQP <- function(obs_url, zip=TRUE, tz="UTC", csv=FALSE){
                     all.x = TRUE)
     names(retval)[names(retval) == "offset"] <- "timeZoneStart"
     retval <- retval[,c(original_order, "timeZoneStart")]
-    
+
     retval <- merge(x = retval, 
                     y = offsetLibrary, 
                     by.x="ActivityEndTime/TimeZoneCode", 

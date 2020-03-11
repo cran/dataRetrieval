@@ -45,8 +45,9 @@ test_that("General NWIS retrievals working", {
   dv <- importRDB1(urlEmpty, asDateTime = FALSE)
   expect_true(nrow(dv) == 0)
   
-  dailyStat <- readNWISdata(site=c("03112500","03111520"),service="stat",statReportType="daily",
-                           statType=c("p25","p50","p75","min","max"),parameterCd="00065",convertType=FALSE)
+  dailyStat <- readNWISdata(site=c("03112500","03111520","02319394"),service="stat",statReportType="daily",
+                           statType=c("p25","p50","p75","min","max"),
+                           parameterCd="00065",convertType=FALSE)
   expect_true(length(dailyStat$min_va) > 1)
   expect_is(dailyStat$p25_va,"character")
   
@@ -55,10 +56,11 @@ test_that("General NWIS retrievals working", {
   expect_is(waterYearStat$mean_va,"numeric")
   expect_is(waterYearStat$parameter_cd,"character")
   
-  #2 data descriptors, but some random empty "values" tag:
+  #Empty data
+  
   urlTest <- "https://nwis.waterservices.usgs.gov/nwis/iv/?site=11447650&format=waterml,1.1&ParameterCd=63680&startDT=2016-12-13&endDT=2016-12-13"
   x <- importWaterML1(urlTest)
-  expect_equal(ncol(x), 6)
+  expect_equal(names(x), c("agency_cd","site_no","dateTime","tz_cd"))
   
   #Test list:
   args <- list(sites="05114000", service="iv", 
@@ -139,7 +141,6 @@ test_that("General WQP retrievals working", {
   secchi.names = c("Depth, Secchi disk depth",
                    "Depth, Secchi disk depth (choice list)",
                    "Secchi Reading Condition (choice list)",
-                   "Secchi depth",
                    "Water transparency, Secchi disc")
   args_2 <- list('startDateLo' = startDate,
                'startDateHi' = "2013-12-31",
@@ -170,13 +171,6 @@ test_that("General WQP retrievals working", {
                                    parameterCd = "00010")
    
    expect_equal(ncol(dailyLexingtonVA),65)
-  
-   bioData <- readWQPdata(statecode = "WI",
-                          countycode = "Dane",
-                          providers = "BIODATA")
-   
-   expect_equal(attr(bioData, "url"), "https://www.waterqualitydata.us/Result/search?statecode=US%3A55&countycode=US%3A55%3A025&providers=BIODATA&zip=yes&mimeType=tsv")
-   expect_gt(nrow(bioData), 1)
    
    site1 <- readWQPsummary(siteid="USGS-07144100",
                            summaryYears=5,
@@ -187,6 +181,8 @@ test_that("General WQP retrievals working", {
 
    expect_equal(attr(site1, "url"), "https://www.waterqualitydata.us/data/summary/monitoringLocation/search?siteid=USGS-07144100&summaryYears=5&dataProfile=periodOfRecord&zip=yes&mimeType=csv")
    
+   wqp.summary_no_atts <- readWQPdata(args_2, ignore_attributes = TRUE)
+   expect_true(!all(c("siteInfo","variableInfo") %in% names(attributes(wqp.summary_no_atts))))
 })
 
 test_that("WQP head query retrievals working", {
