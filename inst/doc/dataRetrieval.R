@@ -30,68 +30,85 @@ knitr::opts_chunk$set(echo = TRUE,
 #  
 
 ## ----echo=FALSE-------------------------------------------
-
-library(htmlTable)
-
-Functions <- c("readNWISdata","",
-               "readNWISdv","","","","",
-               "readNWISqw","","","","",
-               "readNWISuv","","","",
-               "readNWISrating","",
-               "readNWISmeas","","",
-               "readNWISpeak","","",
-               "readNWISgwl","","",
-               "readNWISuse","","","",
-               "readNWISstat","","","","","",
+Functions <- c("readNWISdata",
+               "readNWISdv",
+               "readNWISqw",
+               "readNWISuv",
+               "readNWISrating",
+               "readNWISmeas",
+               "readNWISpeak",
+               "readNWISgwl",
+               "readNWISuse",
+               "readNWISstat",
                "readNWISpCode",
                "readNWISsite",
                "whatNWISsites",
-               "whatNWISdata","",
+               "whatNWISdata",
                "readWQPdata",
-               "readWQPqw","","","",
-               "whatWQPsites")
-Arguments <- c("...","service", #readNWISdata
-               "siteNumber","parameterCd","startDate","endDate","statCd", #readNWISdv
-               "siteNumber","parameterCd","startDate","endDate","expanded", #readNWISqw
-               "siteNumber","parameterCd","startDate","endDate", #readNWISuv
-               "siteNumber","type", #readNWISrating
-               "siteNumber","startDate","endDate", #readNWISmeas
-               "siteNumber","startDate","endDate", #readNWISpeak
-               "siteNumber","startDate","endDate", #readNWISgwl
-               "stateCd","countyCd","years","categories", #readNWISuse
-               "siteNumbers","parameterCd","startDate","endDate","statReportType","statType", #readNWISstat
-               "parameterCd", #readNWISpCode
-               "siteNumber", #readNWISsite
+               "readWQPqw",
+               "whatWQPsites",
+               "whatWQPdata",
+               "readWQPsummary",
+               "whatWQPmetrics",
+               "whatWQPsamples")
+Arguments <- c("service, tz='UTC', ...", #readNWISdata
+               "statCd='00003'", #readNWISdv
+               "expanded=TRUE, tz='UTC'", #readNWISqw
+               "tz='UTC'", #readNWISuv
+               "type='base", #readNWISrating
+               "tz='UTC'", #readNWISmeas
+               "", #readNWISpeak
+               "tz='UTC'", #readNWISgwl
+               "stateCd, countyCd, years='ALL', categories='ALL'", #readNWISuse
+               "statReportType='daily', statType='mean'",#readNWISstat
+               "", #readNWISpCode
+               "", #readNWISsite
                "...", #whatNWISsites
-               "siteNumber","service", #whatNWISdata
-               "...", #readWQPdata
-               "siteNumber","parameterCd","startDate","endDate", #readWQPqw
-               "...") #whatWQPsites
-Description <- c("NWIS data using user-specified queries","", #readNWISdata
-                 "NWIS daily data","","","","", #readNWISdv
-                 "NWIS water quality data","","","","", #readNWISqw
-                 "NWIS instantaneous value data","","","", #readNWISuv
-                 "NWIS rating table for active streamgage","", #readNWISrating
-                 "NWIS surface-water measurements","","", #readNWISmeas
-                 "NWIS peak flow data","","", #readNWISpeak
-                 "NWIS groundwater level measurements","","", #readNWISgwl
-                 "NWIS water use","","","", #readNWISuse
-                 "NWIS statistical service","","","","","", #readNWISstat
-                 "NWIS parameter code information", #readNWISpCode
-                 "NWIS site information", #readNWISsite
-                 "NWIS site search using user-specified queries",
-                 "NWIS data availability, including period of record and count","",
-                 "WQP data using user-specified queries",
-                 "WQP data","","","",
-                 "WQP site search using user-specified queries")
+               "service, ...", #whatNWISdata
+               "...",
+               "", #readWQPdata
+               "...",
+               "...", "...", "...", "...") #whatWQPsites
+Description <- c("Data using user-specified queries", #readNWISdata
+                 "Daily values", #readNWISdv
+                 "Water quality", #readNWISqw
+                 "Instantaneous values", #readNWISuv
+                 "Rating table for active streamgage", #readNWISrating
+                 "Surface-water measurements", #readNWISmeas
+                 "Peak flow", #readNWISpeak
+                 "Groundwater levels", #readNWISgwl
+                 "Water use", #readNWISuse
+                 "Statistical service", #readNWISstat
+                 "Parameter code information", #readNWISpCode
+                 "Site information", #readNWISsite
+                 "Site search using user-specified queries",
+                 "Data availability",
+                 "User-specified queries",
+                 "Water quality data",
+                 "Site search",
+                 "Data availability",
+                 "Summary data",
+                 "Metric availability",
+                 "Sample availability")
+Source <- c(rep("NWIS", 14), rep("WQP", 7))
+Site <- c("opt.", rep("req.", 7), "", 
+          rep("req.", 4), "opt.", "opt.", "req.", rep("opt.", 5))
+parameterCd <- c("opt.", rep("req.",3),
+                 rep("", 5), "req.", "req.",
+                 rep("",2), rep("opt.",2), "req.", rep("", 5))
+start <- c("opt.", rep("req.",3),"",
+           rep("req.", 3), "", "req.", rep("", 5), "req.", rep("opt.", 5))
 
-data.df <- data.frame(`Function Name` = Functions, Arguments, Description, stringsAsFactors=FALSE)
+data.df <- data.frame(Name = Functions,
+                      `Data Returned` = Description,
+                      siteNumbers = Site,
+                      parameterCd = parameterCd, 
+                      `startDate \n endDate` = start,
+                      Arguments,
+                      Source, stringsAsFactors=FALSE)
 
-htmlTable(data.df, 
-          caption="Table 1: dataRetrieval functions",
-          rnames=FALSE, align=c("l","l","l","l"),
-          col.rgroup = c("none", "#F7F7F7"), 
-          css.cell="padding-bottom: 0.0em; padding-right: 0.5em; padding-top: 0.0em;")
+kable(data.df, 
+      caption="Table 1: dataRetrieval functions")
 
 
 ## ----tableParameterCodes, echo=FALSE----------------------
@@ -102,10 +119,8 @@ shortName <- c("Discharge [ft<sup>3</sup>/s]","Gage height [ft]","Temperature [C
 
 data.df <- data.frame(pCode, shortName, stringsAsFactors=FALSE)
 
-htmlTable(data.df, 
-          caption="Table 2: Common USGS Parameter Codes",
-          rnames=FALSE, align=c("c","c"), col.rgroup = c("none", "#F7F7F7"), 
-          css.cell="padding-bottom: 0.0em; padding-right: 0.5em; padding-top: 0.0em;")
+kable(data.df, 
+          caption="Table 2: Common USGS Parameter Codes")
 
 
 
@@ -115,10 +130,8 @@ shortName <- c("Maximum","Minimum","Mean", "Median")
 
 data.df <- data.frame(StatCode, shortName, stringsAsFactors=FALSE)
 
-htmlTable(data.df, 
-          caption="Table 3: Commonly used USGS Stat Codes",
-          rnames=FALSE, align=c("c","c"), col.rgroup = c("none", "#F7F7F7"), 
-          css.cell="padding-bottom: 0.0em; padding-right: 0.5em; padding-top: 0.0em;")
+kable(data.df, 
+          caption="Table 3: Commonly used USGS Stat Codes")
 
 
 
@@ -142,7 +155,7 @@ htmlTable(data.df,
 ## ----echo=FALSE-------------------------------------------
 
 tableData <- data.frame(
-  siteNumber = c("01491000","01491000","01645000","01491000","01491000","01491000"),
+  siteNumbers = c("01491000","01491000","01645000","01491000","01491000","01491000"),
   srsname = c("Temperature, water","Stream flow, mean daily",
               "Stream flow, mean daily",
               "Specific conductance",
@@ -155,11 +168,8 @@ tableData <- data.frame(
   stringsAsFactors = FALSE)
 
 
-htmlTable(tableData, 
-          caption="Table 4: Reformatted version of output from the whatNWISdata function for the Choptank River near Greensboro, MD, and from Seneca Creek at Dawsonville, MD from the daily values service [Some columns deleted for space considerations]",
-          rnames=FALSE, 
-          col.rgroup = c("none", "#F7F7F7"), 
-          css.cell="padding-bottom: 0.0em; padding-right: 0.5em; padding-top: 0.0em;")
+kable(tableData, 
+          caption="Table 4: Reformatted version of output from the whatNWISdata function for the Choptank River near Greensboro, MD, and from Seneca Creek at Dawsonville, MD from the daily values service [Some columns deleted for space considerations]")
 
 
 ## ----label=getPCodeInfo, echo=TRUE, eval=FALSE------------
@@ -321,11 +331,8 @@ tableData <- data.frame(Service,
   stringsAsFactors = FALSE)
 
 
-htmlTable(tableData, 
-          caption="Table 5: NWIS general data calls",
-          rnames=FALSE, align=c("l","l","l"),
-          col.rgroup = c("none", "#F7F7F7"), 
-          css.cell="padding-bottom: 0.0em; padding-right: 0.5em; padding-top: 0.0em;")
+kable(tableData, 
+          caption="Table 5: NWIS general data calls")
 
 
 ## ----dataExample, eval=FALSE------------------------------
@@ -388,28 +395,5 @@ htmlTable(tableData,
 #  attr(peakData, "comment")
 
 ## ----seeVignette,eval = FALSE-----------------------------
-#  vignette(dataRetrieval)
-
-## ----installFromCran,eval = FALSE-------------------------
-#  install.packages("dataRetrieval")
-
-## ----openLibraryTest, eval=FALSE--------------------------
-#  library(dataRetrieval)
-
-## ----label=getSiteApp, echo=TRUE, eval=FALSE--------------
-#  availableData <- whatNWISdata(siteNumber, "dv")
-#  dailyData <- availableData["00003" == availableData$stat_cd,]
-#  
-#  tableData <- with(dailyData,
-#        data.frame(
-#          shortName=srsname,
-#          Start=begin_date,
-#          End=end_date,
-#          Count=count_nu,
-#          Units=parameter_units)
-#        )
-
-## ----label=saveData, echo=TRUE, eval=FALSE----------------
-#  write.table(tableData, file="tableData.tsv",sep="\t",
-#              row.names = FALSE,quote=FALSE)
+#  vignette(topic = "Introduction", package = "dataRetrieval")
 

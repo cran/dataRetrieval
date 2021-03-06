@@ -12,24 +12,31 @@ whatWQPsamples <- function(...){
   
   values <- readWQPdots(...)
   
+  values <- values$values
+  
+  if("tz" %in% names(values)){
+    values <- values[!(names(values) %in% "tz")]
+  }
+  
+  if("service" %in% names(values)){
+    values <- values[!(names(values) %in% "service")]
+  }
+  
   values <- sapply(values, function(x) URLencode(x, reserved = TRUE))
   
-  urlCall <- paste(paste(names(values),values,sep="="),collapse="&")
- 
-  baseURL <- drURL("wqpActivity")
-  urlCall <- paste0(baseURL,
-                    urlCall,
-                    "&mimeType=tsv")
+  baseURL <- drURL("Activity", arg.list = values)
+
+  baseURL <- appendDrURL(baseURL, mimeType = "tsv")
   
   withCallingHandlers({
-    retval <- importWQP(urlCall, zip=values["zip"] == "yes")
+    retval <- importWQP(baseURL, zip=values["zip"] == "yes")
   }, warning=function(w) {
     if (any( grepl( "Number of rows returned not matched in header", w)))
       invokeRestart("muffleWarning")
   })
 
   attr(retval, "queryTime") <- Sys.time()
-  attr(retval, "url") <- urlCall
+  attr(retval, "url") <- baseURL
   
   return(retval)
 }
@@ -48,24 +55,31 @@ whatWQPmetrics <- function(...){
 
   values <- readWQPdots(...)
 
+  values <- values$values
+  
+  if("tz" %in% names(values)){
+    values <- values[!(names(values) %in% "tz")]
+  }
+  
+  if("service" %in% names(values)){
+    values <- values[!(names(values) %in% "service")]
+  }
+  
   values <- sapply(values, function(x) URLencode(x, reserved = TRUE))
-
-  urlCall <- paste(paste(names(values),values,sep="="),collapse="&")
-
-  baseURL <- drURL("wqpMetrics")
-  urlCall <- paste0(baseURL,
-                    urlCall,
-                    "&mimeType=tsv")
+  
+  baseURL <- drURL("ActivityMetric", arg.list = values)
+  
+  baseURL <- appendDrURL(baseURL, mimeType = "tsv")
   
   withCallingHandlers({
-    retval <- importWQP(urlCall, zip=values["zip"] == "yes")
+    retval <- importWQP(baseURL, zip=values["zip"] == "yes")
   }, warning=function(w) {
     if (any( grepl( "Number of rows returned not matched in header", w)))
       invokeRestart("muffleWarning")
   })
 
   attr(retval, "queryTime") <- Sys.time()
-  attr(retval, "url") <- urlCall
+  attr(retval, "url") <- baseURL
 
   return(retval)
 }
@@ -109,7 +123,6 @@ whatWQPmetrics <- function(...){
 #' }
 #' 
 #' @export
-#' @import utils
 #' @seealso whatNWISsites
 #' @examples
 #' \donttest{
@@ -124,54 +137,82 @@ whatWQPdata <- function(..., saveFile = tempfile()){
 
   values <- readWQPdots(...)
   
+  values <- values$values
+  
+  if("tz" %in% names(values)){
+    values <- values[!(names(values) %in% "tz")]
+  }
+  
+  if("service" %in% names(values)){
+    values <- values[!(names(values) %in% "service")]
+  }
+  
   values <- sapply(values, function(x) URLencode(x, reserved = TRUE))
   
-  urlCall <- paste(paste(names(values),values,sep="="),collapse="&")
+  baseURL <- drURL("Station", arg.list = values)
   
-  
-  baseURL <- drURL("wqpStation")
-  urlCall <- paste0(baseURL,
-                    urlCall,
-                    "&mimeType=geojson")
-  
+  baseURL <- appendDrURL(baseURL, mimeType = "geojson")
+
   saveFile_zip <- saveFile
   if(tools::file_ext(saveFile) != ".zip"){
     saveFile_zip <- paste0(saveFile,".zip")
   }
 
-  doc <- getWebServiceData(urlCall, httr::write_disk(saveFile_zip))
+  doc <- getWebServiceData(baseURL, httr::write_disk(saveFile_zip))
   headerInfo <- attr(doc, "headerInfo")
-  doc <- utils::unzip(saveFile_zip, exdir = saveFile)
-  unlink(saveFile_zip)
-
-  retval <- as.data.frame(jsonlite::fromJSON(doc), stringsAsFactors = FALSE)
-  df_cols <- as.integer(which(sapply(retval, class) == "data.frame"))
-  y <- retval[,-df_cols]
   
-  for(i in df_cols){
-    y <- cbind(y, retval[[i]])
-  }
+  if(headerInfo$`total-site-count` == 0){
+    y <- data.frame(total_type = character(),
+                     lat = numeric(),
+                     lon = numeric(),
+                     ProviderName = character(),
+                     OrganizationIdentifier = character(),
+                     OrganizationFormalName = character(),
+                     MonitoringLocationIdentifier = character(),
+                     MonitoringLocationName = character(),
+                     MonitoringLocationTypeName = character(),
+                     ResolvedMonitoringLocationTypeName = character(),
+                     HUCEightDigitCode = character(),
+                     siteUrl = character(),
+                     activityCount = numeric(),
+                     resultCount = numeric(),
+                     StateName = character(),
+                     CountyName = character(),
+                     stringsAsFactors=FALSE)
+    
+  } else {
+    
+    doc <- utils::unzip(saveFile_zip, exdir = saveFile)
+    unlink(saveFile_zip)
   
-  y[,grep("Count$",names(y))] <- sapply(y[,grep("Count$",names(y))], as.numeric)
-  
-  names(y)[names(y) == "type"] <- paste("type",letters[1:length(names(y)[names(y) == "type"])],sep="_")
-  
-  if(all(c("type_a","type_b","features.type") %in% names(y))){
-    y$total_type <- paste(y$type_a, y$features.type, y$type_b)
-    y$type_a <- NULL
-    if(all(y$type_b == "Point")){
-      y$lon <- sapply(y$coordinates, function(x) x[[1]][1])
-      y$lat <- sapply(y$coordinates, function(x) x[[2]][1])
+    retval <- as.data.frame(jsonlite::fromJSON(doc), stringsAsFactors = FALSE)
+    df_cols <- as.integer(which(sapply(retval, class) == "data.frame"))
+    y <- retval[,-df_cols]
+    
+    for(i in df_cols){
+      y <- cbind(y, retval[[i]])
     }
-    y$type_b <- NULL
-    y$coordinates <- NULL
-    y$features.type <- NULL
-    y <- y[,c("total_type","lat","lon",names(y)[!(names(y) %in% c("total_type","lat","lon"))])]
+    
+    y[,grep("Count$",names(y))] <- sapply(y[,grep("Count$",names(y))], as.numeric)
+    
+    names(y)[names(y) == "type"] <- paste("type",letters[1:length(names(y)[names(y) == "type"])],sep="_")
+    
+    if(all(c("type_a","type_b","features.type") %in% names(y))){
+      y$total_type <- paste(y$type_a, y$features.type, y$type_b)
+      y$type_a <- NULL
+      if(all(y$type_b == "Point")){
+        y$lon <- sapply(y$coordinates, function(x) x[[1]][1])
+        y$lat <- sapply(y$coordinates, function(x) x[[2]][1])
+      }
+      y$type_b <- NULL
+      y$coordinates <- NULL
+      y$features.type <- NULL
+      y <- y[,c("total_type","lat","lon",names(y)[!(names(y) %in% c("total_type","lat","lon"))])]
+    }
   }
-
   
   attr(y, "queryTime") <- Sys.time()
-  attr(y, "url") <- urlCall
+  attr(y, "url") <- baseURL
   attr(y, "file") <- saveFile
   return(y)
 }

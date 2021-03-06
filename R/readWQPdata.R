@@ -100,8 +100,6 @@
 #' pHData_summary <- readWQPdata(bBox=c(-90.10,42.67,-88.64,43.35),
 #'      characteristicName=nameToUse, querySummary=TRUE)
 #' startDate <- as.Date("2013-01-01")
-#' nutrientDaneCounty <- readWQPdata(countycode="US:55:025",startDate=startDate,
-#'                         characteristicType="Nutrient")
 #' secchi.names = c("Depth, Secchi disk depth", 
 #'                  "Depth, Secchi disk depth (choice list)", 
 #'                  "Secchi Reading Condition (choice list)", 
@@ -136,30 +134,31 @@
 #'                                 parameterCd = "00010") 
 #'                                 
 #' }
-readWQPdata <- function(..., querySummary=FALSE, tz="UTC", ignore_attributes = FALSE){
+readWQPdata <- function(..., querySummary=FALSE, tz="UTC", 
+                        ignore_attributes = FALSE){
   
   tz <- match.arg(tz, OlsonNames())
   
-  values <- readWQPdots(...)
-  values <- sapply(values, function(x) URLencode(x, reserved = TRUE))
-
-  urlCall <- paste(paste(names(values),values,sep="="),collapse="&")
+  valuesList <- readWQPdots(...)
   
-  baseURL <- drURL("wqpData")
-  urlCall <- paste0(baseURL,
-                   urlCall,
-                   "&mimeType=tsv")
+  service <- valuesList$service
+  
+  values <- sapply(valuesList$values, function(x) URLencode(x, reserved = TRUE))
+
+  baseURL <- drURL(service, arg.list=values)
+
+  baseURL <- appendDrURL(baseURL, mimeType = "tsv")
 
   if(querySummary){
-    retquery <- getQuerySummary(urlCall)
+    retquery <- getQuerySummary(baseURL)
     return(retquery)
   } else {
   
-    retval <- importWQP(urlCall, zip= values["zip"] == "yes", tz=tz)
+    retval <- importWQP(baseURL, zip = values["zip"] == "yes", tz=tz)
     
     if(!all(is.na(retval)) & !ignore_attributes){
       
-      siteInfo <- whatWQPsites(...)
+      siteInfo <- whatWQPsites(..., service = "Station")
       
       siteInfoCommon <- data.frame(station_nm=siteInfo$MonitoringLocationName,
                                    agency_cd=siteInfo$OrganizationIdentifier,
@@ -197,16 +196,16 @@ readWQPdata <- function(..., querySummary=FALSE, tz="UTC", ignore_attributes = F
       
       attr(retval, "siteInfo") <- siteInfo
       attr(retval, "variableInfo") <- variableInfo
-      attr(retval, "url") <- urlCall
-      attr(retval, "queryTime") <- Sys.time()
-      
       
     } else {
-      
-      message("The following url returned no data:\n")
-      message(urlCall)
-      return(NULL)
+      if(!ignore_attributes){
+        message("The following url returned no data:\n")
+        message(baseURL)        
+      }
+
     }
+    attr(retval, "queryTime") <- Sys.time()
+    attr(retval, "url") <- baseURL
     
     return(retval)
   }

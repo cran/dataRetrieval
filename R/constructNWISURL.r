@@ -30,7 +30,6 @@
 #' @keywords data import USGS web service
 #' @return url string
 #' @export
-#' @import utils
 #' @examples
 #' site_id <- '01594440'
 #' startDate <- '1985-01-01'
@@ -209,7 +208,7 @@ constructNWISURL <- function(siteNumbers,parameterCd="00060",startDate="",endDat
             },
             rdb = {
               if("gwlevels" == service){
-                  "rdb"
+                  "rdb,3.0"
                 } else {
                   "rdb,1.0"
                 }
@@ -233,7 +232,7 @@ constructNWISURL <- function(siteNumbers,parameterCd="00060",startDate="",endDat
 
           url <- appendDrURL(baseURL, site=siteNumbers, format=formatURL)
           
-          if("gwlevels"!= service){
+          if(!is.na(parameterCd)){
             url <- appendDrURL(url, ParameterCd=parameterCd)
           }
           
@@ -315,7 +314,7 @@ constructWQPURL <- function(siteNumbers,parameterCd,startDate,endDate,zip=TRUE){
     parameterCd <- paste(parameterCd, collapse=";")
   }
   
-  baseURL <- drURL("wqpData", siteid = siteNumbers, Access=pkg.env$access) 
+  baseURL <- drURL("Result", siteid = siteNumbers, Access=pkg.env$access) 
   url <- paste0(baseURL,
                 ifelse(pCodeLogic,"&pCode=","&characteristicName="),
                 parameterCd)

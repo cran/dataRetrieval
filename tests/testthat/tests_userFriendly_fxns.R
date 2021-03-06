@@ -262,7 +262,8 @@ test_that("addWaterYear works with Date, POSIXct, character, but breaks with num
   expect_equal(ncol(df_char_wy), ncol(df_char) + 1)
   df_num <- df_test
   df_num$dateTime <- as.numeric(df_num$dateTime)
-  expect_error(addWaterYear(df_num), "'origin' must be supplied")
+  dfnum2 <- addWaterYear(df_num)
+  expect_equal(dfnum2$waterYear, rep(NA, 13))
 })
 
 test_that("addWaterYear works for each column name", {
@@ -320,7 +321,7 @@ test_that("addWaterYear doesn't add another WY column if it exists", {
 })
 
 test_that("calcWaterYear can handle missing values", {
-  testthat::skip_on_cran()
+
   dateVec <- seq(as.Date("2010-01-01"),as.Date("2011-01-31"), by="months")
   dateVec[c(3,7,12)] <- NA
   wyVec <- dataRetrieval:::calcWaterYear(dateVec)

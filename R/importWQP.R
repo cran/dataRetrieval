@@ -15,8 +15,6 @@
 #' start and end times, and converted to UTC. See \url{https://www.waterqualitydata.us/portal_userguide/} for more information.
 #' @export
 #' @seealso \code{\link{readWQPdata}}, \code{\link{readWQPqw}}, \code{\link{whatWQPsites}}
-#' @import utils
-#' @import stats
 #' @examples
 #' # These examples require an internet connection to run
 #' 
@@ -68,7 +66,75 @@ importWQP <- function(obs_url, zip=TRUE, tz="UTC", csv=FALSE){
       for(i in grep("Warning",names(headerInfo))){
         warning(headerInfo[i])
       }
-      emptyReturn <- data.frame(NA)
+      emptyReturn <- data.frame(OrganizationIdentifier = character(),                        
+                                OrganizationFormalName = character(),                            
+                                ActivityIdentifier = character(),                               
+                                ActivityTypeCode = character(),                       
+                                ActivityMediaName = character(),                                 
+                                ActivityMediaSubdivisionName = character(),                  
+                                ActivityStartDate = as.Date(x = integer(), origin = "1970-01-01"),       
+                                ActivityStartTime.Time = character(),                  
+                                ActivityStartTime.TimeZoneCode = character(),             
+                                ActivityEndDate = as.Date(x = integer(), origin = "1970-01-01"),            
+                                ActivityEndTime.Time = character(),  
+                                ActivityEndTime.TimeZoneCode = character(), 
+                                ActivityDepthHeightMeasure.MeasureValue = numeric(),       
+                                ActivityDepthHeightMeasure.MeasureUnitCode = character(), 
+                                ActivityDepthAltitudeReferencePointText = character(), 
+                                ActivityTopDepthHeightMeasure.MeasureValue = numeric(), 
+                                ActivityTopDepthHeightMeasure.MeasureUnitCode = character(), 
+                                ActivityBottomDepthHeightMeasure.MeasureValue = numeric(), 
+                                ActivityBottomDepthHeightMeasure.MeasureUnitCode = character(), 
+                                ProjectIdentifier = character(), 
+                                ActivityConductingOrganizationText = character(), 
+                                MonitoringLocationIdentifier = character(), 
+                                ActivityCommentText = character(), 
+                                SampleAquifer = character(), 
+                                HydrologicCondition = character(), 
+                                HydrologicEvent = character(), 
+                                SampleCollectionMethod.MethodIdentifier = character(), 
+                                SampleCollectionMethod.MethodIdentifierContext = character(), 
+                                SampleCollectionMethod.MethodName = character(),                 
+                                SampleCollectionEquipmentName = character(),  
+                                ResultDetectionConditionText = character(), 
+                                CharacteristicName = character(), 
+                                ResultSampleFractionText = character(),                 
+                                ResultMeasureValue = numeric(), 
+                                ResultMeasure.MeasureUnitCode = character(), 
+                                MeasureQualifierCode = character(), 
+                                ResultStatusIdentifier = character(), 
+                                StatisticalBaseCode = character(), 
+                                ResultValueTypeName = character(), 
+                                ResultWeightBasisText = character(), 
+                                ResultTimeBasisText = character(), 
+                                ResultTemperatureBasisText = character(), 
+                                ResultParticleSizeBasisText = character(), 
+                                PrecisionValue = numeric(), 
+                                ResultCommentText = character(), 
+                                USGSPCode = character(), 
+                                ResultDepthHeightMeasure.MeasureValue = numeric(),      
+                                ResultDepthHeightMeasure.MeasureUnitCode = character(), 
+                                ResultDepthAltitudeReferencePointText = character(), 
+                                SubjectTaxonomicName = character(), 
+                                SampleTissueAnatomyName = character(), 
+                                ResultAnalyticalMethod.MethodIdentifier = character(), 
+                                ResultAnalyticalMethod.MethodIdentifierContext = character(),    
+                                ResultAnalyticalMethod.MethodName = character(), 
+                                MethodDescriptionText = character(),  
+                                LaboratoryName = character(),              
+                                AnalysisStartDate = as.Date(x = integer(), origin = "1970-01-01"), 
+                                ResultLaboratoryCommentText = character(), 
+                                DetectionQuantitationLimitTypeName = character(), 
+                                DetectionQuantitationLimitMeasure.MeasureValue = numeric(), 
+                                DetectionQuantitationLimitMeasure.MeasureUnitCode = character(), 
+                                PreparationStartDate = as.Date(x = integer(), origin = "1970-01-01"), 
+                                ProviderName = character(),               
+                                ActivityStartDateTime = as.POSIXct(integer()), 
+                                ActivityEndDateTime = as.POSIXct(integer()))
+      
+      attr(emptyReturn$ActivityStartDateTime, "tzone") <- tz
+      attr(emptyReturn$ActivityEndDateTime, "tzone") <- tz
+      
       attr(emptyReturn, "headerInfo") <- headerInfo
       return(emptyReturn)
     }
@@ -100,12 +166,24 @@ importWQP <- function(obs_url, zip=TRUE, tz="UTC", csv=FALSE){
                                         ResultParticleSizeBasisText = readr::col_character(),
                                         `ActivityDepthHeightMeasure/MeasureValue` = readr::col_number(),
                                         `DetectionQuantitationLimitMeasure/MeasureValue` = readr::col_number(),
-                                        # ResultMeasureValue = readr::col_number(),
+                                        ResultMeasureValue = readr::col_character(),
                                         `WellDepthMeasure/MeasureValue` = readr::col_number(),
                                         `WellHoleDepthMeasure/MeasureValue` = readr::col_number(),
+                                        DetectionQuantitationLimitTypeName = readr::col_character(),
+                                        LaboratoryName = readr::col_character(),
+                                        MethodDescriptionText = readr::col_character(),
+                                        `ResultAnalyticalMethod/MethodName` = readr::col_character(),
+                                        `ResultAnalyticalMethod/MethodIdentifier` = readr::col_character(),
+                                        `ResultAnalyticalMethod/MethodIdentifierContext` = readr::col_character(),
+                                        SampleTissueAnatomyName = readr::col_character(),
+                                        SubjectTaxonomicName = readr::col_character(),
+                                        ResultDepthAltitudeReferencePointText = readr::col_character(),
+                                        `ResultDepthHeightMeasure/MeasureUnitCode` = readr::col_character(),
+                                        `DetectionQuantitationLimitMeasure/MeasureUnitCode` = readr::col_character(),
                                         `HUCEightDigitCode` = readr::col_character(), 
                                         `ActivityEndTime/TimeZoneCode` = readr::col_character()),
-                       quote = ifelse(csv,'\"',""), delim = ifelse(csv,",","\t")))
+                       quote = ifelse(csv,'\"',""),
+                       delim = ifelse(csv,",","\t")))
     
   if(!file.exists(obs_url)){
     actualNumReturned <- nrow(retval)
@@ -114,7 +192,19 @@ importWQP <- function(obs_url, zip=TRUE, tz="UTC", csv=FALSE){
       warning("Number of rows returned not matched in header")
     } 
   }
-  
+  suppressWarnings({
+    val <- tryCatch(as.numeric(retval$ResultMeasureValue),
+                    warning = function(w) w)
+
+    # we don't want to convert it to numeric if there are non-numeric chars
+    # they often happen after readr has decided the column type if we left it to readr
+    # If we leave it to the user, it will probably break a lot of code
+    # If we bump up readr's guess_max...the computational time becomes really really long
+    if(!"warning" %in% class(val)){
+      retval$ResultMeasureValue <- val
+    }
+  })
+
   if(length(grep("ActivityStartTime",names(retval))) > 0){
     
     #Time zones to characters:

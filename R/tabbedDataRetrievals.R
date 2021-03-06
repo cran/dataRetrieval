@@ -1,8 +1,3 @@
-.onAttach <- function(libname, pkgname) {
-  if("package:reshape" %in% search()){
-    packageStartupMessage("Caution: The reshape package interferes with some functions in the dataRetrieval package.")
-  }
-}
 
 #' Retrieval functions for USGS and EPA data
 #'
@@ -14,7 +9,7 @@
 #' that originally came from the United States Geological Survey, an agency of
 #' the United States Department of Interior. For more information, see the
 #' official USGS copyright policy at
-#' \url{https://www.usgs.gov/visual-id/credit_usgs.html}\cr
+#' \url{https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits}\cr
 #' LazyLoad: \tab yes\cr
 #' }
 #'
@@ -24,12 +19,17 @@
 #'
 #' @name dataRetrieval
 #' @docType package
+#' @importFrom stats setNames
+#' @importFrom utils URLencode
+#' @importFrom utils packageVersion
+#' @importFrom utils tail
+#' @importFrom utils unzip
 #' @author Laura De Cicco \email{ldecicco@@usgs.gov}
 NULL
 
 #' List of USGS parameter codes
 #'
-#' Complete list of USGS parameter codes as of May 22, 2017. 
+#' Complete list of USGS parameter codes as of Oct. 13, 2020. 
 #'
 #' @name parameterCdFile
 #' @return parameterData data frame with information about USGS parameters.
@@ -51,9 +51,12 @@ NULL
 #'head(parameterCdFile[,1:2])
 NULL
 
+
+
+
 #' Data to convert USGS parameter code to characteristic names
 #'
-#' Data pulled from Water Quality Portal on November 25, 2014. The data was pulled from
+#' Data pulled from Water Quality Portal on October 13, 2020. The data was pulled from
 #' \url{https://www.waterqualitydata.us/public_srsnames?mimeType=json}.
 #'
 #' @name pCodeToName
