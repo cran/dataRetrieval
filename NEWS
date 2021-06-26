@@ -1,3 +1,9 @@
+dataRetrieval 2.7.8
+==================
+* Fixed missing comments in readNWISqw
+* Added Stable Isotopes, Habitat, and Other water quality groupings
+* Adding options for updated readr
+
 dataRetrieval 2.7.7
 ==================
 * The NLDI service is now available through the `findNLDI` function.
