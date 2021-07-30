@@ -22,6 +22,11 @@
 #' }
 getWebServiceData <- function(obs_url, ...){
   
+  if (!curl::has_internet()) {
+    message("No internet connection.")
+    return(invisible(NULL))
+  }
+  
   returnedList <- retryGetOrPost(obs_url, ...)
   
   if(httr::status_code(returnedList) == 400){
@@ -44,7 +49,7 @@ getWebServiceData <- function(obs_url, ...){
       returnedDoc <- returnedList
     } else if (headerInfo$`content-type` %in% c("text/html",
                                                 "text/html; charset=UTF-8") ){
-      txt <- readBin(returnedList$content, character())
+      txt <- readLines(returnedList$content)
       message(txt)
       return(txt)
     } else {

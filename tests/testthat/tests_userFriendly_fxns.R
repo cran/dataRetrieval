@@ -74,6 +74,7 @@ test_that("peak, rating curves, surface-water measurements", {
   
   siteINFO <- readNWISsite('05114000')
   expect_is(siteINFO$agency_cd, 'character')
+  expect_equal(siteINFO$site_no, '05114000')
   
   siteINFOMulti <- readNWISsite(c('05114000','09423350'))
   expect_true(nrow(siteINFOMulti) == 2)
@@ -82,57 +83,19 @@ test_that("peak, rating curves, surface-water measurements", {
   expect_is(Meas07227500.ex$measurement_dt, 'Date')
   expect_is(Meas07227500.ex$measurement_dateTime, 'POSIXct')
   
-  expect_error(whatNWISdata(siteNumber = "10312000",parameterCd = "50286"))
+  expect_equal(nrow(whatNWISdata(siteNumber = "10312000",parameterCd = "50286")), 0)
+  expect_equal(ncol(whatNWISdata(siteNumber = "10312000",parameterCd = "50286")), 24)
   
   url <- "https://waterservices.usgs.gov/nwis/site/?format=rdb&seriesCatalogOutput=true&sites=05114000"
   x <- importRDB1(url)
+  
+  siteID <- "263819081585801"
+  gwl_1 <- readNWISgwl(siteID)
+  expect_equal(unique(gwl_1$site_no), siteID)
 
 })
 
 context("qw")
-
-test_that("NWIS qw tests", {
-  testthat::skip_on_cran()
-  siteNumbers <- c('04024430','04024000')
-  startDate <- '2010-01-01'
-  endDate <- ''
-  parameterCd <- c('34247','30234','32104','34220')
-  
-  rawNWISqwData <- readNWISqw(siteNumbers,parameterCd,startDate,endDate)
-  expect_is(rawNWISqwData$startDateTime, 'POSIXct')
-  
-  rawNWISqwDataReshaped <- readNWISqw(siteNumbers,parameterCd,
-            startDate,endDate,reshape=TRUE)
-  expect_is(rawNWISqwDataReshaped$startDateTime, 'POSIXct')
-  expect_gt(ncol(rawNWISqwDataReshaped), ncol(rawNWISqwData))
-  expect_lt(nrow(rawNWISqwDataReshaped), nrow(rawNWISqwData))
-  
-  parameterCd <- "all"
-  rawNWISall <- readNWISqw(siteNumbers,parameterCd,
-           startDate,"2011-01-01",reshape=TRUE)
-  expect_is(rawNWISall$startDateTime, 'POSIXct')
-  
-  pgroup <- c("NUT")
-  rawNWISNutrients <- readNWISqw(siteNumbers,pgroup,
-           startDate,endDate)
-  expect_is(rawNWISNutrients$startDateTime, 'POSIXct')
-  
-  qwret <- readNWISqw("413437087150601", parameterCd = c("NUT","INN"),startDate = "",endDate = "")
-  expect_true(nrow(qwret) == 0)
-  
-  siteNumber <- '455638089034501'
-  wy_start <- paste0(2014, "-10-01")
-  wy_end <- paste0(2015, "-09-30")
-  
-  #No data test:
-  no.data <- readNWISqw(siteNumbers = siteNumber, 
-                  parameterCd = '00060', 
-                  startDate = wy_start, 
-                  endDat = wy_end)
-  
-  expect_true(nrow(no.data) == 0)
-  
-})
 
 context("dv")
 
@@ -201,7 +164,7 @@ test_that("readNWISuse tests", {
   testthat::skip_on_cran()
   dc <- readNWISuse(years=c(2000,2005,2010),stateCd = "DC", countyCd = NULL)
   expect_true(nrow(dc)==3)
-  expect_is(dc$state_cd, 'numeric')
+  expect_is(dc$state_cd, 'character')
   
   ohio <- readNWISuse(years=2005,stateCd="OH",countyCd="ALL")
   expect_true(nrow(ohio)==88)

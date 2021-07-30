@@ -80,10 +80,6 @@
 #'                   service="dv", startDate=startDate, endDate=endDate)
 #' siteInfo <- readNWISdata(stateCd="WI", parameterCd="00010",
 #'                   hasDataTypeCd="iv", service="site")
-#' qwData <- readNWISdata(bBox=c(-82.5,41.52,-81,41),startDate=as.Date("2000-01-01"),
-#'                   drain_area_va_min=50, qw_count_nu=50,qw_attributes="expanded",
-#'                   qw_sample_wide="wide",list_of_search_criteria=c("lat_long_bounding_box",
-#'                   "drain_area_va","obs_count_nu"),service="qw")
 #' temp <- readNWISdata(bBox=c(-83,36.5,-81,38.5), parameterCd="00010", service="site", 
 #'                    seriesCatalogOutput=TRUE)
 #' wiGWL <- readNWISdata(stateCd="WI",service="gwlevels")
@@ -139,6 +135,17 @@ readNWISdata <- function(..., asDateTime=TRUE,convertType=TRUE,tz="UTC"){
   valuesList <- readNWISdots(...)
   
   service <- valuesList$service
+  if(length(service) > 1){
+    warning("Only one service value is allowed. Service: ", service[1], " will be used.")
+    service <- service[1]
+  }
+  
+  if(any(service %in% c("qw", "qwdata"))){
+    .Deprecated(old = "readNWISdata", package = "dataRetrieval",
+                new = "readWQPdata",
+                msg = "NWIS qw web services are being retired. Please see the vignette 
+'Changes to NWIS QW services' for more information.")
+  }
   
   values <- sapply(valuesList$values, function(x) URLencode(x))
   

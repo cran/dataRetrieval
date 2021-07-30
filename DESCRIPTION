@@ -2,7 +2,7 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrologic and Water
         Quality Data
-Version: 2.7.8
+Version: 2.7.9
 Authors@R: c(
     person("Laura", "DeCicco", role = c("aut","cre"),
             email = "ldecicco@usgs.gov",
@@ -39,11 +39,11 @@ Suggests: covr, dplyr, ggplot2, DT, gridExtra, knitr, rmarkdown, sf,
 Encoding: UTF-8
 BuildVignettes: true
 VignetteBuilder: knitr
-BugReports: https://github.com/USGS/dataRetrieval/issues
+BugReports: https://github.com/USGS-R/dataRetrieval/issues
 URL: https://pubs.usgs.gov/tm/04/a10/
 RoxygenNote: 7.1.1
 NeedsCompilation: no
-Packaged: 2021-06-25 13:35:14 UTC; ldecicco
+Packaged: 2021-07-29 20:22:35 UTC; ldecicco
 Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
   Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>),
   David Lorenz [aut],
@@ -55,4 +55,4 @@ Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
   Mike Johnson [aut] (<https://orcid.org/0000-0002-5288-8350>)
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2021-06-26 05:00:10 UTC
+Date/Publication: 2021-07-30 15:00:02 UTC
