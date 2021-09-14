@@ -26,6 +26,7 @@ start and end times, and converted to UTC. See \url{https://www.waterqualitydata
 Imports data from the Water Quality Portal based on a specified url.
 }
 \examples{
+\dontshow{if (is_dataRetrieval_user()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # These examples require an internet connection to run
 
 ## Examples take longer than 5 seconds:
@@ -35,11 +36,14 @@ rawSampleURL <- constructWQPURL('USGS-01594440','01075', '', '')
 rawSample <- importWQP(rawSampleURL)
 
 rawSampleURL_NoZip <- constructWQPURL('USGS-01594440','01075', '', '', zip=FALSE)
+
 rawSample2 <- importWQP(rawSampleURL_NoZip, zip=FALSE)
 
 STORETex <- constructWQPURL('WIDNR_WQX-10032762','Specific conductance', '', '')
-STORETdata <- importWQP(STORETex)
+
+ STORETdata <- importWQP(STORETex)
 }
+\dontshow{\}) # examplesIf}
 }
 \seealso{
 \code{\link{readWQPdata}}, \code{\link{readWQPqw}}, \code{\link{whatWQPsites}}

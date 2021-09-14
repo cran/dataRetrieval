@@ -59,10 +59,12 @@
 #' comment \tab character \tab Header comments from the RDB file \cr
 #' }
 #' @export
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' \donttest{
+#' 
 #' siteINFO <- readNWISsite('05114000')
 #' siteINFOMulti <- readNWISsite(c('05114000','09423350'))
+#' 
 #' }
 readNWISsite <- function(siteNumbers){
   

@@ -55,6 +55,7 @@ NWIS site, parameter code, statistic, startdate and enddate. It is not
 recommended to use the RDB format for importing multi-site data.
 }
 \examples{
+\dontshow{if (is_dataRetrieval_user()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 site_id <- "02177000"
 startDate <- "2012-09-01"
 endDate <- "2012-10-01"
@@ -66,27 +67,36 @@ obs_url <- constructNWISURL(site_id,property,
 \donttest{
 data <- importRDB1(obs_url)
 
+
 urlMultiPcodes <- constructNWISURL("04085427",c("00060","00010"),
          startDate,endDate,"dv",statCd=c("00003","00001"),"tsv")
-multiData <- importRDB1(urlMultiPcodes)
+
+  multiData <- importRDB1(urlMultiPcodes)
+
 unitDataURL <- constructNWISURL(site_id,property,
          "2020-10-30","2020-11-01","uv",format="tsv") #includes timezone switch
-unitData <- importRDB1(unitDataURL, asDateTime=TRUE)
+
+  unitData <- importRDB1(unitDataURL, asDateTime=TRUE)
+
 qwURL <- constructNWISURL(c('04024430','04024000'),
           c('34247','30234','32104','34220'),
-         "2010-11-03","","qw",format="rdb") 
+         "2010-11-03","","qw",format="rdb")
+
 qwData <- importRDB1(qwURL, asDateTime=TRUE, tz="America/Chicago")
+
 iceSite <- '04024000'
 start <- "2015-11-09"
 end <- "2015-11-24"
 urlIce <- constructNWISURL(iceSite,"00060",start, end,"uv",format="tsv")
-ice <- importRDB1(urlIce, asDateTime=TRUE)
-iceNoConvert <- importRDB1(urlIce, convertType=FALSE)
+
+  ice <- importRDB1(urlIce, asDateTime=TRUE)
+  iceNoConvert <- importRDB1(urlIce, convertType=FALSE)
+
 }
 # User file:
 filePath <- system.file("extdata", package="dataRetrieval")
 fileName <- "RDB1Example.txt"
 fullPath <- file.path(filePath, fileName)
 importUserRDB <- importRDB1(fullPath)
-
+\dontshow{\}) # examplesIf}
 }

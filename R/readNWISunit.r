@@ -48,12 +48,13 @@
 #' 
 #' @seealso \code{\link{renameNWISColumns}}, \code{\link{importWaterML1}}
 #' @export
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' site_id <- '05114000'
 #' parameterCd <- '00060'
 #' startDate <- "2014-10-10"
 #' endDate <- "2014-10-10"
 #' \donttest{
+#' 
 #' rawData <- readNWISuv(site_id,parameterCd,startDate,endDate)
 #' 
 #' rawData_today <- readNWISuv(site_id, parameterCd, Sys.Date(),Sys.Date())
@@ -68,8 +69,8 @@
 #' # Adding 'Z' to the time indicates to the web service to call the data with UTC time:
 #' GMTdata <- readNWISuv(site_id,parameterCd,
 #'                            "2014-10-10T00:00Z", "2014-10-10T23:59Z")
-#' }
 #' 
+#' }
 readNWISuv <- function (siteNumbers,parameterCd,startDate="",endDate="", tz="UTC"){  
   
   if(as.character(startDate) == "" || (as.Date(startDate) <= Sys.Date()-120)){
@@ -129,7 +130,7 @@ readNWISuv <- function (siteNumbers,parameterCd,startDate="",endDate="", tz="UTC
 #' }
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' site_ids <- c('01594440','040851325')
 #' \donttest{
 #' data <- readNWISpeak(site_ids)
@@ -212,7 +213,7 @@ readNWISpeak <- function (siteNumbers,startDate="",endDate="", asDateTime=TRUE, 
 #'relate flow to stage.
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' site_id <- '01594440'
 #' \donttest{
 #' data <- readNWISrating(site_id, "base")
@@ -293,7 +294,7 @@ readNWISrating <- function (siteNumber,type="base",convertType = TRUE){
 #' }
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' site_ids <- c('01594440','040851325')
 #' \donttest{
 #' data <- readNWISmeas(site_ids)
@@ -400,7 +401,7 @@ readNWISmeas <- function (siteNumbers,startDate="",endDate="", tz="UTC", expande
 #' 
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' site_id <- "434400121275801"
 #' \donttest{
 #' data <- readNWISgwl(site_id)
@@ -477,7 +478,7 @@ readNWISgwl <- function(siteNumbers, startDate = "", endDate = "",
 #' }
 #' @seealso \code{\link{constructNWISURL}}, \code{\link{importRDB1}}
 #' @export
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' \donttest{
 #' x1 <- readNWISstat(siteNumbers=c("02319394"),
 #'                   parameterCd=c("00060"),
@@ -548,7 +549,7 @@ readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "",
 #' County and state fields will be included as appropriate.
 #' 
 #' @export
-#' @examples 
+#' @examplesIf is_dataRetrieval_user()
 #' \donttest{
 #' #All data for a county
 #' allegheny <- readNWISuse(stateCd = "Pennsylvania",countyCd = "Allegheny")

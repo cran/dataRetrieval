@@ -12,7 +12,7 @@
 #' "America/Jamaica","America/Managua","America/Phoenix", and "America/Metlakatla". See also  \code{OlsonNames()} 
 #' for more information on time zones.
 #' @export
-#' @examples 
+#' @examplesIf is_dataRetrieval_user()
 #' \donttest{
 #' #one site
 #' site <- "USGS.430427089284901"
@@ -152,9 +152,9 @@ readNGWMNlevels <- function(siteNumbers, asDateTime = TRUE, tz = "UTC"){
 #' }
 #' @examples 
 #' \donttest{
-#' #one site
+#' #one site 
 #' site <- "USGS.430427089284901"
-#' oneSite <- readNGWMNsites(siteNumbers = site)
+#' oneSite <- readNGWMNsites(siteNumbers = site)   
 #' 
 #' #non-USGS site
 #' site <- "MBMG.103306"

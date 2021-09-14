@@ -225,17 +225,17 @@ valid_ask = function(all, type) {
 #' @return a list of data.frames if sf is not installed, a list of sf objects if it is
 #' @export
 #' @keywords nldi
-#' @examples
+#' @examplesIf is_dataRetrieval_user()
 #' \donttest{
 #' # Find Features / Define origin features
 #'
 #' ## Find feature by COMID
 #'  findNLDI(comid = 101)
-#'
+#'  
 #' ## Find feature by NWIS ID
-#'  findNLDI(nwis = '11120000')
-#'
-#' ## Find feature by WQP ID
+#'   findNLDI(nwis = '11120000')
+#' 
+#' ## Find feature by WQP ID 
 #'  findNLDI(wqp = 'USGS-04024315')
 #'
 #' ## Find feature by LOCATION
