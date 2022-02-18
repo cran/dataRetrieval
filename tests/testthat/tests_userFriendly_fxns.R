@@ -194,7 +194,7 @@ test_that("state county tests",{
   name <- countyCdLookup(state = "OH", county = 13, output = "fullName")
   expect_equal(name, "Belmont County")
   index <- countyCdLookup(state = "Pennsylvania", county = "ALLEGHENY COUNTY", output = "tableIndex")
-  expect_equal(index, 2246)
+  expect_equal(index, 2258)
   fromIDs <- countyCdLookup(state = 13, county = 5, output = "fullName")
   expect_equal(fromIDs, "Bacon County")
   counties <-  c("51001","51003")
@@ -372,15 +372,6 @@ test_that("Construct WQP urls", {
   expect_equal(obs_url_orig, "https://www.waterqualitydata.us/data/Result/search?siteid=IIDFG-41WSSPAHS;USGS-02352560&characteristicName=Temperature;Temperature%2C%20sample;Temperature%2C%20water;Temperature%2C%20water%2C%20deg%20F&mimeType=tsv&zip=yes")
 })
 
-context("checkWQPdates")
-test_that("checkWQPdates", {
-  values <- list(startDateLo="01-01-2002", characteristicName="Phosphorous",
-            endDate=as.Date("2014-01-01"))
-  values1 <- checkWQPdates(values)
-  expect_equal(values1$startDateHi, "01-01-2014")
-  expect_equal(values1$startDateLo, "01-01-2002")
-})
-
 context("Construct WQP urls")
 test_that("Construct WQP urls", {
   siteNumber <- '01594440'
@@ -403,9 +394,12 @@ test_that("pCode Stuff", {
   
   testthat::skip_on_cran()
   
-  paramINFO <- readNWISpCode(c('01075','00060','00931', NA))
+  paramINFO <- readNWISpCode(c('00060','01075','00931', NA))
   expect_equal(nrow(paramINFO), 4)
+  expect_equal(paramINFO$parameter_cd, c('00060','01075','00931', NA) )
   
   paramINFO <- readNWISpCode("all")
-  expect_equal(attr(paramINFO, "url"),"https://nwis.waterdata.usgs.gov/nwis/pmcodes/pmcodes?radio_pm_search=param_group&pm_group=All+--+include+all+parameter+groups&show=parameter_group_nm&show=parameter_nm&show=casrn&show=srsname&show=parameter_units&format=rdb")
+  expect_true(nrow(paramINFO) > 24000)
+  expect_equal(attr(paramINFO, "url"),
+               "https://help.waterdata.usgs.gov/code/parameter_cd_query?fmt=rdb&group_cd=%")
 })

@@ -44,6 +44,24 @@ test_that("External importRDB1 tests", {
                           statCd = "laksjd")
   # And....now there's data there:
   expect_null(importRDB1(url))
+  
+  site <- "11486500"
+  
+  url <- dataRetrieval:::drURL("site", arg.list = list(siteOutput = "Expanded", 
+                                                       format = "rdb", 
+                                                       site = site))
+  site_data <- importRDB1(url)
+  
+  expect_equal(site_data$station_nm, "\"G\" CANAL NEAR OLENE,OREG.")
+  
+  site <- "040854588204"
+  
+  url <- dataRetrieval:::drURL("site", arg.list = list(siteOutput = "Expanded", 
+                                                       format = "rdb", 
+                                                       site = site))
+  site_data <- importRDB1(url)
+  
+  expect_equal(site_data$station_nm, "\"FISHER CR AT 32 & HIGHLAND RD AT HOWARDS GROVE, W")
 })
 
 context("importRDB")
@@ -157,6 +175,14 @@ test_that("External importWaterML1 test", {
   expect_true(all(chi_iv$tz_cd == "America/Chicago"))
   expect_equal(chi_iv$dateTime[1], as.POSIXct("2014-05-01T00:00", format = "%Y-%m-%dT%H:%M", tz="America/Chicago"))
   expect_equal(chi_iv$dateTime[nrow(chi_iv)], as.POSIXct("2014-05-01T12:00", format = "%Y-%m-%dT%H:%M", tz="America/Chicago"))
+  
+  # Time over daylight saving switch:
+  tzURL <- constructNWISURL("04027000", c("00300","63680"),
+                            "2011-11-05", "2011-11-07","uv")
+  tzIssue <- importWaterML1(tzURL, 
+                            asDateTime = TRUE,
+                            tz = "America/Chicago")
+  expect_false(any(duplicated(tzIssue$dateTime)))
   
 })
 

@@ -49,10 +49,10 @@ test_that("General NWIS retrievals working", {
   expect_is(waterYearStat$parameter_cd,"character")
   
   #Empty data
-  
+  # note....not empty anymore!
   urlTest <- "https://nwis.waterservices.usgs.gov/nwis/iv/?site=11447650&format=waterml,1.1&ParameterCd=63680&startDT=2016-12-13&endDT=2016-12-13"
   x <- importWaterML1(urlTest)
-  expect_equal(names(x), c("agency_cd","site_no","dateTime","tz_cd"))
+  expect_true(all(c("agency_cd","site_no","dateTime","tz_cd") %in% names(x)))
   
   #Test list:
   args <- list(sites="05114000", service="iv", 
@@ -96,6 +96,16 @@ test_that("General NWIS retrievals working", {
                                               "type",
                                               "update_time",
                                               "url")))
+  
+  multi_hucs <- c("07130007", "07130011")
+  multi_huc <- dataRetrieval::readNWISdata(huc = multi_hucs, 
+                                           parameterCd = "63680", 
+                                           startDate = "2015-06-18", 
+                                           endDate = "2015-06-18", 
+                                           service="dv") 
+  expect_equal(2, nrow(multi_huc))
+
+  
   
 })
 
@@ -164,15 +174,9 @@ test_that("General WQP retrievals working", {
    # 
    # expect_equal(ncol(dailyLexingtonVA),65)
    
-   site1 <- readWQPsummary(siteid="USGS-07144100",
-                           summaryYears=5,
-                           dataProfile="periodOfRecord")
-   
-   expect_type(site1$ActivityCount, "double")
-   expect_type(site1$MonitoringLocationIdentifier, "character")
 
-   expect_equal(attr(site1, "url"), "https://www.waterqualitydata.us/data/summary/monitoringLocation/search?siteid=USGS-07144100&summaryYears=5&dataProfile=periodOfRecord&zip=yes&mimeType=csv")
-   
+
+  
    wqp.summary_no_atts <- readWQPdata(siteid="USGS-04024315",
                                       characteristicName=nameToUse,
                                       ignore_attributes = TRUE)
@@ -342,7 +346,9 @@ test_that("readWQPdots working", {
 context("getWebServiceData")
 test_that("long urls use POST", {
   testthat::skip_on_cran()
-  url <- paste0(rep("reallylongurl", 200), collapse = '')
+  baseURL <- dataRetrieval:::drURL("Result") 
+  url <- paste0(baseURL,
+                rep("reallylongurl", 200), collapse = '')
   with_mock(
     RETRY = function(method, ...) {
       return(method == "POST")
@@ -357,7 +363,9 @@ test_that("long urls use POST", {
 
 test_that("ngwmn urls don't use post", {
   testthat::skip_on_cran()
-  url <- paste0(rep("urlwithngwmn", 200), collapse = '')
+  baseURL <- dataRetrieval:::drURL("NGWMN") 
+  url <- paste0(baseURL,
+                rep("urlwithngwmn", 200), collapse = '')
   with_mock(
     RETRY = function(method, ...) {
       return(method == "POST")
@@ -413,4 +421,127 @@ test_that("internal functions",{
 
 })
 
+test_that("profiles", {
+  # Data profiles: "Organization Data"
+  org_data <- readWQPdata(statecode = "WI",
+                          countycode = "Dane",
+                          service = "Organization")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(org_data)))
+  
+  # Data profiles: "Site Data Only"
+  site_data <- readWQPdata(statecode = "WI",
+                           countycode = "Dane",
+                           service = "Station")
+  
+  expect_true(all(c("ProviderName", "MonitoringLocationIdentifier") %in% names(site_data)))
+  
+  # Data profiles: "Project Data"
+  project_data <- readWQPdata(statecode = "WI",
+                              countycode = "Dane",
+                              service = "Project")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(project_data)))
+  
+  # Data profiles: "Project Monitoring Location Weighting Data"
+  proj_mlwd <- readWQPdata(statecode = "WI",
+                           countycode = "Dane",
+                           service = "ProjectMonitoringLocationWeighting")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(proj_mlwd)))
+  
+  # Data profiles: "Sample Results (physical/chemical metadata)":
+  samp_data <- readWQPdata(siteid = "USGS-04024315",
+                           dataProfile = "resultPhysChem")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(samp_data)))
+  
+  # Data profiles: "Sample Results (biological metadata)"
+  samp_bio <- readWQPdata(siteid="USGS-04024315",
+                          dataProfile = "biological")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(samp_bio)))
+  
+  # Data profiles: "Sample Results (narrow)"
+  samp_narrow <- readWQPdata(siteid="USGS-04024315",
+                             dataProfile = "narrowResult")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(samp_narrow)))
+  
+  # Data profiles: "Sampling Activity"
+  samp_activity <- readWQPdata(siteid="USGS-04024315",
+                               dataProfile = "activityAll")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(samp_activity)))
+  
+  # Data profile: "Sampling Activity Metrics"
+  act_metrics <- readWQPdata(statecode = "WI",
+                             countycode = "Dane",
+                             service = "ActivityMetric")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(act_metrics)))
+  
+  # Data profile: "Result Detection Quantitation Limit Data"
+  dl_data <- readWQPdata(siteid="USGS-04024315",
+                         service = "ResultDetectionQuantitationLimit")
+  
+  expect_true(all(c("OrganizationIdentifier",
+                    "OrganizationFormalName") %in% names(dl_data)))
+})
+
+test_that("readWQPsummary", {
+  testthat::skip_on_cran()
+  
+  dane_county_data <- readWQPsummary(countycode = "US:55:025",
+                                   summaryYears = 5,
+                                   siteType = "Stream")
+  
+  summary_names <- c("Provider",                          
+                     "MonitoringLocationIdentifier",      
+                     "YearSummarized",                    
+                     "CharacteristicType",                
+                     "CharacteristicName",                
+                     "ActivityCount",                     
+                     "ResultCount",                       
+                     "LastResultSubmittedDate",           
+                     "OrganizationIdentifier",            
+                     "OrganizationFormalName",           
+                     "MonitoringLocationName",           
+                     "MonitoringLocationTypeName",        
+                     "ResolvedMonitoringLocationTypeName",
+                     "HUCEightDigitCode",
+                     "MonitoringLocationUrl",             
+                     "CountyName",            
+                     "StateName",                       
+                     "MonitoringLocationLatitude",        
+                     "MonitoringLocationLongitude" )
+  
+  expect_true(all(summary_names %in% names(dane_county_data)))
+  expect_true(diff(range(dane_county_data$YearSummarized)) <= 5)
+  
+  lake_sites <- readWQPsummary(siteType = "Lake, Reservoir, Impoundment",
+                             CharacteristicName = "Temperature, water",
+                             countycode = "US:55:025")
+  
+  expect_true(all(summary_names %in% names(lake_sites)))
+  expect_true(diff(range(lake_sites$YearSummarized)) >= 5)
+  
+  site1 <- readWQPsummary(siteid="USGS-07144100",
+                          summaryYears=5)
+  
+  expect_type(site1$ActivityCount, "double")
+  expect_type(site1$MonitoringLocationIdentifier, "character")
+  
+  expect_equal(attr(site1, "url"), "https://www.waterqualitydata.us/data/summary/monitoringLocation/search?siteid=USGS-07144100&summaryYears=5&zip=yes&dataProfile=periodOfRecord&mimeType=csv")
+  
+  
+})
 
