@@ -8,45 +8,55 @@ readWQPsummary(...)
 }
 \arguments{
 \item{\dots}{see \url{https://www.waterqualitydata.us/webservices_documentation}
-for a complete list of options. A list of arguments can also be supplied.}
+ for a complete list of options. A list of arguments can also be supplied.
+One way to figure out how to construct a WQP query is to go to the "Advanced" 
+form in the Water Quality Portal:
+\url{https://www.waterqualitydata.us/#mimeType=csv&providers=NWIS&providers=STEWARDS&providers=STORET}
+Use the form to discover what parameters are available. Once the query is 
+set in the form, scroll down to the "Query URL". You will see the parameters
+after "https://www.waterqualitydata.us/#". For example, if you chose "Nutrient"
+in the Characteristic Group dropdown, you will see characteristicType=Nutrient
+in the Query URL. The corresponding argument for dataRetrieval is
+characteristicType = "Nutrient". dataRetrieval users do not need to include
+mimeType, zip, and providers is optional (these arguments are picked automatically).}
 }
 \value{
 A data frame with at least the following columns:
-\tabular{lll}{ 
+\tabular{lll}{
 Name \tab Type \tab Description \cr
- "Provider" \tab character \tab Providing database.  \cr            
- "MonitoringLocationIdentifier" \tab character \tab	A designator used to 
-describe the unique name, number, or code assigned to identify 
+ "Provider" \tab character \tab Providing database.  \cr
+ "MonitoringLocationIdentifier" \tab character \tab	A designator used to
+describe the unique name, number, or code assigned to identify
 the monitoring location.\cr
  "YearSummarized" \tab numeric \tab The year of the summary \cr
- "CharacteristicType" \tab character \tab CharacteristicType  \cr  
- "CharacteristicName" \tab character \tab	The object, property, or substance 
+ "CharacteristicType" \tab character \tab CharacteristicType  \cr
+ "CharacteristicName" \tab character \tab	The object, property, or substance
 which is evaluated or enumerated by either a direct field measurement,
 a direct field observation, or by laboratory analysis of material
-collected in the field.\cr 
+collected in the field.\cr
  "ActivityCount" \tab numeric \tab The number of times the location was sampled \cr
  "ResultCount" \tab numeric \tab The number of individual data results. \cr
  "LastResultSubmittedDate" \tab Date \tab Date when data was last submitted. \cr
- "OrganizationIdentifier" \tab character \tab  A designator used to uniquely 
+ "OrganizationIdentifier" \tab character \tab  A designator used to uniquely
 identify a unique business establishment within a context.\cr
  "OrganizationFormalName" \tab character \tab  The legal designator
 (i.e. formal name) of an organization.\cr
- "MonitoringLocationName \tab character \tab MonitoringLocationName \cr 
+ "MonitoringLocationName \tab character \tab MonitoringLocationName \cr
  "MonitoringLocationTypeName" \tab character \tab MonitoringLocationTypeName \cr
  "ResolvedMonitoringLocationTypeName" \tab character \tab  \cr
  "HUCEightDigitCode" \tab character \tab 8-digit HUC id. \cr
  "MonitoringLocationUrl" \tab character \tab URL to monitoring location. \cr
  "CountyName" \tab character \tab County of sampling location. \cr
- "StateName" \tab character \tab State of sampling location. \cr  
- "MonitoringLocationLatitude"  \tab numeric \tab latitude of sampling 
+ "StateName" \tab character \tab State of sampling location. \cr
+ "MonitoringLocationLatitude"  \tab numeric \tab latitude of sampling
  location. \cr
- "MonitoringLocationLongitude" \tab numeric \tab longitude of sampling 
+ "MonitoringLocationLongitude" \tab numeric \tab longitude of sampling
  location. \cr
 }
 }
 \description{
-Returns a list of sites from the Water Quality Portal web service. This
-function gets the data from: \url{https://www.waterqualitydata.us}.
+Returns a list of sites with year-by-year information on what data is available.
+The function gets the data from: \url{https://www.waterqualitydata.us}.
 Arguments to the function should be based on
 \url{https://www.waterqualitydata.us/webservices_documentation}.
 The information returned from this function describes the
@@ -56,26 +66,39 @@ available data at the WQP sites, and some metadata on the sites themselves.
 \dontshow{if (is_dataRetrieval_user()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
 # Summary of a single site for the last 5 years:
-site_5 <- readWQPsummary(siteid="USGS-07144100",
-                        summaryYears=5)
-                        
-# Summary of a single site for the full period of record:
-site_all <- readWQPsummary(siteid="USGS-07144100",
-                           summaryYears="all")
+site_5 <- readWQPsummary(
+  siteid = "USGS-07144100",
+  summaryYears = 5
+)
 
-# Summary of the data available from streams in a single county:       
-dane_county_data <- readWQPsummary(countycode = "US:55:025",
-                        summaryYears = 5,
-                        siteType = "Stream")
+# Summary of a single site for the full period of record:
+site_all <- readWQPsummary(
+  siteid = "USGS-07144100",
+  summaryYears = "all"
+)
+
+# Summary of the data available from streams in a single county:
+dane_county_data <- readWQPsummary(
+  countycode = "US:55:025",
+  summaryYears = 5,
+  siteType = "Stream"
+)
 
 # Summary of the data all available from lakes in a single county:
-lake_sites <- readWQPsummary(siteType = "Lake, Reservoir, Impoundment",
-                         countycode = "US:55:025")
+lake_sites <- readWQPsummary(
+  siteType = "Lake, Reservoir, Impoundment",
+  countycode = "US:55:025"
+)
 
 # Summary of the data available for the last 5 years in New Jersey:
-state1 <- readWQPsummary(statecode="NJ",
-                         summaryYears = 5,
-                         siteType = "Stream")
+state1 <- readWQPsummary(
+  statecode = "NJ",
+  summaryYears = 5,
+  siteType = "Stream"
+)
 }
 \dontshow{\}) # examplesIf}
+}
+\seealso{
+whatWQPsites whatWQPdata
 }

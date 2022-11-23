@@ -4,61 +4,88 @@
 \alias{whatWQPdata}
 \title{Data Available from Water Quality Portal}
 \usage{
-whatWQPdata(..., saveFile = tempfile())
+whatWQPdata(..., saveFile = tempfile(), convertType = TRUE)
 }
 \arguments{
-\item{\dots}{see \url{https://www.waterqualitydata.us/webservices_documentation} for a complete list of options. A list of arguments can also be supplied.}
+\item{\dots}{see \url{https://www.waterqualitydata.us/webservices_documentation} for
+a complete list of options. A list of arguments can also be supplied.
+One way to figure out how to construct a WQP query is to go to the "Advanced" 
+form in the Water Quality Portal:
+\url{https://www.waterqualitydata.us/#mimeType=csv&providers=NWIS&providers=STEWARDS&providers=STORET}
+Use the form to discover what parameters are available. Once the query is 
+set in the form, scroll down to the "Query URL". You will see the parameters
+after "https://www.waterqualitydata.us/#". For example, if you chose "Nutrient"
+in the Characteristic Group dropdown, you will see characteristicType=Nutrient
+in the Query URL. The corresponding argument for dataRetrieval is
+characteristicType = "Nutrient". dataRetrieval users do not need to include
+mimeType, zip, and providers is optional (these arguments are picked automatically).}
 
 \item{saveFile}{path to save the incoming geojson output.}
+
+\item{convertType}{logical, defaults to \code{TRUE}. If \code{TRUE}, the function
+will convert the data to dates, datetimes,
+numerics based on a standard algorithm. If false, everything is returned as a character.}
 }
 \value{
 A data frame with at least the following columns:
-\tabular{lll}{ 
+\tabular{lll}{
 Name \tab Type \tab Description \cr
-"type_a" \tab character \tab Geojson type \cr 
-"features.type"  \tab character \tab Geojson feature type  \cr                     
-"type1"   \tab character \tab Geojson spatial type \cr                            
-"coordinates" \tab list \tab List of longitude/latitude \cr       
-"ProviderName"  \tab character \tab 	The name of the database that provided the data to the Water Qaulity 
-portal (E.G. STORET, NWIS, STEWARDS) \cr                     
-"OrganizationIdentifier" \tab character \tab A designator used to 
-uniquely identify a unique business establishment within a context. \cr             
-"OrganizationFormalName"  \tab character \tab The legal designator (i.e. formal name) of an organization. \cr        
-"MonitoringLocationIdentifier"  \tab character \tab 	A designator used to 
-describe the unique name, number, or code assigned to identify the monitoring location. \cr 
-"MonitoringLocationName"  \tab character \tab 	The designator specified by the sampling organization 
-for the site at which sampling or other activities are conducted. \cr 
-"MonitoringLocationTypeName" \tab character \tab 	The descriptive name for a type of monitoring location. \cr 
-"ResolvedMonitoringLocationTypeName" \tab character \tab  \cr 
-"HUCEightDigitCode"  \tab character \tab The 8 digit federal code used to identify the 
-hydrologic unit of the monitoring location to the cataloging unit level of precision. \cr                 
-"siteUrl"   \tab character \tab URL to site information \cr                          
-"activityCount" \tab numeric \tab  \cr                    
-"resultCount"  \tab numeric \tab  \cr                       
-"StateName" \tab character \tab  State name \cr                        
-"CountyName" \tab character \tab County name \cr  
+"type_a" \tab character \tab Geojson type \cr
+"features.type"  \tab character \tab Geojson feature type  \cr
+"type1"   \tab character \tab Geojson spatial type \cr
+"coordinates" \tab list \tab List of longitude/latitude \cr
+"ProviderName"  \tab character \tab 	The name of the database that provided the data to the Water Qaulity
+portal (E.G. STORET, NWIS, STEWARDS) \cr
+"OrganizationIdentifier" \tab character \tab A designator used to
+uniquely identify a unique business establishment within a context. \cr
+"OrganizationFormalName"  \tab character \tab The legal designator (i.e. formal name) of an organization. \cr
+"MonitoringLocationIdentifier"  \tab character \tab 	A designator used to
+describe the unique name, number, or code assigned to identify the monitoring location. \cr
+"MonitoringLocationName"  \tab character \tab 	The designator specified by the sampling organization
+for the site at which sampling or other activities are conducted. \cr
+"MonitoringLocationTypeName" \tab character \tab 	The descriptive name for a type of monitoring location. \cr
+"ResolvedMonitoringLocationTypeName" \tab character \tab  \cr
+"HUCEightDigitCode"  \tab character \tab The 8 digit federal code used to identify the
+hydrologic unit of the monitoring location to the cataloging unit level of precision. \cr
+"siteUrl"   \tab character \tab URL to site information \cr
+"activityCount" \tab numeric \tab  \cr
+"resultCount"  \tab numeric \tab  \cr
+"StateName" \tab character \tab  State name \cr
+"CountyName" \tab character \tab County name \cr
 }
 }
 \description{
-Returns a list of sites from the Water Quality Portal web service. This function gets the data from: \url{https://www.waterqualitydata.us}.
-Arguments to the function should be based on \url{https://www.waterqualitydata.us/webservices_documentation}.
-The information returned from this function describes the
+Returns a list of sites from the Water Quality Portal web service. This function gets
+the data from: \url{https://www.waterqualitydata.us}.
+Arguments to the function should be based on
+\url{https://www.waterqualitydata.us/webservices_documentation}.
+The information returned from whatWQPdata describes the
 available data at the WQP sites, and some metadata on the sites themselves.
+For example, a row is returned for each individual site that fulfills this 
+query. In that we can learn how many sampling activities and results 
+are available for the query. It does not break those results down by any finer 
+grain. For example, if you ask for "Nutrients" (characteristicGroup), you will
+not learn what specific nutrients are available at that site. For that 
+kind of data discovery see \code{readWQPsummary}.
 }
 \examples{
 \dontshow{if (is_dataRetrieval_user()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
-site1 <- whatWQPdata(siteid="USGS-01594440")
+site1 <- whatWQPdata(siteid = "USGS-01594440")
 
 type <- "Stream"
-sites <- whatWQPdata(countycode="US:55:025",siteType=type)
+sites <- whatWQPdata(countycode = "US:55:025", siteType = type)
 
-lakeSites <- whatWQPdata(siteType = "Lake, Reservoir, Impoundment", statecode = "US:55")
+lakeSites <- whatWQPdata(siteType = "Lake, Reservoir, Impoundment",
+                         countycode = "US:55:025")
+lakeSites_chars <- whatWQPdata(
+  siteType = "Lake, Reservoir, Impoundment",
+  countycode = "US:55:025", convertType = FALSE)
 }
 \dontshow{\}) # examplesIf}
 }
 \seealso{
-whatNWISsites
+whatWQPsites readWQPsummary readWQPdata
 }
 \keyword{WQP}
 \keyword{data}

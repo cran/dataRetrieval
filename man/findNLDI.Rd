@@ -14,7 +14,8 @@ findNLDI(
   nav = NULL,
   find = c("flowlines"),
   distance_km = 100,
-  no_sf = FALSE
+  no_sf = FALSE,
+  warn = TRUE
 )
 }
 \arguments{
@@ -40,8 +41,8 @@ one or more of the abbreviations ("UM", "UT", DM", "DD").}
 \item{find}{character vector. Define what resources to find along the
 navigation path(s) (see get_nldi_sources()$source). Can also include 'basin'
 or 'flowline', which will return the upstream basin of the starting feature
-or flowlines along the navigation respectively. The default is "flowlines". 
-If you provide any other resource, AND want flowlines, then flowlines must 
+or flowlines along the navigation respectively. The default is "flowlines".
+If you provide any other resource, AND want flowlines, then flowlines must
 be explicitly requested.}
 
 \item{distance_km}{numeric. Define how far to look along the navigation path in
@@ -49,6 +50,8 @@ kilometers (default = 100)}
 
 \item{no_sf}{if available, should `sf` be used for parsing,
 defaults to `TRUE` if `sf` is locally installed}
+
+\item{warn}{(default TRUE) should warnings be printed}
 }
 \value{
 a list of data.frames if sf is not installed, a list of sf objects if it is
@@ -70,42 +73,42 @@ arguments: comid, nwis, huc12, wqp, location, and start.
 # Find Features / Define origin features
 
 ## Find feature by COMID
- findNLDI(comid = 101)
- 
-## Find feature by NWIS ID
-  findNLDI(nwis = '11120000')
+findNLDI(comid = 101)
 
-## Find feature by WQP ID 
- findNLDI(wqp = 'USGS-04024315')
+## Find feature by NWIS ID
+findNLDI(nwis = "11120000")
+
+## Find feature by WQP ID
+findNLDI(wqp = "USGS-04024315")
 
 ## Find feature by LOCATION
- findNLDI(location = c(-115,40))
+findNLDI(location = c(-115, 40))
 
 ## GENERAL ORIGIN: COMID
- findNLDI(origin = list("comid" = 101))
+findNLDI(origin = list("comid" = 101))
 
 ## GENERAL ORIGIN: WaDE
- findNLDI(origin = list("wade" = 'CA_45206'))
+findNLDI(origin = list("wade" = "CA_45206"))
 
 # Navigation (flowlines will be returned if find is unspecified)
 # UPPER MAINSTEM of USGS-11120000
- findNLDI(nwis = '11120000', nav = "UM")
+findNLDI(nwis = "11120000", nav = "UM")
 
 # MULTI-REQUEST
 # UPPER MAINSTEM and TRIBUTARY of USGS-11120000
- findNLDI(nwis = '11120000', nav = c("UT", "UM"))
+findNLDI(nwis = "11120000", nav = c("UT", "UM"))
 
 # Discover Features(flowlines will not be returned unless included in find)
 
 ## Find feature(s) on the upper tributary of USGS-11120000
- findNLDI(nwis = '11120000', nav = "UT", find = c("nwis", "wqp"))
+findNLDI(nwis = "11120000", nav = "UT", find = c("nwis", "wqp"))
 
 ## Find upstream basin boundary and  of USGS-11120000
- findNLDI(nwis = '11120000',  find = "basin")
+findNLDI(nwis = "11120000", find = "basin")
 
 # Control Distance
 ## Limit search to 50 km
- findNLDI(comid = 101, nav = "DM", find = c("nwis", "wqp", "flowlines"), distance_km = 50)
+findNLDI(comid = 101, nav = "DM", find = c("nwis", "wqp", "flowlines"), distance_km = 50)
 }
 \dontshow{\}) # examplesIf}
 }
