@@ -2,7 +2,7 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrology and Water Quality
         Data
-Version: 2.7.12
+Version: 2.7.13
 Authors@R: c(
     person("Laura", "DeCicco", role = c("aut","cre"),
             email = "ldecicco@usgs.gov",
@@ -35,7 +35,7 @@ Copyright: This software is in the public domain because it contains
         Interior.
 Depends: R (>= 3.5.0)
 Imports: httr (>= 1.0.0), curl, lubridate (>= 1.5.0), stats, utils,
-        xml2, readr (>= 1.0.0), jsonlite
+        xml2, readr (>= 1.4.0), jsonlite
 Suggests: covr, dplyr, ggplot2, DT, gridExtra, knitr, rmarkdown, sf,
         testthat
 Encoding: UTF-8
@@ -43,9 +43,9 @@ BuildVignettes: true
 VignetteBuilder: knitr
 BugReports: https://github.com/DOI-USGS/dataRetrieval/issues
 URL: https://code.usgs.gov/water/dataRetrieval
-RoxygenNote: 7.2.2
+RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2022-11-21 16:49:02 UTC; ldecicco
+Packaged: 2023-07-20 20:33:39 UTC; ldecicco
 Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
   Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>),
   David Lorenz [aut],
@@ -58,4 +58,4 @@ Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
   Aliesha Krall [ctb] (<https://orcid.org/0000-0003-2521-5043>)
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2022-11-24 00:30:02 UTC
+Date/Publication: 2023-07-20 21:00:06 UTC

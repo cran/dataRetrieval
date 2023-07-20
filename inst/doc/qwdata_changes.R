@@ -53,17 +53,17 @@ param_WQP <- attr(wqpData, "variableInfo")
 ## ---------------------------------------------------------
 library(dplyr)
 
-nwisData_USED <- nwisData %>%
+nwisData_relavent <- nwisData %>%
   select(
     site_no, startDateTime, parm_cd,
     hyd_cond_cd, remark_cd, result_va
   ) %>%
   arrange(startDateTime, parm_cd)
 
-knitr::kable(head(nwisData_USED))
+knitr::kable(head(nwisData_relavent))
 
 ## ---------------------------------------------------------
-wqpData_USED <- wqpData %>%
+wqpData_relavent <- wqpData %>%
   select(
     site_no = MonitoringLocationIdentifier,
     startDateTime = ActivityStartDateTime,
@@ -73,7 +73,7 @@ wqpData_USED <- wqpData %>%
     result_va = ResultMeasureValue
   ) %>%
   arrange(startDateTime, parm_cd)
-knitr::kable(head(wqpData_USED))
+knitr::kable(head(wqpData_relavent))
 
 ## ---------------------------------------------------------
 
@@ -85,7 +85,7 @@ censored_text <- c(
   "Below Quantification Limit"
 )
 
-wqpData_USED <- wqpData %>%
+wqpData_relavent <- wqpData %>%
   mutate(left_censored = grepl(paste(censored_text, collapse = "|"),
     ResultDetectionConditionText,
     ignore.case = TRUE
@@ -101,10 +101,10 @@ wqpData_USED <- wqpData %>%
   ) %>%
   arrange(startDateTime, parm_cd)
 
-knitr::kable(head(wqpData_USED))
+knitr::kable(head(wqpData_relavent))
 
 ## ---------------------------------------------------------
-wqpData_USED_codes <- wqpData %>%
+wqpData_relavent_codes <- wqpData %>%
   mutate(units = ifelse(is.na(ResultMeasure.MeasureUnitCode),
     DetectionQuantitationLimitMeasure.MeasureUnitCode,
     ResultMeasure.MeasureUnitCode
@@ -116,17 +116,17 @@ wqpData_USED_codes <- wqpData %>%
   ) %>%
   distinct()
 
-knitr::kable(wqpData_USED_codes)
+knitr::kable(wqpData_relavent_codes)
 
 ## ---------------------------------------------------------
-wqpData_USED_codes <- wqpData %>%
+wqpData_with_codes <- wqpData %>%
   select(
     HydrologicCondition, HydrologicEvent,
     ActivityTypeCode, ActivityMediaName
   ) %>%
   distinct()
 
-knitr::kable(head(wqpData_USED_codes))
+knitr::kable(head(wqpData_with_codes))
 
 ## ----codes, echo=FALSE------------------------------------
 df <- data.frame(

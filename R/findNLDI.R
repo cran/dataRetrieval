@@ -34,6 +34,7 @@ find_good_names <- function(input, type) {
 
 #' @title Get current NLDI offerings
 #' @description Used to query the current resources available through the NLDI
+#' @param url URL for NLDI sources. Default is supplied by package environment.
 #' @return data.frame
 #' @export
 #' @keywords nldi
@@ -41,11 +42,10 @@ find_good_names <- function(input, type) {
 #' \donttest{
 #' get_nldi_sources()
 #' }
-
-get_nldi_sources <- function() {
+get_nldi_sources <- function(url = pkg.env$nldi_base) {
   res <-
     httr::RETRY("GET",
-      pkg.env$nldi_base,
+      url,
       times = 3,
       pause_cap = 60
     )
@@ -232,7 +232,7 @@ valid_ask <- function(all, type) {
 
 #' @title R Client for the Network Linked Data Index
 #' @description Provides a formal client to the USGS
-#' \href{https://labs.waterdata.usgs.gov/about-nldi/index.html}{Network Linked Data Index}.
+#' Network Linked Data Index.
 #' @details The function is useful for topology and location based
 #' feature discovery. A user must specify an origin feature, optional navigation
 #' direction(s) along the network, as well as features to identify along the
