@@ -1,13 +1,13 @@
-89832ea082a6faa0b898f7dcb3573d34 *DESCRIPTION
+dcc8671b5b28e585f209c7b550711f46 *DESCRIPTION
 aaf9f78db9d13c47b4fd90c47aa7d0c7 *LICENSE.note
 5bb92814a011a0f83da8afbd3b0faa4b *NAMESPACE
-216f599e4b3b058d5dfce5bfc7d451f7 *NEWS
+38cc72e7511a8d037e2cf070eaaed4ea *NEWS
 23fbb18b802a55a3a767d0ed1ca96f12 *R/AAA.R
 0d3886cc44a21f6d252f681fb3a62761 *R/addWaterYear.R
 4b4c679025c7fff15b425e7bf3332cc1 *R/checkWQPdates.R
 c6028a45aab11ab1edb0b3ee748706c7 *R/constructNWISURL.R
-919e82ba7a19d8e87f41ea3ad704e921 *R/dataRetrievals-package.R
-be67ead0d28905d9465e7408cda8c568 *R/findNLDI.R
+ef76b354c25f7a6e03bcf28efea8b0f3 *R/dataRetrievals-package.R
+780cd54bad66545b74ac710e20581980 *R/findNLDI.R
 c8e512d49b12f2c06c0d97c42cf28838 *R/getWebServiceData.R
 f67bce93ba1c56fb231457cafec19fa5 *R/importNGWMN_wml2.R
 010542c3191e713ccf5310c5c1b98b8b *R/importRDB1.R
@@ -27,7 +27,7 @@ fc10a52b144e8f0b830bf3f34fcb5059 *R/readNWISsite.R
 05e0763492488aca60241b856d3e62c1 *R/renameColumns.R
 0d247471d2e3f714908db3e7fbb51abe *R/setAccess.R
 4f2815c0b0b9d67d12400b211d3b8b8d *R/sysdata.rda
-9c0d12a7434c332f1536a5d89735ae3c *R/whatNWISdata.R
+49d44ca60d809d6b96598167f341b7e9 *R/whatNWISdata.R
 6ef6d328bbe78c864d702831c9da1718 *R/whatNWISsites.R
 720e4930271ed76fc290ce23f2e9be04 *R/whatWQPdata.R
 f386f03d3c2ac60b65bab2a7832d9311 *R/whatWQPsites.R
@@ -36,7 +36,7 @@ f386f03d3c2ac60b65bab2a7832d9311 *R/whatWQPsites.R
 8ce67ee6ed683e440861f9c3df474fc7 *inst/CITATION
 858ae02baa37aa65f2325d31bc74c84c *inst/doc/dataRetrieval.R
 7ca40214f94d7457e6ffb06ed9ccf029 *inst/doc/dataRetrieval.Rmd
-8df981c3a1b8bd01372f438d6b14f3a0 *inst/doc/dataRetrieval.html
+be8f6370616f91d522a35cba793a12bb *inst/doc/dataRetrieval.html
 2607be43711fbe0edb135043724ff2db *inst/doc/qwdata_changes.R
 7ff593473202eb777267f7379fed7861 *inst/doc/qwdata_changes.Rmd
 ba7bcf6232781924803332253e093812 *inst/doc/qwdata_changes.html
@@ -55,7 +55,7 @@ d4b584e92984a0443104449aeb8a611b *man/constructWQPURL.Rd
 35cc6c4766c646259f581c763d0ebdc3 *man/convertLists.Rd
 44d3319577c6e488ef80c2cff44bc527 *man/countyCd.Rd
 df0b23982ed9f408caddb766da9afd04 *man/countyCdLookup.Rd
-52ae93a6f4b10da3c5dc631b23cf94e2 *man/dataRetrieval.Rd
+b33695d37ed4d039972f008bdc82dc8e *man/dataRetrieval.Rd
 e6a826d125c14a5e9be1b3427b0c64e6 *man/default_ua.Rd
 78d97a586bf84de7f168e47611b88770 *man/figures/hex_logo.png
 859dfa2d26e39da07fb0151fa95ce4cd *man/figures/logo.png
@@ -105,7 +105,7 @@ c18dcc3838d8944d4f42ef1af1ae67f6 *man/whatWQPdata.Rd
 170707cd5d5c1b768015b8acc02b8e05 *tests/testthat.R
 7703d5c16fbb69a120ac415daab22c4f *tests/testthat/tests_general.R
 b458181fec820a8d103972174f5ff42a *tests/testthat/tests_imports.R
-8cd42718f9c40c7cce004bc8264b0945 *tests/testthat/tests_nldi.R
+6ef5182999708ee92f0bdc7b0f4da8b2 *tests/testthat/tests_nldi.R
 c7d06ed52b892990b05c13b1f5deeb0b *tests/testthat/tests_userFriendly_fxns.R
 d2bd258a1a5cba31082baf9ace957bf9 *vignettes/Rhelp.png
 7ca40214f94d7457e6ffb06ed9ccf029 *vignettes/dataRetrieval.Rmd
