@@ -1,10 +1,10 @@
 #' USGS data availability
 #'
 #' Imports a table of available parameters, period of record, and count. See
-#' \url{https://waterservices.usgs.gov/rest/Site-Service.html}
+#' \url{https://waterservices.usgs.gov/docs/site-service/}
 #' for more information.
 #'
-#' @param \dots see \url{https://waterservices.usgs.gov/rest/Site-Service.html}
+#' @param \dots see \url{https://waterservices.usgs.gov/docs/site-service/}
 #' for a complete list of options.  A list of arguments can also be supplied.
 #' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function will
 #' convert the data to dates, datetimes,
@@ -86,6 +86,7 @@
 whatNWISdata <- function(..., convertType = TRUE) {
   matchReturn <- convertLists(...)
 
+  prewarned <- FALSE
   if ("service" %in% names(matchReturn)) {
     service <- matchReturn$service
 
@@ -93,9 +94,9 @@ whatNWISdata <- function(..., convertType = TRUE) {
       .Deprecated(
         old = "whatNWISdata", package = "dataRetrieval",
         new = "whatWQPdata",
-        msg = "NWIS qw web services are being retired. Please see the vignette
-'Changes to NWIS QW services' for more information."
+        msg = nwis_message()
       )
+      prewarned <- TRUE
     } 
   } else {
     service <- "all"
@@ -155,5 +156,10 @@ whatNWISdata <- function(..., convertType = TRUE) {
     SiteFile$end_date <- as.Date(suppressWarnings(lubridate::parse_date_time(SiteFile$end_date, c("Ymd", "mdY", "Y!"))))
   }
 
+  if(any(SiteFile$data_type_cd == "qw")){
+    if(!prewarned){
+      message(nwis_message())
+    }
+  }
   return(SiteFile)
 }

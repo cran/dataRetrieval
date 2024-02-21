@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Introduction to the dataRetrieval
 package</h1>
 <h4 class="author">Laura A. DeCicco and Robert M. Hirsch</h4>
-<h4 class="date">04 October, 2023</h4>
+<h4 class="date">21 February, 2024</h4>
 
 
 <div id="TOC">
@@ -387,7 +387,16 @@ whatWQPdata</a></li>
 <ul>
 <li><a href="#new-to-r" id="toc-new-to-r"><span class="toc-section-number">5.1</span> New to R?</a></li>
 </ul></li>
-<li><a href="#disclaimer" id="toc-disclaimer"><span class="toc-section-number">6</span> Disclaimer</a></li>
+<li><a href="#citations" id="toc-citations"><span class="toc-section-number">6</span> Citations</a>
+<ul>
+<li><a href="#citing-the-dataretrieval-package" id="toc-citing-the-dataretrieval-package"><span class="toc-section-number">6.1</span> Citing the dataRetrieval
+package</a></li>
+<li><a href="#citing-nwis-data" id="toc-citing-nwis-data"><span class="toc-section-number">6.2</span> Citing NWIS data</a></li>
+<li><a href="#citing-wqp-data" id="toc-citing-wqp-data"><span class="toc-section-number">6.3</span> Citing WQP data</a></li>
+<li><a href="#citing-water-quality-portal-itself" id="toc-citing-water-quality-portal-itself"><span class="toc-section-number">6.4</span> Citing Water Quality Portal
+itself</a></li>
+</ul></li>
+<li><a href="#disclaimer" id="toc-disclaimer"><span class="toc-section-number">7</span> Disclaimer</a></li>
 </ul>
 </div>
 
@@ -416,14 +425,8 @@ not imply endorsement by the U.S. Government.</p>
 <span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="st">&quot;1980-01-01&quot;</span>, <span class="st">&quot;2010-01-01&quot;</span></span>
 <span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>)</span>
 <span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co"># Sample data Nitrate:</span></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00618&quot;</span></span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>qwData <span class="ot">&lt;-</span> <span class="fu">readNWISqw</span>(</span>
-<span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>  siteNumber, parameterCd,</span>
-<span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>  <span class="st">&quot;1980-01-01&quot;</span>, <span class="st">&quot;2010-01-01&quot;</span></span>
-<span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>)</span>
-<span id="cb1-19"><a href="#cb1-19" tabindex="-1"></a></span>
-<span id="cb1-20"><a href="#cb1-20" tabindex="-1"></a>pCode <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>pCode <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
 <p>USGS data are made available through the National Water Information
 System (NWIS).</p>
 <p>Table 1 describes the functions available in the
@@ -470,15 +473,6 @@ System (NWIS).</p>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
-<td align="left">readNWISqw</td>
-<td align="left">Water quality</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">expanded=TRUE, tz=‘UTC’</td>
-<td align="left">NWIS</td>
-</tr>
-<tr class="even">
 <td align="left">readNWISuv</td>
 <td align="left">Instantaneous values</td>
 <td align="left">req.</td>
@@ -487,7 +481,7 @@ System (NWIS).</p>
 <td align="left">tz=‘UTC’</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">readNWISrating</td>
 <td align="left">Rating table for active streamgage</td>
 <td align="left">req.</td>
@@ -496,7 +490,7 @@ System (NWIS).</p>
 <td align="left">type=’base</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">readNWISmeas</td>
 <td align="left">Surface-water measurements</td>
 <td align="left">req.</td>
@@ -505,7 +499,7 @@ System (NWIS).</p>
 <td align="left">tz=‘UTC’</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">readNWISpeak</td>
 <td align="left">Peak flow</td>
 <td align="left">req.</td>
@@ -514,7 +508,7 @@ System (NWIS).</p>
 <td align="left"></td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">readNWISgwl</td>
 <td align="left">Groundwater levels</td>
 <td align="left">req.</td>
@@ -523,7 +517,7 @@ System (NWIS).</p>
 <td align="left">tz=‘UTC’</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">readNWISuse</td>
 <td align="left">Water use</td>
 <td align="left"></td>
@@ -532,7 +526,7 @@ System (NWIS).</p>
 <td align="left">stateCd, countyCd, years=‘ALL’, categories=‘ALL’</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">readNWISstat</td>
 <td align="left">Statistical service</td>
 <td align="left">req.</td>
@@ -541,7 +535,7 @@ System (NWIS).</p>
 <td align="left">statReportType=‘daily’, statType=‘mean’</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">readNWISpCode</td>
 <td align="left">Parameter code information</td>
 <td align="left">req.</td>
@@ -550,7 +544,7 @@ System (NWIS).</p>
 <td align="left"></td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">readNWISsite</td>
 <td align="left">Site information</td>
 <td align="left">req.</td>
@@ -559,7 +553,7 @@ System (NWIS).</p>
 <td align="left"></td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">whatNWISsites</td>
 <td align="left">Site search using user-specified queries</td>
 <td align="left">req.</td>
@@ -568,7 +562,7 @@ System (NWIS).</p>
 <td align="left">…</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">whatNWISdata</td>
 <td align="left">Data availability</td>
 <td align="left">opt.</td>
@@ -577,7 +571,7 @@ System (NWIS).</p>
 <td align="left">service, …</td>
 <td align="left">NWIS</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">readWQPdata</td>
 <td align="left">User-specified queries</td>
 <td align="left">opt.</td>
@@ -586,7 +580,7 @@ System (NWIS).</p>
 <td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">readWQPqw</td>
 <td align="left">Water quality data</td>
 <td align="left">req.</td>
@@ -595,7 +589,7 @@ System (NWIS).</p>
 <td align="left"></td>
 <td align="left">WQP</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">whatWQPsites</td>
 <td align="left">Site search</td>
 <td align="left">opt.</td>
@@ -604,7 +598,7 @@ System (NWIS).</p>
 <td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">whatWQPdata</td>
 <td align="left">Data availability</td>
 <td align="left">opt.</td>
@@ -613,7 +607,7 @@ System (NWIS).</p>
 <td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">readWQPsummary</td>
 <td align="left">Summary data</td>
 <td align="left">opt.</td>
@@ -622,7 +616,7 @@ System (NWIS).</p>
 <td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">whatWQPmetrics</td>
 <td align="left">Metric availability</td>
 <td align="left">opt.</td>
@@ -631,7 +625,7 @@ System (NWIS).</p>
 <td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">whatWQPsamples</td>
 <td align="left">Sample availability</td>
 <td align="left">opt.</td>
@@ -761,7 +755,7 @@ station name, drainage area, latitude, and longitude.
 sites with a vector input.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>siteNumbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;01491000&quot;</span>, <span class="st">&quot;01645000&quot;</span>)</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>siteINFO <span class="ot">&lt;-</span> <span class="fu">readNWISsite</span>(siteNumbers)</span></code></pre></div>
-<p>Site information is obtained from: <a href="https://waterservices.usgs.gov/rest/Site-Test-Tool.html">https://waterservices.usgs.gov/rest/Site-Test-Tool.html</a></p>
+<p>Site information is obtained from: <a href="https://waterservices.usgs.gov/docs/site-service/">https://waterservices.usgs.gov/docs/site-service/</a></p>
 <p>Information on the returned data can be found with the
 <code>comment</code> function as described in the <a href="#embedded-metadata">Metadata</a> section.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">comment</span>(siteINFO)</span></code></pre></div>
@@ -893,7 +887,7 @@ function. The arguments for this function are <code>siteNumbers</code>,
 <code>parameterCd</code>, <code>startDate</code>, <code>endDate</code>,
 and <code>statCd</code> (defaults to “00003”). If you want to use the
 default values, you do not need to list them in the function call. Daily
-data is pulled from <a href="https://waterservices.usgs.gov/rest/DV-Test-Tool.html">https://waterservices.usgs.gov/rest/DV-Test-Tool.html</a>.</p>
+data is pulled from <a href="https://waterservices.usgs.gov/docs/dv-service/">https://waterservices.usgs.gov/docs/dv-service/</a>.</p>
 <p>The dates (start and end) must be in the format “YYYY-MM-DD” (note:
 the user must include the quotes). Setting the start date to “” (no
 space) will prompt the program to ask for the earliest date, and setting
@@ -1007,7 +1001,7 @@ America/Jamaica
 America/Managua
 America/Phoenix
 America/Metlakatla</code></pre>
-<p>Data are retrieved from <a href="https://waterservices.usgs.gov/rest/IV-Test-Tool.html">https://waterservices.usgs.gov/rest/IV-Test-Tool.html</a>.
+<p>Data are retrieved from <a href="https://waterservices.usgs.gov/docs/instantaneous-values/">https://waterservices.usgs.gov/docs/instantaneous-values/</a>.
 There are occasions where NWIS values are not reported as numbers,
 instead a common example is “Ice”. Any value that cannot be converted to
 a number will be reported as NA in this package. Site information and
@@ -1095,14 +1089,13 @@ beta.</p>
 Web Retrievals</h1>
 <p>Water quality data sets available from the <a href="https://www.waterqualitydata.us/">Water Quality Data Portal</a>.
 These data sets can be housed in either the STORET database (data from
-EPA), NWIS database (data from USGS), STEWARDS database (data from
-USDA), and additional databases are slated to be included in the future.
-Because only USGS uses parameter codes, a “characteristic name” must be
-supplied. The <code>readWQPqw</code> function can take either a USGS
-parameter code, or a more general characteristic name in the parameterCd
-input argument. The Water Quality Data Portal includes data discovery
-tools and information on characteristic names. The following example
-retrieves specific conductance from a DNR site in Wisconsin.</p>
+EPA) and NWIS database (data from USGS). Because only USGS uses
+parameter codes, a “characteristic name” must be supplied. The
+<code>readWQPqw</code> function can take either a USGS parameter code,
+or a more general characteristic name in the parameterCd input argument.
+The Water Quality Data Portal includes data discovery tools and
+information on characteristic names. The following example retrieves
+specific conductance from a DNR site in Wisconsin.</p>
 <div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>specificCond <span class="ot">&lt;-</span> <span class="fu">readWQPqw</span>(</span>
 <span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>  <span class="st">&quot;WIDNR_WQX-10032762&quot;</span>,</span>
 <span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>  <span class="st">&quot;Specific conductance&quot;</span>,</span>
@@ -1125,14 +1118,14 @@ whatNWISsites</h3>
 <p>The function <code>whatNWISsites</code> can be used to discover NWIS
 sites based on any query that the NWIS Site Service offers. This is done
 by using the <code>...</code> argument, which allows the user to use any
-arbitrary input argument. We can then use the service <a href="https://waterservices.usgs.gov/rest/Site-Test-Tool.html">here</a>
-to discover many options for searching for NWIS sites. For example, you
-may want to search for sites in a lat/lon bounding box, or only sites
-tidal streams, or sites with water quality samples, sites above a
-certain altitude, etc. The results of this site query generate a URL.
-For example, the tool provided a search within a specified bounding box,
-for sites that have daily discharge (parameter code = 00060) and
-temperature (parameter code = 00010). The generated URL is:</p>
+arbitrary input argument. We can then use the service <a href="https://waterservices.usgs.gov/docs/site-service">here</a> to
+discover many options for searching for NWIS sites. For example, you may
+want to search for sites in a lat/lon bounding box, or only sites tidal
+streams, or sites with water quality samples, sites above a certain
+altitude, etc. The results of this site query generate a URL. For
+example, the tool provided a search within a specified bounding box, for
+sites that have daily discharge (parameter code = 00060) and temperature
+(parameter code = 00010). The generated URL is:</p>
 <p><a href="https://waterservices.usgs.gov/nwis/site/?format=rdb&amp;bBox=-83.0,36.5,-81.0,38.5&amp;parameterCd=00010,00060&amp;hasDataTypeCd=dv">https://waterservices.usgs.gov/nwis/site/?format=rdb&amp;bBox=-83.0,36.5,-81.0,38.5&amp;parameterCd=00010,00060&amp;hasDataTypeCd=dv</a></p>
 <p>The following <code>dataRetrieval</code> code can be used to get
 those sites:</p>
@@ -1152,9 +1145,9 @@ services are available.</p>
 <table>
 <caption>Table 5: NWIS general data calls</caption>
 <colgroup>
-<col width="6%" />
-<col width="12%" />
-<col width="80%" />
+<col width="7%" />
+<col width="14%" />
+<col width="78%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -1167,17 +1160,17 @@ services are available.</p>
 <tr class="odd">
 <td align="left">dv</td>
 <td align="left">Daily</td>
-<td align="left"><a href="https://waterservices.usgs.gov/rest/DV-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/DV-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/DV-Test-Tool.html</a><a></td>
+<td align="left"><a href="https://waterservices.usgs.gov/docs/dv-service/" target="_blank"><a href="https://waterservices.usgs.gov/docs/dv-service/" class="uri">https://waterservices.usgs.gov/docs/dv-service/</a><a></td>
 </tr>
 <tr class="even">
 <td align="left">iv</td>
 <td align="left">Instantaneous</td>
-<td align="left"><a href="https://waterservices.usgs.gov/rest/IV-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/IV-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/IV-Test-Tool.html</a><a></td>
+<td align="left"><a href="https://waterservices.usgs.gov/docs/instantaneous-values/" target="_blank"><a href="https://waterservices.usgs.gov/docs/instantaneous-values/" class="uri">https://waterservices.usgs.gov/docs/instantaneous-values/</a><a></td>
 </tr>
 <tr class="odd">
 <td align="left">gwlevels</td>
 <td align="left">Groundwater Levels</td>
-<td align="left"><a href="https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html</a><a></td>
+<td align="left"><a href="https://waterservices.usgs.gov/docs/groundwater-levels/" target="_blank"><a href="https://waterservices.usgs.gov/docs/groundwater-levels/" class="uri">https://waterservices.usgs.gov/docs/groundwater-levels/</a><a></td>
 </tr>
 <tr class="even">
 <td align="left">qwdata</td>
@@ -1197,7 +1190,7 @@ services are available.</p>
 <tr class="odd">
 <td align="left">stat</td>
 <td align="left">Statistics Service</td>
-<td align="left"><a href="https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html" target="_blank"><a href="https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html" class="uri">https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html</a><a></td>
+<td align="left"><a href="https://waterservices.usgs.gov/docs/statistics/" target="_blank"><a href="https://waterservices.usgs.gov/docs/statistics/" class="uri">https://waterservices.usgs.gov/docs/statistics/</a><a></td>
 </tr>
 </tbody>
 </table>
@@ -1330,12 +1323,140 @@ code, type the name of the function, without parentheses.</p>
 <div class="figcaption">A simple R help file</div>
 </div>
 <p>Additionally, many R packages have vignette files attached (such as
-this paper). To view the vignette:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">topic =</span> <span class="st">&quot;Introduction&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
+this paper). To see the list of vignettes in a package:</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="co"># to see all available vignettes:</span></span>
+<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">package=</span><span class="st">&quot;dataRetrieval&quot;</span>)</span>
+<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co">#to open a specific vignette:</span></span>
+<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">topic =</span> <span class="st">&quot;qwdata_changes&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
 </div>
 </div>
-<div id="disclaimer" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Disclaimer</h1>
+<div id="citations" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Citations</h1>
+<div id="citing-the-dataretrieval-package" class="section level2" number="6.1">
+<h2><span class="header-section-number">6.1</span> Citing the
+dataRetrieval package</h2>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
+<pre><code>## To cite dataRetrieval in publications, please use:
+## 
+##   De Cicco, L.A., Hirsch, R.M., Lorenz, D., Watkins,
+##   W.D., Johnson, M., 2024, dataRetrieval: R packages
+##   for discovering and retrieving water data available
+##   from Federal hydrologic web services, v.2.7.15,
+##   doi:10.5066/P9X4L3GE
+## 
+## A BibTeX entry for LaTeX users is
+## 
+##   @Manual{,
+##     author = {Laura DeCicco and Robert Hirsch and David Lorenz and David Watkins and Mike Johnson},
+##     title = {dataRetrieval: R packages for discovering and retrieving water data available from U.S. federal hydrologic web services},
+##     publisher = {U.S. Geological Survey},
+##     address = {Reston, VA},
+##     version = {2.7.15},
+##     institution = {U.S. Geological Survey},
+##     year = {2024},
+##     doi = {10.5066/P9X4L3GE},
+##     url = {https://code.usgs.gov/water/dataRetrieval},
+##   }</code></pre>
+</div>
+<div id="citing-nwis-data" class="section level2" number="6.2">
+<h2><span class="header-section-number">6.2</span> Citing NWIS data</h2>
+<p>The requested format is:</p>
+<p>U.S. Geological Survey, 2023, National Water Information System data
+available on the World Wide Web (USGS Water Data for the Nation),
+accessed [April 26, 2023], at <a href="https://waterdata.usgs.gov/nwis/" class="uri">https://waterdata.usgs.gov/nwis/</a>. <a href="https://dx.doi.org/10.5066/F7P55KJN" class="uri">https://dx.doi.org/10.5066/F7P55KJN</a></p>
+<p>This can be created from the attributes of the data using the
+<code>create_NWIS_bib</code> function:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>dv <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(<span class="st">&quot;09010500&quot;</span>, <span class="st">&quot;00060&quot;</span>)</span>
+<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a></span>
+<span id="cb40-3"><a href="#cb40-3" tabindex="-1"></a>NWIScitation <span class="ot">&lt;-</span> <span class="fu">create_NWIS_bib</span>(dv)</span>
+<span id="cb40-4"><a href="#cb40-4" tabindex="-1"></a>NWIScitation</span></code></pre></div>
+<pre><code>U.S. Geological Survey (2024). _National Water Information
+System data available on the World Wide Web (USGS Water Data
+for the Nation)_. doi:10.5066/F7P55KJN
+&lt;https://doi.org/10.5066/F7P55KJN&gt;, Accessed Feb 09, 2024,
+&lt;https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01&gt;.</code></pre>
+<p>Alternative output is available:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;Bibtex&quot;</span>)</span></code></pre></div>
+<pre><code>@Manual{,
+  title = {National Water Information System data available on the World Wide Web (USGS Water Data for the Nation)},
+  author = {{U.S. Geological Survey}},
+  doi = {10.5066/F7P55KJN},
+  note = {Accessed Feb 09, 2024},
+  year = {2024},
+  url = {https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01},
+}</code></pre>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;citation&quot;</span>)</span></code></pre></div>
+<pre><code>U.S. Geological Survey, 2024, National Water Information System
+data available on the World Wide Web (USGS Water Data for the
+Nation), accessed Feb 09, 2024, at
+https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01,
+https://dx.doi.org/10.5066/F7P55KJN
+
+A BibTeX entry for LaTeX users is
+
+  @Manual{,
+    title = {National Water Information System data available on the World Wide Web (USGS Water Data for the Nation)},
+    author = {{U.S. Geological Survey}},
+    doi = {10.5066/F7P55KJN},
+    note = {Accessed Feb 09, 2024},
+    year = {2024},
+    url = {https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01},
+  }</code></pre>
+</div>
+<div id="citing-wqp-data" class="section level2" number="6.3">
+<h2><span class="header-section-number">6.3</span> Citing WQP data</h2>
+<p>Citations for specific datasets should use this format:</p>
+<p>National Water Quality Monitoring Council, YYYY, Water Quality
+Portal, accessed mm, dd, yyyy, hyperlink_for_query, <a href="https://doi.org/10.5066/P9QRKUVJ" class="uri">https://doi.org/10.5066/P9QRKUVJ</a>.</p>
+<p>This can be obtained using the <code>create_WQP_bib</code>
+function:</p>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>SC <span class="ot">&lt;-</span> <span class="fu">readWQPqw</span>(<span class="at">siteNumbers =</span> <span class="st">&quot;USGS-05288705&quot;</span>,</span>
+<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>                <span class="at">parameterCd =</span> <span class="st">&quot;00300&quot;</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a>WQPcitation <span class="ot">&lt;-</span> <span class="fu">create_WQP_bib</span>(SC)</span>
+<span id="cb46-5"><a href="#cb46-5" tabindex="-1"></a>WQPcitation</span></code></pre></div>
+<pre><code>National Water Quality Monitoring Council (2024). _ Water
+Quality Portal_. doi:10.5066/P9QRKUVJ
+&lt;https://doi.org/10.5066/P9QRKUVJ&gt;, Accessed Feb 09, 2024,
+&lt;https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes&gt;.</code></pre>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="fu">print</span>(WQPcitation, <span class="at">style =</span> <span class="st">&quot;Bibtex&quot;</span>)</span></code></pre></div>
+<pre><code>@Manual{,
+  title = { Water Quality Portal},
+  author = {{National Water Quality Monitoring Council}},
+  doi = {10.5066/P9QRKUVJ},
+  note = {Accessed Feb 09, 2024},
+  year = {2024},
+  url = {https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes},
+}</code></pre>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="fu">print</span>(WQPcitation, <span class="at">style =</span> <span class="st">&quot;citation&quot;</span>)</span></code></pre></div>
+<pre><code>National Water Quality Monitoring Council, 2024, Water Quality
+Portal, accessed 02, 09, 2024,
+https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes,
+https://doi.org/10.5066/P9QRKUVJ.
+
+A BibTeX entry for LaTeX users is
+
+  @Manual{,
+    title = { Water Quality Portal},
+    author = {{National Water Quality Monitoring Council}},
+    doi = {10.5066/P9QRKUVJ},
+    note = {Accessed Feb 09, 2024},
+    year = {2024},
+    url = {https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes},
+  }</code></pre>
+</div>
+<div id="citing-water-quality-portal-itself" class="section level2" number="6.4">
+<h2><span class="header-section-number">6.4</span> Citing Water Quality
+Portal itself</h2>
+<p>General Water Quality Portal citations should use the following:</p>
+<p>Water Quality Portal. Washington (DC): National Water Quality
+Monitoring Council, United States Geological Survey (USGS),
+Environmental Protection Agency (EPA); 2021. <a href="https://doi.org/10.5066/P9QRKUVJ" class="uri">https://doi.org/10.5066/P9QRKUVJ</a>.</p>
+</div>
+</div>
+<div id="disclaimer" class="section level1" number="7">
+<h1><span class="header-section-number">7</span> Disclaimer</h1>
 <p>This information is preliminary and is subject to revision. It is
 being provided to meet the need for timely best science. The information
 is provided on the condition that neither the U.S. Geological Survey nor

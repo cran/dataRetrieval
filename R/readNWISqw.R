@@ -106,10 +106,7 @@ readNWISqw <- function(siteNumbers,
                        tz = "UTC") {
   .Deprecated(
     new = "readWQPqw", package = "dataRetrieval",
-    msg = "NWIS qw web services are being retired.
-Please see vignette('qwdata_changes', package = 'dataRetrieval')
-for more information.
-https://cran.r-project.org/web/packages/dataRetrieval/vignettes/qwdata_changes.html"
+    msg = nwis_message()
   )
 
   pgrp <- c(

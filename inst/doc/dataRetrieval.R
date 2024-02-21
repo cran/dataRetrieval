@@ -25,12 +25,6 @@ knitr::opts_chunk$set(
 #    "1980-01-01", "2010-01-01"
 #  )
 #  
-#  # Sample data Nitrate:
-#  parameterCd <- "00618"
-#  qwData <- readNWISqw(
-#    siteNumber, parameterCd,
-#    "1980-01-01", "2010-01-01"
-#  )
 #  
 #  pCode <- readNWISpCode(parameterCd)
 
@@ -38,7 +32,6 @@ knitr::opts_chunk$set(
 Functions <- c(
   "readNWISdata",
   "readNWISdv",
-  "readNWISqw",
   "readNWISuv",
   "readNWISrating",
   "readNWISmeas",
@@ -61,7 +54,6 @@ Functions <- c(
 Arguments <- c(
   "service, tz='UTC', ...", # readNWISdata
   "statCd='00003'", # readNWISdv
-  "expanded=TRUE, tz='UTC'", # readNWISqw
   "tz='UTC'", # readNWISuv
   "type='base", # readNWISrating
   "tz='UTC'", # readNWISmeas
@@ -81,7 +73,6 @@ Arguments <- c(
 Description <- c(
   "Data using user-specified queries", # readNWISdata
   "Daily values", # readNWISdv
-  "Water quality", # readNWISqw
   "Instantaneous values", # readNWISuv
   "Rating table for active streamgage", # readNWISrating
   "Surface-water measurements", # readNWISmeas
@@ -101,18 +92,18 @@ Description <- c(
   "Metric availability",
   "Sample availability"
 )
-Source <- c(rep("NWIS", 14), rep("WQP", 7))
+Source <- c(rep("NWIS", 13), rep("WQP", 7))
 Site <- c(
-  "opt.", rep("req.", 7), "",
+  "opt.", rep("req.", 6), "",
   rep("req.", 4), "opt.", "opt.", "req.", rep("opt.", 5)
 )
 parameterCd <- c(
-  "opt.", rep("req.", 3),
+  "opt.", rep("req.", 2),
   rep("", 5), "req.", "req.",
   rep("", 2), rep("opt.", 2), "req.", rep("", 5)
 )
 start <- c(
-  "opt.", rep("req.", 3), "",
+  "opt.", rep("req.", 2), "",
   rep("req.", 3), "", "req.", rep("", 5), "req.", rep("opt.", 5)
 )
 
@@ -356,13 +347,13 @@ legend("topleft", variableInfo$param_units,
 Service <- c("dv", "iv", "gwlevels", "qwdata", "measurements", "peak", "stat")
 Description <- c("Daily", "Instantaneous", "Groundwater Levels", "Water Quality", "Surface Water Measurements", "Peak Flow", "Statistics Service")
 URL <- c(
-  "<a href='https://waterservices.usgs.gov/rest/DV-Test-Tool.html' target='_blank'>https://waterservices.usgs.gov/rest/DV-Test-Tool.html<a>",
-  "<a href='https://waterservices.usgs.gov/rest/IV-Test-Tool.html' target='_blank'>https://waterservices.usgs.gov/rest/IV-Test-Tool.html<a>",
-  "<a href='https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html' target='_blank'>https://waterservices.usgs.gov/rest/GW-Levels-Test-Tool.html<a>",
+  "<a href='https://waterservices.usgs.gov/docs/dv-service/' target='_blank'>https://waterservices.usgs.gov/docs/dv-service/<a>",
+  "<a href='https://waterservices.usgs.gov/docs/instantaneous-values/' target='_blank'>https://waterservices.usgs.gov/docs/instantaneous-values/<a>",
+  "<a href='https://waterservices.usgs.gov/docs/groundwater-levels/' target='_blank'>https://waterservices.usgs.gov/docs/groundwater-levels/<a>",
   "<a href='https://nwis.waterdata.usgs.gov/nwis/qwdata' target='_blank'>https://nwis.waterdata.usgs.gov/nwis/qwdata<a>",
   "<a href='https://waterdata.usgs.gov/nwis/measurements/' target='_blank'>https://waterdata.usgs.gov/nwis/measurements/<a>",
   "<a href='https://nwis.waterdata.usgs.gov/usa/nwis/peak/' target='_blank'>https://nwis.waterdata.usgs.gov/usa/nwis/peak/<a>",
-  "<a href='https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html' target='_blank'>https://waterservices.usgs.gov/rest/Statistics-Service-Test-Tool.html<a>"
+  "<a href='https://waterservices.usgs.gov/docs/statistics/' target='_blank'>https://waterservices.usgs.gov/docs/statistics/<a>"
 )
 
 tableData <- data.frame(Service,
@@ -436,5 +427,38 @@ kable(tableData,
 #  attr(peakData, "comment")
 
 ## ----seeVignette,eval = FALSE-----------------------------
-#  vignette(topic = "Introduction", package = "dataRetrieval")
+#  # to see all available vignettes:
+#  vignette(package="dataRetrieval")
+#  
+#  #to open a specific vignette:
+#  vignette(topic = "qwdata_changes", package = "dataRetrieval")
+
+## ----cite, eval=TRUE--------------------------------------
+citation(package = "dataRetrieval")
+
+## ----nwisCite, eval=FALSE---------------------------------
+#  
+#  dv <- readNWISdv("09010500", "00060")
+#  
+#  NWIScitation <- create_NWIS_bib(dv)
+#  NWIScitation
+
+## ----show1, eval=FALSE------------------------------------
+#  print(NWIScitation, style = "Bibtex")
+
+## ----show2, eval=FALSE------------------------------------
+#  print(NWIScitation, style = "citation")
+
+## ----WQPcite, eval=FALSE----------------------------------
+#  SC <- readWQPqw(siteNumbers = "USGS-05288705",
+#                  parameterCd = "00300")
+#  
+#  WQPcitation <- create_WQP_bib(SC)
+#  WQPcitation
+
+## ----show3, eval=FALSE------------------------------------
+#  print(WQPcitation, style = "Bibtex")
+
+## ----show4, eval=FALSE------------------------------------
+#  print(WQPcitation, style = "citation")
 
