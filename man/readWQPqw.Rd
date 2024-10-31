@@ -10,7 +10,9 @@ readWQPqw(
   startDate = "",
   endDate = "",
   tz = "UTC",
+  legacy = TRUE,
   querySummary = FALSE,
+  ignore_attributes = FALSE,
   convertType = TRUE
 )
 }
@@ -39,8 +41,14 @@ time: "America/Honolulu",
 See also  \code{OlsonNames()}
 for more information on time zones.}
 
+\item{legacy}{Logical. If TRUE, uses legacy WQP services. Default is TRUE.
+Setting legacy = FALSE uses WQX3.0 WQP services, which are in-development, use with caution.}
+
 \item{querySummary}{logical to look at number of records and unique sites that
 will be returned from this query.}
+
+\item{ignore_attributes}{logical to choose to ignore fetching site and parameter
+attributes. Default is \code{FALSE}.}
 
 \item{convertType}{logical, defaults to \code{TRUE}. If \code{TRUE}, the function
 will convert the data to dates, datetimes,
@@ -70,13 +78,14 @@ site name, such as 'USGS-01234567'.
 \dontshow{if (is_dataRetrieval_user()) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 \donttest{
 rawPcode <- readWQPqw("USGS-01594440", "01075", "", "")
+
+attr(rawPcode, "siteInfo")
+attr(rawPcode, "queryTime")
+
+
 rawCharacteristicName <- readWQPqw("WIDNR_WQX-10032762", "Specific conductance", "", "")
 rawPHsites <- readWQPqw(c("USGS-05406450", "USGS-05427949", "WIDNR_WQX-133040"), "pH", "", "")
-nwisEx <- readWQPqw("USGS-04024000", c("34247", "30234", "32104", "34220"), "", "2012-12-20")
-nwisEx.summary <- readWQPqw("USGS-04024000", c("34247", "30234", "32104", "34220"),
-  "", "2012-12-20",
-  querySummary = TRUE
-)
+nwisEx <- readWQPqw("USGS-04024000", c("34247", "30234", "32104", "34220"), "", "2022-12-20")
 
 SC <- readWQPqw(siteNumbers = "USGS-05288705", parameterCd = "00300", convertType = FALSE)
 }
@@ -84,7 +93,7 @@ SC <- readWQPqw(siteNumbers = "USGS-05288705", parameterCd = "00300", convertTyp
 }
 \seealso{
 \code{\link{readWQPdata}}, \code{\link{whatWQPsites}},
-\code{\link{readNWISqw}}, and \code{\link{importWQP}}
+and \code{\link{importWQP}}
 }
 \keyword{USGS}
 \keyword{data}

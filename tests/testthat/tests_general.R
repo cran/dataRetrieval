@@ -59,6 +59,24 @@ test_that("General NWIS retrievals working", {
   )
   expect_is(siteInfo$station_nm, "character")
 
+  gw_data <- readNWISdata(
+    stateCd = "AL",
+    service = "gwlevels",
+    startDate = "2024-05-01",
+    endDate = "2024-05-30") 
+  
+  expect_true(nrow(gw_data) > 0)
+  expect_equal(attr(gw_data, "url"),
+               "https://nwis.waterdata.usgs.gov/nwis/gwlevels?state_cd=AL&begin_date=2024-05-01&end_date=2024-05-30&date_format=YYYY-MM-DD&rdb_inventory_output=file&TZoutput=0&range_selection=date_range&list_of_search_criteria=state_cd&format=rdb")
+  
+  gw_data2 <- readNWISdata(
+    state_cd = "AL",
+    service = "gwlevels",
+    startDate = "2024-05-01",
+    endDate = "2024-05-30") 
+  
+  expect_equal(nrow(gw_data), nrow(gw_data2))
+  
   # nolint start: line_length_linter
   url <- "https://waterservices.usgs.gov/nwis/dv/?site=09037500&format=rdb&ParameterCd=00060&StatCd=00003&startDT=1985-10-02&endDT=2012-09-06"
   dv <- importRDB1(url, asDateTime = FALSE)
@@ -213,77 +231,94 @@ test_that("whatNWISdata", {
 test_that("General WQP retrievals working", {
   testthat::skip_on_cran()
   nameToUse <- "pH"
-  pHData <- readWQPdata(siteid = "USGS-04024315", characteristicName = nameToUse)
-  expect_is(pHData$ActivityStartDateTime, "POSIXct")
-
-  # testing lists:
-  startDate <- as.Date("2013-01-01")
-  secchi.names <- c(
-    "Depth, Secchi disk depth",
-    "Depth, Secchi disk depth (choice list)",
-    "Secchi Reading Condition (choice list)",
-    "Water transparency, Secchi disc"
-  )
-  args_2 <- list(
-    "startDateLo" = startDate,
-    "startDateHi" = "2013-12-31",
-    statecode = "WI",
-    characteristicName = secchi.names
-  )
-
-  wqp.summary <- readWQPdata(args_2, querySummary = TRUE)
-  expect_true("list" %in% class(wqp.summary))
-
-  # Testing multiple lists:
-  arg_3 <- list(
-    "startDateLo" = startDate,
-    "startDateHi" = "2013-12-31"
-  )
-  arg_4 <- list(
-    statecode = "WI",
-    characteristicName = secchi.names
-  )
-  wqp.summary <- readWQPdata(arg_3, arg_4, querySummary = TRUE)
-  expect_true("list" %in% class(wqp.summary))
-
-  lakeSites <- whatWQPsites(args_2)
-  expect_type(lakeSites, "list")
-
-  wqp.summary_no_atts <- readWQPdata(
-    siteid = "USGS-04024315",
-    characteristicName = nameToUse,
-    ignore_attributes = TRUE
-  )
-  expect_true(!all(c("siteInfo", "variableInfo") %in% names(attributes(wqp.summary_no_atts))))
+  # pHData <- readWQPdata(siteid = "USGS-04024315", 
+  #                       characteristicName = nameToUse,
+  #                       service = "ResultWQX3")
+  # expect_is(pHData$Activity_StartDateTime, "POSIXct")
+  # 
+  # # testing lists:
+  # startDate <- as.Date("2022-01-01")
+  # secchi.names <- c("Depth, Secchi disk depth",
+  # "Secchi depth",
+  # "Water transparency, Secchi disc",
+  # "Depth, Secchi disk depth (choice list)")
+  # # "Transparency, Secchi tube with disk",
+  # # "Secchi Reading Condition (choice list)",
+  # # "Depth, Secchi disk visible at bottom (Y/N) (choice list)")
+  # 
+  # args_2 <- list(
+  #   "startDateLo" = startDate,
+  #   "startDateHi" = "2024-01-01",
+  #   statecode = "WI",
+  #   characteristicName = secchi.names
+  # )
+  # 
+  # # Testing multiple lists:
+  # arg_3 <- list(
+  #   "startDateLo" = startDate,
+  #   "startDateHi" = "2023-12-31"
+  # )
+  # arg_4 <- list(
+  #   statecode = "WI",
+  #   characteristicName = secchi.names
+  # )
+  # 
+  # lakeData <- readWQPdata(args_2, ignore_attributes = TRUE)
+  # expect_true(nrow(lakeData) > 0)
+  # lakeSites <- whatWQPsites(args_2)
+  # expect_type(lakeSites, "list")
+  # 
+  # wqp.summary_no_atts <- readWQPdata(
+  #   siteid = "USGS-04024315",
+  #   characteristicName = nameToUse,
+  #   ignore_attributes = TRUE,
+  #   service = "ResultWQX3"
+  # )
+  # expect_true(!all(c("siteInfo", "variableInfo") %in% names(attributes(wqp.summary_no_atts))))
+  # 
+  # rawPcode <- readWQPqw("USGS-01594440", "01075", "", "", legacy = FALSE)
+  # expect_true(all(c("url", "queryTime", "siteInfo", "headerInfo") %in%
+  #                   names(attributes(rawPcode))))
+  # 
+  # # This means wqp_check_status was called:
+  # expect_true("dataProviders" %in% names(attr(rawPcode, "headerInfo")))
+  
+  rawPcode2 <- readWQPqw("USGS-01594440", "01075", "", "", ignore_attributes = TRUE)
+  expect_true(all(!c( "queryTime", "siteInfo") %in%
+                    names(attributes(rawPcode2))))
+  
+  # This means wqp_check_status wasn't called:
+  expect_false("dataProviders" %in% names(attr(rawPcode2, "headerInfo")))
+  
+  # pHData <- readWQPdata(siteid = "USGS-04024315",
+  #                       characteristicName = "pH",
+  #                       service = "ResultWQX3")
+  # expect_true(all(c("url", "queryTime", "siteInfo", "headerInfo") %in%
+  #                   names(attributes(pHData))))
+  # 
+  # # This means wqp_check_status was called:
+  # expect_true("dataProviders" %in% names(attr(pHData, "headerInfo")))
+  # 
+  # pHData2 <- readWQPdata(siteid = "USGS-04024315",
+  #                       characteristicName = "pH",
+  #                       ignore_attributes = TRUE,
+  #                       service = "ResultWQX3")
+  # expect_true(all(!c("queryTime", "siteInfo") %in%
+  #                   names(attributes(pHData2))))
+  # 
+  # # This means wqp_check_status was called:
+  # expect_false("dataProviders" %in% names(attr(pHData2, "headerInfo")))
+  # 
+  # rawPcode <- readWQPqw("USGS-01594440", "01075",
+  #                       ignore_attributes = TRUE, legacy = FALSE)
+  # headerInfo <- attr(rawPcode, "headerInfo")
+  # wqp_request_id <- headerInfo$`wqp-request-id`
+  # count_info <- wqp_check_status(wqp_request_id)
+  # 
+  # expect_true("dataProviders" %in% names(count_info))
+  
 })
 
-test_that("WQP head query retrievals working", {
-  testthat::skip_on_cran()
-  nameToUse <- "pH"
-  pHDataQueryResults <- readWQPdata(
-    siteid = "USGS-04024315",
-    characteristicName = nameToUse,
-    querySummary = TRUE
-  )
-  expect_false(is.null(pHDataQueryResults$date))
-  expect_is(pHDataQueryResults$date, "Date")
-  expect_false(is.null(pHDataQueryResults$`total-site-count`))
-  expect_is(pHDataQueryResults$`total-site-count`, "numeric")
-  expect_false(is.null(pHDataQueryResults$`total-result-count`))
-  expect_is(pHDataQueryResults$`total-result-count`, "numeric")
-
-  pHDataQueryResults <- readWQPqw(
-    siteNumbers = "USGS-04024315",
-    parameterCd = nameToUse,
-    querySummary = TRUE
-  )
-  expect_false(is.null(pHDataQueryResults$date))
-  expect_is(pHDataQueryResults$date, "Date")
-  expect_false(is.null(pHDataQueryResults$`total-site-count`))
-  expect_is(pHDataQueryResults$`total-site-count`, "numeric")
-  expect_false(is.null(pHDataQueryResults$`total-result-count`))
-  expect_is(pHDataQueryResults$`total-result-count`, "numeric")
-})
 
 test_that("zeroPad handles NAs", {
   toPad <- c(1, 5, 55, NA)
@@ -301,7 +336,7 @@ context("whatWQPsamples")
 test_that("whatWQPsamples working", {
   testthat::skip_on_cran()
   # The warning is caused by a confirmed bug in WQP
-  siteInfo <- suppressWarnings(whatWQPsamples(siteid = "USGS-01594440"))
+  siteInfo <- whatWQPsamples(siteid = "USGS-01594440")
   expect_true(nrow(siteInfo) > 0)
 })
 
@@ -339,6 +374,11 @@ test_that("whatNWISsites working", {
   bboxSites <- whatNWISsites(bbox = c(-92.5, 45.4, -87, 47), parameterCd = "00060")
   expect_true(nrow(bboxSites) > 0)
   expect_true(is.numeric(bboxSites$dec_lat_va))
+  
+  #gwlevels:
+  info <- whatNWISsites(stateCd = "NY", service="gwlevels") 
+  expect_true(nrow(info) > 0)
+  expect_equal(attr(info, "url"), "https://waterservices.usgs.gov/nwis/site/?stateCd=NY&format=mapper&hasDataTypeCd=gw")
 })
 
 context("readWQPdots")
@@ -348,7 +388,7 @@ test_that("readWQPdots working", {
   # bbox vector turned into single string with coords separated by semicolons
   formArgs_bbox <- dataRetrieval:::readWQPdots(bbox = c(-92.5, 45.4, -87, 47))
   expect_true(length(formArgs_bbox) == 2)
-  expect_true(length(gregexpr(";", formArgs_bbox)[[1]]) == 3)
+  expect_true(length(gregexpr(",", formArgs_bbox)[[1]]) == 3)
 
   # NWIS names (siteNumber) converted to WQP expected names (siteid)
   formArgs_site <- dataRetrieval:::readWQPdots(siteNumber = "04010301")
@@ -358,9 +398,29 @@ test_that("readWQPdots working", {
 
   # NWIS names (stateCd) converted to WQP expected names (statecode)
   formArgs <- dataRetrieval:::readWQPdots(stateCd = "OH", parameterCd = "00665")
-  expect_true(length(formArgs$values) == 3)
+  expect_true(length(formArgs$values) == 2)
   expect_true("statecode" %in% names(formArgs$values))
   expect_false("stateCd" %in% names(formArgs$values))
+  
+  bbox <- c(-86.97361, 34.48827, -86.61349,  34.65623)
+  what_bbox <- whatWQPdata(bBox = bbox)
+  expect_true(nrow(what_bbox) > 0)
+  x <- whatWQPsites(bBox = bbox)
+  expect_true(nrow(x) > 0)
+  df <- readWQPdata(bBox = bbox,
+                    characteristicName = "Total Coliform",
+                    startDateLo = "2023-01-01",
+                    startDateHi = "2023-12-31",
+                    service = "ResultWQX3",
+                    dataProfile = "narrow")
+  expect_true(nrow(df) > 0)
+  df_legacy <- readWQPdata(bBox = bbox,
+                           characteristicName = "Total Coliform",
+                           startDateLo = "2023-01-01",
+                           startDateHi = "2023-12-31",
+                           service = "Result",
+                           dataProfile = "narrowResult")
+  expect_true(nrow(df_legacy) > 0)
 })
 
 
@@ -449,6 +509,8 @@ test_that("internal functions", {
 })
 
 test_that("profiles", {
+  
+  testthat::skip_on_cran()
   # Data profiles: "Organization Data"
   org_data <- readWQPdata(
     statecode = "WI",
@@ -465,10 +527,10 @@ test_that("profiles", {
   site_data <- readWQPdata(
     statecode = "WI",
     countycode = "Dane",
-    service = "Station"
+    service = "StationWQX"
   )
 
-  expect_true(all(c("ProviderName", "MonitoringLocationIdentifier") %in% names(site_data)))
+  expect_true(all(c("ProviderName", "Location_Identifier") %in% names(site_data)))
 
   # Data profiles: "Project Data"
   project_data <- readWQPdata(
@@ -494,21 +556,23 @@ test_that("profiles", {
     "OrganizationFormalName"
   ) %in% names(proj_mlwd)))
 
-  # Data profiles: "Sample Results (physical/chemical metadata)":
-  samp_data <- readWQPdata(
-    siteid = "USGS-04024315",
-    dataProfile = "resultPhysChem"
-  )
-
-  expect_true(all(c(
-    "OrganizationIdentifier",
-    "OrganizationFormalName"
-  ) %in% names(samp_data)))
+  # Data profiles: "narrow":
+  # samp_data <- readWQPdata(
+  #   siteid = "USGS-04024315",
+  #   service = "ResultWQX3",
+  #   dataProfile = "narrow"
+  # )
+  # 
+  # expect_true(all(c(
+  #   "Activity_StartDateTime",
+  #   "LastChangeDate"
+  # ) %in% names(samp_data)))
 
   # Data profiles: "Sample Results (biological metadata)"
   samp_bio <- readWQPdata(
     siteid = "USGS-04024315",
-    dataProfile = "biological"
+    dataProfile = "biological",
+    service = "Result"
   )
 
   expect_true(all(c(
@@ -519,7 +583,8 @@ test_that("profiles", {
   # Data profiles: "Sample Results (narrow)"
   samp_narrow <- readWQPdata(
     siteid = "USGS-04024315",
-    dataProfile = "narrowResult"
+    dataProfile = "narrowResult",
+    service = "Result"
   )
 
   expect_true(all(c(
@@ -530,7 +595,8 @@ test_that("profiles", {
   # Data profiles: "Sampling Activity"
   samp_activity <- readWQPdata(
     siteid = "USGS-04024315",
-    dataProfile = "activityAll"
+    dataProfile = "activityAll",
+    service = "Activity"
   )
 
   expect_true(all(c(
@@ -538,17 +604,17 @@ test_that("profiles", {
     "OrganizationFormalName"
   ) %in% names(samp_activity)))
 
-  # Data profile: "Sampling Activity Metrics"
-  act_metrics <- readWQPdata(
-    statecode = "WI",
-    countycode = "Dane",
-    service = "ActivityMetric"
-  )
-
-  expect_true(all(c(
-    "OrganizationIdentifier",
-    "OrganizationFormalName"
-  ) %in% names(act_metrics)))
+  # # Data profile: "Sampling Activity Metrics"
+  # act_metrics <- readWQPdata(
+  #   statecode = "WI",
+  #   countycode = "Dane",
+  #   service = "ActivityMetric"
+  # )
+  # 
+  # expect_true(all(c(
+  #   "OrganizationIdentifier",
+  #   "OrganizationFormalName"
+  # ) %in% names(act_metrics)))
 
   # Data profile: "Result Detection Quantitation Limit Data"
   dl_data <- readWQPdata(
@@ -615,7 +681,7 @@ test_that("readWQPsummary", {
   # nolint start: line_length_linter
   expect_equal(
     attr(site1, "url"),
-    "https://www.waterqualitydata.us/data/summary/monitoringLocation/search?siteid=USGS-07144100&summaryYears=5&zip=yes&dataProfile=periodOfRecord&mimeType=csv"
+    "https://www.waterqualitydata.us/data/summary/monitoringLocation/search?siteid=USGS-07144100&summaryYears=5&dataProfile=periodOfRecord&mimeType=csv"
   )
   # nolint end
 })
@@ -623,18 +689,22 @@ test_that("readWQPsummary", {
 test_that("importWQP convertType", {
   testthat::skip_on_cran()
 
-  rawSampleURL_NoZip <- constructWQPURL("USGS-01594440", "01075", "", "", zip = FALSE)
-  rawSampleURL_NoZip_char <- importWQP(rawSampleURL_NoZip, zip = FALSE, convertType = FALSE)
-  expect_is(rawSampleURL_NoZip_char$ResultMeasureValue, "character")
+  # rawSampleURL_NoZip <- constructWQPURL("USGS-01594440", "01075", "", "")
+  # rawSampleURL_NoZip_char <- importWQP(rawSampleURL_NoZip, convertType = FALSE)
+  # expect_is(rawSampleURL_NoZip_char$Result_Measure, "character")
+  # 
+  # Put back in when services get more robust.
+  # phos <- readWQPdata(statecode = "WI", countycode = "Dane",
+  #                   characteristicName = "Phosphorus",
+  #                   startDateLo = "2022-06-01",
+  #                   startDateHi = "2022-09-01",
+  #                   convertType = FALSE,
+  #                   service = "ResultWQX")
+  # expect_is(phos$Result_Measure, "character")
 
-  phos <- readWQPdata(statecode = "WI", countycode = "Dane",
-                    characteristicName = "Phosphorus",
-                    startDateLo = "2022-01-01",
-                    convertType = FALSE)
-  expect_is(phos$ResultMeasureValue, "character")
-
-  SC <- readWQPqw(siteNumbers = "USGS-05288705", parameterCd = "00300", convertType = FALSE)
-  expect_is(SC$ResultMeasureValue, "character")
+  SC <- readWQPqw(siteNumbers = "USGS-05288705", parameterCd = "00300", 
+                  convertType = FALSE, legacy = FALSE)
+  expect_is(SC$Result_Measure, "character")
 
   lakeSites_chars <- whatWQPdata(
     siteType = "Lake, Reservoir, Impoundment",

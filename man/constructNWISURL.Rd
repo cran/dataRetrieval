@@ -31,7 +31,7 @@ retrieval for the latest possible record.}
 
 \item{service}{string USGS service to call. Possible values are "dv" (daily values),
 "uv" (unit/instantaneous values),
-"qw" (water quality data), "gwlevels" (groundwater),and "rating" (rating curve),
+"gwlevels" (groundwater),and "rating" (rating curve),
 "peak", "meas" (discrete streamflow measurements),
 "stat" (statistics web service BETA).}
 
@@ -70,12 +70,7 @@ full list of codes.}
 url string
 }
 \description{
-Imports data from NWIS web service. This function gets the data from here:
-\url{https://nwis.waterdata.usgs.gov/nwis/qwdata}
-A list of parameter codes can be found here:
-\url{https://nwis.waterdata.usgs.gov/nwis/pmcodes/}
-A list of statistic codes can be found here:
-\url{https://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}
+Imports data from NWIS web service.
 }
 \examples{
 site_id <- "01594440"
@@ -99,10 +94,8 @@ url_daily_tsv <- constructNWISURL(site_id, pCode, startDate, endDate, "dv",
 url_rating <- constructNWISURL(site_id, service = "rating", ratingType = "base")
 url_peak <- constructNWISURL(site_id, service = "peak")
 url_meas <- constructNWISURL(site_id, service = "meas")
-urlQW <- constructNWISURL("450456092225801", "70300",
-  startDate = "", endDate = "",
-  "qw", expanded = TRUE
-)
+url_gwl <- constructNWISURL(site_id, service = "gwlevels",
+                            startDate = "2024-05-01", endDate = "2024-05-30")
 }
 \keyword{USGS}
 \keyword{data}

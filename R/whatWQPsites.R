@@ -21,7 +21,9 @@
 #' in the Characteristic Group dropdown, you will see characteristicType=Nutrient
 #' in the Query URL. The corresponding argument for dataRetrieval is
 #' characteristicType = "Nutrient". dataRetrieval users do not need to include
-#' mimeType, zip, and providers is optional (these arguments are picked automatically).
+#' mimeType,  and providers is optional (these arguments are picked automatically).
+#' @param legacy Logical. If TRUE, uses legacy WQP services. Default is TRUE.
+#' Setting legacy = FALSE uses WQX3.0 WQP services, which are in-development, use with caution.
 #' @keywords data import WQP web service
 #' @rdname wqpSpecials
 #' @name whatWQPsites
@@ -42,8 +44,8 @@
 #'   siteType = type
 #' )
 #' }
-whatWQPsites <- function(...) {
-  values <- readWQPdots(...)
+whatWQPsites <- function(..., legacy = TRUE) {
+  values <- readWQPdots(..., legacy = legacy)
 
   values <- values$values
 
@@ -56,16 +58,22 @@ whatWQPsites <- function(...) {
   }
 
   values <- sapply(values, function(x) utils::URLencode(x, reserved = TRUE))
+  
+  if(legacy){
+    baseURL <- drURL("Station", arg.list = values)
+  } else {
+    baseURL <- drURL("StationWQX3", arg.list = values)
+  }
+  
+  baseURL <- appendDrURL(baseURL, mimeType = "csv")
 
-  baseURL <- drURL("Station", arg.list = values)
-
-  baseURL <- appendDrURL(baseURL, mimeType = "tsv")
-
-  retval <- importWQP(baseURL, zip = values["zip"] == "yes")
-
-  attr(retval, "queryTime") <- Sys.time()
-  attr(retval, "url") <- baseURL
-
+  retval <- importWQP(baseURL)
+  
+  if(!is.null(retval)){
+    attr(retval, "queryTime") <- Sys.time()
+    attr(retval, "url") <- baseURL
+  }
+  
   return(retval)
 }
 
@@ -90,40 +98,8 @@ whatWQPsites <- function(...) {
 #' in the Characteristic Group dropdown, you will see characteristicType=Nutrient
 #' in the Query URL. The corresponding argument for dataRetrieval is
 #' characteristicType = "Nutrient". dataRetrieval users do not need to include
-#' mimeType, zip, and providers is optional (these arguments are picked automatically).
-#' 
-#' @return A data frame with at least the following columns:
-#' \tabular{lll}{
-#' Name \tab Type \tab Description \cr
-#'  "Provider" \tab character \tab Providing database.  \cr
-#'  "MonitoringLocationIdentifier" \tab character \tab	A designator used to
-#' describe the unique name, number, or code assigned to identify
-#' the monitoring location.\cr
-#'  "YearSummarized" \tab numeric \tab The year of the summary \cr
-#'  "CharacteristicType" \tab character \tab CharacteristicType  \cr
-#'  "CharacteristicName" \tab character \tab	The object, property, or substance
-#' which is evaluated or enumerated by either a direct field measurement,
-#' a direct field observation, or by laboratory analysis of material
-#' collected in the field.\cr
-#'  "ActivityCount" \tab numeric \tab The number of times the location was sampled \cr
-#'  "ResultCount" \tab numeric \tab The number of individual data results. \cr
-#'  "LastResultSubmittedDate" \tab Date \tab Date when data was last submitted. \cr
-#'  "OrganizationIdentifier" \tab character \tab  A designator used to uniquely
-#' identify a unique business establishment within a context.\cr
-#'  "OrganizationFormalName" \tab character \tab  The legal designator
-#' (i.e. formal name) of an organization.\cr
-#'  "MonitoringLocationName \tab character \tab MonitoringLocationName \cr
-#'  "MonitoringLocationTypeName" \tab character \tab MonitoringLocationTypeName \cr
-#'  "ResolvedMonitoringLocationTypeName" \tab character \tab  \cr
-#'  "HUCEightDigitCode" \tab character \tab 8-digit HUC id. \cr
-#'  "MonitoringLocationUrl" \tab character \tab URL to monitoring location. \cr
-#'  "CountyName" \tab character \tab County of sampling location. \cr
-#'  "StateName" \tab character \tab State of sampling location. \cr
-#'  "MonitoringLocationLatitude"  \tab numeric \tab latitude of sampling
-#'  location. \cr
-#'  "MonitoringLocationLongitude" \tab numeric \tab longitude of sampling
-#'  location. \cr
-#' }
+#' mimeType, and providers is optional (these arguments are picked automatically).
+#' @return A data frame from the data returned from the Water Quality Portal
 #' @export
 #' @seealso whatWQPsites whatWQPdata
 #' @examplesIf is_dataRetrieval_user()
@@ -161,8 +137,9 @@ whatWQPsites <- function(...) {
 #' )
 #' }
 readWQPsummary <- function(...) {
-  
+
   wqp_message()
+  
   values <- readWQPdots(...)
   
   values <- values$values
@@ -182,11 +159,13 @@ readWQPsummary <- function(...) {
   values <- sapply(values, function(x) utils::URLencode(x, reserved = TRUE))
 
   baseURL <- drURL("SiteSummary", arg.list = values)
+
   baseURL <- appendDrURL(baseURL, mimeType = "csv")
 
   withCallingHandlers(
     {
-      retval <- importWQP(baseURL, zip = values["zip"] == "yes", csv = TRUE)
+      retval <- importWQP(baseURL, 
+                          csv = TRUE)
     },
     warning = function(w) {
       if (any(grepl("Number of rows returned not matched in header", w))) {
@@ -194,8 +173,11 @@ readWQPsummary <- function(...) {
       }
     }
   )
-  attr(retval, "queryTime") <- Sys.time()
-  attr(retval, "url") <- baseURL
-
+  
+  if(!is.null(retval)){
+    attr(retval, "queryTime") <- Sys.time()
+    attr(retval, "url") <- baseURL
+  }
+  
   return(retval)
 }

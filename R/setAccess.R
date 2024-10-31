@@ -46,7 +46,6 @@ setAccess <- function(access = "public") {
   pkg.env$measurements <- "https://waterdata.usgs.gov/nwis/measurements/"
   pkg.env$peak <- "https://nwis.waterdata.usgs.gov/usa/nwis/peak/"
   pkg.env$rating <- "https://waterdata.usgs.gov/nwisweb/get_ratings/"
-  pkg.env$qwdata <- "https://nwis.waterdata.usgs.gov/nwis/qwdata"
   pkg.env$stat <- "https://waterservices.usgs.gov/nwis/stat/"
   pkg.env$useNat <- "https://waterdata.usgs.gov/nwis/water_use"
   pkg.env$pCode <- "https://help.waterdata.usgs.gov/code/parameter_cd_query"
@@ -63,7 +62,12 @@ setAccess <- function(access = "public") {
   pkg.env$ResultDetectionQuantitationLimit <- "https://www.waterqualitydata.us/data/ResultDetectionQuantitationLimit/search"
   pkg.env$BiologicalMetric <- "https://www.waterqualitydata.us/data/BiologicalMetric/search"
   pkg.env$Organization <- "https://www.waterqualitydata.us/data/Organization/search"
-
+  pkg.env$ResultWQX3 <- "https://www.waterqualitydata.us/wqx3/Result/search"
+  pkg.env$StationWQX3 <- "https://www.waterqualitydata.us/wqx3/Station/search"
+  pkg.env$ActivityWQX3 <- "https://www.waterqualitydata.us/wqx3/Activity/search"
+  pkg.env$samplesData <- "https://api.waterdata.usgs.gov/samples-data/summary"
+  pkg.env$status <- "https://www.waterqualitydata.us/wqx3/status/"
+  
   pkg.env$NGWMN <- "https://cida.usgs.gov/ngwmn_cache/sos"
   # nolint end
 }

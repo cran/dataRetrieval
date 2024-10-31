@@ -1,11 +1,6 @@
 #' Construct NWIS url for data retrieval
 #'
-#' Imports data from NWIS web service. This function gets the data from here:
-#' \url{https://nwis.waterdata.usgs.gov/nwis/qwdata}
-#' A list of parameter codes can be found here:
-#' \url{https://nwis.waterdata.usgs.gov/nwis/pmcodes/}
-#' A list of statistic codes can be found here:
-#' \url{https://nwis.waterdata.usgs.gov/nwis/help/?read_file=stat&format=table}
+#' Imports data from NWIS web service. 
 #'
 #' @param siteNumbers string or vector of strings USGS site number.  This is usually an 8 digit number
 #' @param parameterCd string or vector of USGS parameter code.  This is usually an 5 digit number.
@@ -17,7 +12,7 @@
 #' This is usually 5 digits.  Daily mean (00003) is the default.
 #' @param service string USGS service to call. Possible values are "dv" (daily values),
 #' "uv" (unit/instantaneous values),
-#' "qw" (water quality data), "gwlevels" (groundwater),and "rating" (rating curve),
+#' "gwlevels" (groundwater),and "rating" (rating curve),
 #' "peak", "meas" (discrete streamflow measurements),
 #' "stat" (statistics web service BETA).
 #' @param format string, can be "tsv" or "xml", and is only applicable for daily
@@ -68,10 +63,8 @@
 #' url_rating <- constructNWISURL(site_id, service = "rating", ratingType = "base")
 #' url_peak <- constructNWISURL(site_id, service = "peak")
 #' url_meas <- constructNWISURL(site_id, service = "meas")
-#' urlQW <- constructNWISURL("450456092225801", "70300",
-#'   startDate = "", endDate = "",
-#'   "qw", expanded = TRUE
-#' )
+#' url_gwl <- constructNWISURL(site_id, service = "gwlevels",
+#'                             startDate = "2024-05-01", endDate = "2024-05-30")
 constructNWISURL <- function(siteNumbers,
                              parameterCd = "00060",
                              startDate = "",
@@ -85,10 +78,8 @@ constructNWISURL <- function(siteNumbers,
                              statType = "mean") {
   service <- match.arg(service, c(
     "dv", "uv", "iv", "iv_recent", "qw", "gwlevels",
-    "rating", "peak", "meas", "stat", "qwdata"
-  ))
+    "rating", "peak", "meas", "stat"))
   
-  service[service == "qw"] <- "qwdata"
   service[service == "meas"] <- "measurements"
   service[service == "uv"] <- "iv"
   
@@ -112,59 +103,6 @@ constructNWISURL <- function(siteNumbers,
   baseURL <- drURL(service, Access = pkg.env$access)
   
   switch(service,
-         qwdata = {
-           if (multipleSites) {
-             searchCriteria <- "multiple_site_no"
-             url <- appendDrURL(baseURL, multiple_site_no = siteNumbers)
-           } else {
-             searchCriteria <- "search_site_no"
-             url <- appendDrURL(baseURL,
-                                search_site_no = siteNumbers,
-                                search_site_no_match_type = "exact"
-             )
-           }
-           
-           multiplePcodes <- length(parameterCd) > 1
-           
-           if (multiplePcodes) {
-             pCodes <- paste(parameterCd, collapse = ",")
-             url <- appendDrURL(url,
-                                multiple_parameter_cds = pCodes,
-                                param_cd_operator = "OR"
-             )
-           } else {
-             url <- appendDrURL(url,
-                                multiple_parameter_cds = parameterCd,
-                                param_cd_operator = "AND"
-             )
-           }
-           
-           searchCriteria <- paste(searchCriteria, "multiple_parameter_cds", sep = ",")
-           url <- appendDrURL(url, list_of_search_criteria = searchCriteria)
-           
-           
-           url <- paste(url, "group_key=NONE&sitefile_output_format=html_table&column_name=agency_cd",
-                        "column_name=site_no&column_name=station_nm&inventory_output=0&rdb_inventory_output=file",
-                        "TZoutput=0&pm_cd_compare=Greater%20than&radio_parm_cds=previous_parm_cds&qw_attributes=0",
-                        "format=rdb&rdb_qw_attributes=0&date_format=YYYY-MM-DD",
-                        "rdb_compression=value",
-                        sep = "&"
-           )
-           if (expanded) {
-             url <- appendDrURL(url, qw_sample_wide = "0")
-             url <- gsub("rdb_qw_attributes=0", "rdb_qw_attributes=expanded", url)
-           } else {
-             url <- appendDrURL(url, qw_sample_wide = "separated_wide")
-           }
-           
-           if (nzchar(startDate)) {
-             url <- appendDrURL(url, begin_date = startDate)
-           }
-           
-           if (nzchar(endDate)) {
-             url <- appendDrURL(url, end_date = endDate)
-           }
-         },
          rating = {
            ratingType <- match.arg(ratingType, c("base", "corr", "exsa"))
            url <- appendDrURL(baseURL, site_no = siteNumbers, file_type = ratingType)
@@ -213,7 +151,7 @@ constructNWISURL <- function(siteNumbers,
              stop("Monthly and annual report types can only provide means")
            }
            
-           # make sure dates aren"t too specific for statReportType
+           # make sure dates aren't too specific for statReportType
            if (grepl("(?i)monthly", statReportType) &&
                (length(unlist(gregexpr("-", startDate))) > 1 ||
                 length(unlist(gregexpr("-", endDate))) > 1)) {
@@ -244,7 +182,6 @@ constructNWISURL <- function(siteNumbers,
            
            url <- appendDrURL(baseURL,
                               site_no = siteNumbers,
-                              agency_cd = "USGS",
                               format = "rdb"
            )
            if (nzchar(startDate)) {
@@ -253,12 +190,10 @@ constructNWISURL <- function(siteNumbers,
            if (nzchar(endDate)) {
              url <- appendDrURL(url, end_date = endDate)
            }
-           
            url <- paste(url, "group_key=NONE",
-                         "date_format=YYYY-MM-DD",
-                         "rdb_compression=value", 
+                        "date_format=YYYY-MM-DD",
+                        "rdb_compression=value", 
                         sep = "&")
-           
          },
          { # this will be either dv, uv, groundwater
            multiplePcodes <- length(parameterCd) > 1
@@ -311,28 +246,32 @@ constructNWISURL <- function(siteNumbers,
 }
 
 
+
+
+
 #' Construct WQP url for data retrieval
 #'
 #' Construct WQP url for data retrieval. This function gets the data from here: \url{https://www.waterqualitydata.us}
 #'
-#' @param siteNumbers string or vector of strings USGS site number.  This is usually an 8 digit number
+#' @param siteNumbers string or vector of strings USGS site number.  
 #' @param parameterCd string or vector of USGS parameter code.  This is usually an 5 digit number.
 #' @param startDate character starting date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 #' retrieval for the earliest possible record.
 #' @param endDate character ending date for data retrieval in the form YYYY-MM-DD. Default is "" which indicates
 #' retrieval for the latest possible record.
-#' @param zip logical to request data via downloading zip file. Default set to TRUE.
+#' @param legacy Logical. If TRUE, uses legacy WQP services. Default is TRUE.
+#' Setting legacy = FALSE uses WQX3.0 WQP services, which are in-development, use with caution.
 #' @keywords data import WQP web service
 #' @return url string
 #' @export
 #' @examples
-#' site_id <- "01594440"
-#' startDate <- "1985-01-01"
+#' site_ids <- c("USGS-02292010", "USGS-02276877")
+#' startDate <- "2020-01-01"
 #' endDate <- ""
-#' pCode <- c("00060", "00010")
+#' pCode <- c("80154", "00613")
 #' url_wqp <- constructWQPURL(
-#'   paste("USGS", site_id, sep = "-"),
-#'   c("01075", "00029", "00453"),
+#'   site_ids,
+#'   pCode,
 #'   startDate, endDate
 #' )
 #' url_wqp
@@ -355,47 +294,62 @@ constructWQPURL <- function(siteNumbers,
                             parameterCd,
                             startDate,
                             endDate,
-                            zip = TRUE) {
-  multiplePcodes <- length(parameterCd) > 1
-  siteNumbers <- paste(siteNumbers, collapse = ";")
-
-  if (all(nchar(parameterCd) == 5)) {
-    suppressWarnings(pCodeLogic <- all(!is.na(as.numeric(parameterCd))))
+                            legacy = TRUE) {
+  
+  allPCode <- any(toupper(parameterCd) == "ALL")
+  if(!allPCode){
+    multiplePcodes <- length(parameterCd) > 1
+    
+    if (all(nchar(parameterCd) == 5)) {
+      suppressWarnings(pCodeLogic <- all(!is.na(as.numeric(parameterCd))))
+    } else {
+      pCodeLogic <- FALSE
+      parameterCd <- sapply(parameterCd, utils::URLencode, USE.NAMES = FALSE, reserved = TRUE)
+    }
+    pcode_name <- ifelse(pCodeLogic, "pCode", "characteristicName")
+  }
+  
+  if(legacy & !allPCode){
+    if (multiplePcodes) {
+      parameterCd <- paste(parameterCd, collapse = ";")
+    }
+    parameterCd <- paste0(pcode_name, "=", parameterCd)
+    
+  } else if(!legacy & !allPCode){
+    parameterCd <- paste0(pcode_name, "=", parameterCd)
+    if (multiplePcodes) {
+      parameterCd <- paste0(parameterCd, collapse = "&")
+    } 
+  }
+  
+  if(legacy){
+    siteNumbers <- paste(siteNumbers, collapse = ";")
+    baseURL <- drURL("Result", siteid = siteNumbers, Access = pkg.env$access)
   } else {
-    pCodeLogic <- FALSE
-    parameterCd <- sapply(parameterCd, utils::URLencode, USE.NAMES = FALSE, reserved = TRUE)
+    siteNumbers <- paste(paste0("siteid=", siteNumbers), collapse = "&")
+    baseURL <- drURL("ResultWQX3", Access = pkg.env$access)
+    baseURL <- paste0(baseURL, siteNumbers)
   }
-
-  if (multiplePcodes) {
-    parameterCd <- paste(parameterCd, collapse = ";")
+  
+  if(!allPCode){
+    baseURL <- paste0(baseURL, "&", parameterCd)
   }
-
-  baseURL <- drURL("Result", siteid = siteNumbers, Access = pkg.env$access)
-  url <- paste0(
-    baseURL,
-    ifelse(pCodeLogic, "&pCode=", "&characteristicName="),
-    parameterCd
-  )
-
+  
   if (nzchar(startDate)) {
     startDate <- format(as.Date(startDate), format = "%m-%d-%Y")
-    url <- paste0(url, "&startDateLo=", startDate)
+    baseURL <- paste0(baseURL, "&startDateLo=", startDate)
   }
-
+  
   if (nzchar(endDate)) {
     endDate <- format(as.Date(endDate), format = "%m-%d-%Y")
-    url <- paste0(url, "&startDateHi=", endDate)
+    baseURL <- paste0(baseURL, "&startDateHi=", endDate)
   }
-
-  url <- paste0(url, "&mimeType=tsv")
-
-  if (zip) {
-    url <- paste0(url, "&zip=yes")
-  } else {
-    url <- paste0(url, "&zip=no")
+  
+  baseURL <- paste0(baseURL, "&mimeType=csv")
+  if(!legacy){
+    baseURL <- paste0(baseURL, "&dataProfile=basicPhysChem")
   }
-
-  return(url)
+  return(baseURL)
 }
 
 #' Construct URL for NWIS water use data service
@@ -420,16 +374,16 @@ constructWQPURL <- function(siteNumbers,
 constructUseURL <- function(years, stateCd, countyCd, categories) {
   if (is.null(stateCd)) {
     baseURL <- drURL("useNat",
-      format = "rdb",
-      rdb_compression = "value",
-      Access = pkg.env$access
+                     format = "rdb",
+                     rdb_compression = "value",
+                     Access = pkg.env$access
     )
   } else {
     stateCd <- stateCdLookup(input = stateCd, outputType = "postal")
     baseURL <- "https://waterdata.usgs.gov/"
     base2 <- "nwis/water_use?format=rdb&rdb_compression=value"
     baseURL <- paste0(baseURL, paste0(stateCd, "/"), base2)
-
+    
     if (!is.null(countyCd)) {
       if (length(countyCd) > 1) {
         countyCd <- paste(countyCd, collapse = "%2C")
@@ -442,6 +396,6 @@ constructUseURL <- function(years, stateCd, countyCd, categories) {
   years <- paste(years, collapse = "%2C")
   categories <- paste(categories, collapse = "%2C")
   retURL <- paste0(baseURL, "&wu_year=", years, "&wu_category=", categories)
-
+  
   return(retURL)
 }

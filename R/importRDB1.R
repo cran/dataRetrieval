@@ -75,14 +75,6 @@
 #'
 #' unitData <- importRDB1(unitDataURL, asDateTime = TRUE)
 #'
-#' qwURL <- constructNWISURL(c("04024430", "04024000"),
-#'   c("34247", "30234", "32104", "34220"),
-#'   "2010-11-03", "", "qw",
-#'   format = "rdb"
-#' )
-#'
-#' qwData <- importRDB1(qwURL, asDateTime = TRUE, tz = "America/Chicago")
-#'
 #' iceSite <- "04024000"
 #' start <- "2015-11-09"
 #' end <- "2015-11-24"
@@ -322,14 +314,6 @@ importRDB1 <- function(obs_url,
 }
 
 convertTZ <- function(df, tz.name, date.time.cols, tz, flip.cols = TRUE) {
-  offsetLibrary <- data.frame(
-    offset = c(5, 4, 6, 5, 7, 6, 8, 7, 9, 8, 10, 10, 0, 0, 0, 0),
-    code = c(
-      "EST", "EDT", "CST", "CDT", "MST", "MDT",
-      "PST", "PDT", "AKST", "AKDT", "HAST", "HST", "UTC", "", NA, "GMT"
-    ),
-    stringsAsFactors = FALSE
-  )
 
   offset <- offsetLibrary$offset[match(df[, tz.name], offsetLibrary$code)]
 

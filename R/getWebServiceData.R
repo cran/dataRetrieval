@@ -25,49 +25,43 @@ getWebServiceData <- function(obs_url, ...) {
 
   returnedList <- retryGetOrPost(obs_url, ...)
 
-  if (httr::status_code(returnedList) == 400) {
-    if (httr::has_content(returnedList)) {
-      response400 <- httr::content(returnedList, type = "text", encoding = "UTF-8")
-      statusReport <- xml2::xml_text(xml2::xml_child(xml2::read_xml(response400), 2)) # making assumption that - body is second node
-      statusMsg <- gsub(pattern = ", server=.*", replacement = "", x = statusReport)
-      message(statusMsg)
-    } else {
-      httr::message_for_status(returnedList)
-      warning_message <- httr::headers(returnedList)
-      if ("warning" %in% names(warning_message)) {
-        warning_message <- warning_message$warning
-        message(warning_message)
-      }
-    }
-    return(invisible(NULL))
-  } else if (httr::status_code(returnedList) != 200) {
-    message("For: ", obs_url, "\n")
-    httr::message_for_status(returnedList)
-    return(invisible(NULL))
-  } else {
+  good <- check_non_200s(returnedList)
+  
+  return_readLines <- c("text/html", "text/html; charset=UTF-8")
+  return_raw <- c("application/zip",
+                  "application/zip;charset=UTF-8",
+                  "application/vnd.geo+json;charset=UTF-8")
+  return_content <- c("text/tab-separated-values;charset=UTF-8",
+                      "text/csv;charset=UTF-8",
+                      "text/plain")
+  
+  if(good){
     headerInfo <- httr::headers(returnedList)
 
-    if (!"content-type" %in% names(headerInfo)) {
-      message("Unknown content, returning NULL")
-      return(invisible(NULL))
-    }
-
-    if (headerInfo$`content-type` %in% c(
-      "text/tab-separated-values;charset=UTF-8",
-      "text/csv;charset=UTF-8"
-    )) {
+    if (headerInfo$`content-type` %in% return_content) {
       returnedDoc <- httr::content(returnedList, type = "text", encoding = "UTF-8")
-    } else if (headerInfo$`content-type` %in%
-      c(
-        "application/zip",
-        "application/zip;charset=UTF-8",
-        "application/vnd.geo+json;charset=UTF-8"
-      )) {
+      trys <- 1
+      if (all(grepl("ERROR: INCOMPLETE DATA", returnedDoc))) {
+        
+        while(trys <= 3){
+          message("Trying again!")
+          obs_url <- paste0(obs_url, "&try=", trys)
+          returnedList <- retryGetOrPost(obs_url)
+          good <- check_non_200s(returnedList)
+          if(good){
+            returnedDoc <- httr::content(returnedList, type = "text", encoding = "UTF-8")
+          }
+          if (all(grepl("ERROR: INCOMPLETE DATA", returnedDoc))) {
+            trys <- trys + 1
+          } else {
+            trys <- 100
+          }
+        } 
+      }
+
+    } else if (headerInfo$`content-type` %in% return_raw) {
       returnedDoc <- returnedList
-    } else if (headerInfo$`content-type` %in% c(
-      "text/html",
-      "text/html; charset=UTF-8"
-    )) {
+    } else if (headerInfo$`content-type` %in% return_readLines) {
       txt <- readLines(returnedList$content)
       message(txt)
       return(txt)
@@ -91,7 +85,44 @@ getWebServiceData <- function(obs_url, ...) {
     attr(returnedDoc, "headerInfo") <- headerInfo
 
     return(returnedDoc)
+  } else {
+    return(NULL)
   }
+}
+
+check_non_200s <- function(returnedList){
+    
+  status <- httr::status_code(returnedList)
+  if (status == 400) {
+    if (httr::has_content(returnedList)) {
+      response400 <- httr::content(returnedList, type = "text", encoding = "UTF-8")
+      statusReport <- xml2::xml_text(xml2::xml_child(xml2::read_xml(response400), 2)) # making assumption that - body is second node
+      statusMsg <- gsub(pattern = ", server=.*", replacement = "", x = statusReport)
+      message(statusMsg)
+    } else {
+      httr::message_for_status(returnedList)
+      warning_message <- httr::headers(returnedList)
+      if ("warning" %in% names(warning_message)) {
+        warning_message <- warning_message$warning
+        message(warning_message)
+      }
+    }
+    return(FALSE)
+  } else if (status != 200) {
+    httr::message_for_status(returnedList)
+    return(FALSE)
+    
+  } else {
+    headerInfo <- httr::headers(returnedList)
+    
+    if (!"content-type" %in% names(headerInfo)) {
+      message("Unknown content, returning NULL")
+      return(FALSE)
+    }
+    return(TRUE)
+  }
+  
+
 }
 
 #' Create user agent
@@ -142,6 +173,7 @@ has_internet_2 <- function(obs_url) {
 #'
 #' @param url the query url
 getQuerySummary <- function(url) {
+  wqp_message()
   queryHEAD <- httr::HEAD(url)
   retquery <- httr::headers(queryHEAD)
 
@@ -157,12 +189,13 @@ getQuerySummary <- function(url) {
 retryGetOrPost <- function(obs_url, ...) {
   resp <- NULL
   if (nchar(obs_url) < 2048 || grepl(pattern = "ngwmn", x = obs_url)) {
+    message("GET: ", obs_url)
     resp <- httr::RETRY("GET", obs_url, ..., httr::user_agent(default_ua()))
   } else {
     split <- strsplit(obs_url, "?", fixed = TRUE)
     obs_url <- split[[1]][1]
     query <- split[[1]][2]
-
+    message("POST: ", obs_url)
     resp <- httr::RETRY("POST", obs_url, ...,
       body = query,
       httr::content_type("application/x-www-form-urlencoded"),

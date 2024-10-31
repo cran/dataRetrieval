@@ -2,7 +2,7 @@ pkg.env <- new.env()
 
 .onLoad <- function(libname, pkgname) {
   suppressMessages(setAccess("public"))
-  pkg.env$nldi_base <- "https://labs.waterdata.usgs.gov/api/nldi/linked-data/"
+  pkg.env$nldi_base <- "https://api.water.usgs.gov/nldi/linked-data/"
   pkg.env$local_sf <- requireNamespace("sf", quietly = TRUE)
 }
 
@@ -19,15 +19,30 @@ is_dataRetrieval_user <- function() {
     identical(Sys.getenv("NOT_CRAN"), "true")
 }
 
-
 wqp_message <- function(){
-  message("NEWS: USGS data availability and format are changing. 
-Beginning in March 2024 the data obtained from legacy WQP profiles
-do not include new USGS data or recent updates to existing data. 
-To view the status of changes in data availability and code functionality, visit:
-https://doi-usgs.github.io/dataRetrieval/articles/Status.html
-If you have additional questions about these changes, 
-email CompTools@usgs.gov.")
+  message("NEWS: Data does not include USGS data newer than March 11, 2024. More details:
+https://doi-usgs.github.io/dataRetrieval/articles/Status.html")
+}
+
+wqp_message_beta <- function(){
+  message("WQX3 services are in-development, use with caution.")
+}
+
+only_legacy <- function(service){
+  legacy <- service %in% c("Organization",
+                 "ActivityMetric", "SiteSummary",
+                 "Project", "ProjectMonitoringLocationWeighting",
+                 "ResultDetectionQuantitationLimit", "BiologicalMetric")
+  return(legacy)
+}
+
+is_legacy <- function(service){
+  legacy <- service %in% c("Result", "Station",
+                           "Activity", "Organization",
+                           "ActivityMetric", "SiteSummary",
+                           "Project", "ProjectMonitoringLocationWeighting",
+                           "ResultDetectionQuantitationLimit", "BiologicalMetric")
+  return(legacy)
 }
 
 nwis_message <- function(){

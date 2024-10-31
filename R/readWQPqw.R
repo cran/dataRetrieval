@@ -31,6 +31,10 @@
 #' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function
 #' will convert the data to dates, datetimes,
 #' numerics based on a standard algorithm. If false, everything is returned as a character.
+#' @param ignore_attributes logical to choose to ignore fetching site and parameter
+#' attributes. Default is \code{FALSE}.
+#' @param legacy Logical. If TRUE, uses legacy WQP services. Default is TRUE.
+#' Setting legacy = FALSE uses WQX3.0 WQP services, which are in-development, use with caution.
 #' @keywords data import USGS web service
 #' @return A data frame derived from the default data profile.
 #'
@@ -44,17 +48,18 @@
 #' }
 #' @export
 #' @seealso \code{\link{readWQPdata}}, \code{\link{whatWQPsites}},
-#' \code{\link{readNWISqw}}, and \code{\link{importWQP}}
+#' and \code{\link{importWQP}}
 #' @examplesIf is_dataRetrieval_user()
 #' \donttest{
 #' rawPcode <- readWQPqw("USGS-01594440", "01075", "", "")
+#' 
+#' attr(rawPcode, "siteInfo")
+#' attr(rawPcode, "queryTime")
+#' 
+#' 
 #' rawCharacteristicName <- readWQPqw("WIDNR_WQX-10032762", "Specific conductance", "", "")
 #' rawPHsites <- readWQPqw(c("USGS-05406450", "USGS-05427949", "WIDNR_WQX-133040"), "pH", "", "")
-#' nwisEx <- readWQPqw("USGS-04024000", c("34247", "30234", "32104", "34220"), "", "2012-12-20")
-#' nwisEx.summary <- readWQPqw("USGS-04024000", c("34247", "30234", "32104", "34220"),
-#'   "", "2012-12-20",
-#'   querySummary = TRUE
-#' )
+#' nwisEx <- readWQPqw("USGS-04024000", c("34247", "30234", "32104", "34220"), "", "2022-12-20")
 #'
 #' SC <- readWQPqw(siteNumbers = "USGS-05288705", parameterCd = "00300", convertType = FALSE)
 #' }
@@ -63,73 +68,40 @@ readWQPqw <- function(siteNumbers,
                       startDate = "",
                       endDate = "",
                       tz = "UTC",
+                      legacy = TRUE,
                       querySummary = FALSE,
+                      ignore_attributes = FALSE,
                       convertType = TRUE) {
-  url <- constructWQPURL(siteNumbers, parameterCd, startDate, endDate)
-  wqp_message()
+  
+  url <- constructWQPURL(siteNumbers, parameterCd, startDate, endDate, legacy)
   
   if (querySummary) {
     retquery <- getQuerySummary(url)
     return(retquery)
   } else {
-    retval <- importWQP(url, zip = TRUE, tz = tz, convertType = convertType)
-
-    pcodeCheck <- all(nchar(parameterCd) == 5) &
-      all(!is.na(suppressWarnings(as.numeric(parameterCd))))
-
-    if (nzchar(startDate)) {
-      startDate <- format(as.Date(startDate), format = "%m-%d-%Y")
+    retval <- importWQP(url, tz = tz, 
+                        convertType = convertType)
+    if(is.null(retval)){
+      return(NULL)
     }
+    attr(retval, "legacy") <- legacy
 
-    if (nzchar(endDate)) {
-      endDate <- format(as.Date(endDate), format = "%m-%d-%Y")
+    if(legacy){
+      sites <- unique(retval$MonitoringLocationIdentifier)
+    } else {
+      sites <- unique(retval$Location_Identifier)
     }
     
-    sites <- unique(retval$MonitoringLocationIdentifier)
-    
-    siteInfo <- suppressWarnings(whatWQPsites(siteid = paste0(sites, collapse = ";")))
+    if (!all(is.na(retval)) && !ignore_attributes) {
+      retval <- suppressMessages(create_WQP_attributes(retval, siteid = sites))
+    } 
 
-    siteInfoCommon <- data.frame(
-      station_nm = siteInfo$MonitoringLocationName,
-      agency_cd = siteInfo$OrganizationIdentifier,
-      site_no = siteInfo$MonitoringLocationIdentifier,
-      dec_lat_va = siteInfo$LatitudeMeasure,
-      dec_lon_va = siteInfo$LongitudeMeasure,
-      hucCd = siteInfo$HUCEightDigitCode,
-      stringsAsFactors = FALSE
-    )
-
-    siteInfo <- cbind(siteInfoCommon, siteInfo)
-
-
-    variableInfo <- data.frame(
-      characteristicName = retval$CharacteristicName,
-      parameterCd = retval$USGSPCode,
-      param_units = retval$ResultMeasure.MeasureUnitCode,
-      valueType = retval$ResultSampleFractionText,
-      stringsAsFactors = FALSE
-    )
-    variableInfo <- unique(variableInfo)
-
-    if (!anyNA(variableInfo$parameterCd)) {
-      pcodes <- unique(variableInfo$parameterCd[!is.na(variableInfo$parameterCd)])
-      pcodes <- pcodes["" != pcodes]
-      paramINFO <- readNWISpCode(pcodes)
-      names(paramINFO)["parameter_cd" == names(paramINFO)] <- "parameterCd"
-
-      pCodeToName <- pCodeToName
-      varExtras <- pCodeToName[pCodeToName$parm_cd %in%
-        unique(variableInfo$parameterCd[!is.na(variableInfo$parameterCd)]), ]
-      names(varExtras)[names(varExtras) == "parm_cd"] <- "parameterCd"
-      variableInfo <- merge(variableInfo, varExtras, by = "parameterCd", all = TRUE)
-      variableInfo <- merge(variableInfo, paramINFO, by = "parameterCd", all = TRUE)
-      variableInfo <- unique(variableInfo)
+    if(legacy){
+      wqp_message()
+    } else {
+      wqp_message_beta()
     }
-
-    attr(retval, "siteInfo") <- siteInfo
-    attr(retval, "variableInfo") <- variableInfo
     attr(retval, "url") <- url
-    attr(retval, "queryTime") <- Sys.time()
 
     return(retval)
   }

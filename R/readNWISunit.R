@@ -90,17 +90,17 @@ readNWISuv <- function(siteNumbers, parameterCd, startDate = "", endDate = "", t
   } else {
     service <- "iv_recent"
   }
-  
+
   url <- constructNWISURL(siteNumbers,
-                          parameterCd,
-                          startDate,
-                          endDate,
-                          service,
-                          format = "xml"
+    parameterCd,
+    startDate,
+    endDate,
+    service,
+    format = "xml"
   )
-  
+
   data <- importWaterML1(url, asDateTime = TRUE, tz = tz)
-  
+
   return(data)
 }
 
@@ -174,7 +174,7 @@ readNWISpeak <- function(siteNumbers,
                          endDate = "",
                          asDateTime = TRUE,
                          convertType = TRUE) {
-  
+
   # Doesn't seem to be a peak xml service
   url <- constructNWISURL(
     siteNumbers = siteNumbers,
@@ -183,17 +183,17 @@ readNWISpeak <- function(siteNumbers,
     endDate = endDate,
     service = "peak"
   )
-  
+
   data <- importRDB1(url,
-                     asDateTime = asDateTime,
-                     convertType = convertType
+    asDateTime = asDateTime,
+    convertType = convertType
   )
-  
+
   if (nrow(data) > 0) {
     if (asDateTime && convertType) {
       if ("peak_dt" %in% names(data)) {
         if (any(nchar(as.character(data$peak_dt)) <= 7, na.rm = TRUE) ||
-            any(grepl("[0-9]*-[0-9]*-00", data$peak_dt), na.rm = TRUE)) {
+          any(grepl("[0-9]*-[0-9]*-00", data$peak_dt), na.rm = TRUE)) {
           stop("Not all dates could be converted to Date object. Use convertType=FALSE to retrieve the raw text")
         } else {
           data$peak_dt <- as.Date(data$peak_dt, format = "%Y-%m-%d")
@@ -202,24 +202,24 @@ readNWISpeak <- function(siteNumbers,
           message("Some dates could not be converted to a valid date, and were returned as NA")
         }
       }
-      
+
       if ("ag_dt" %in% names(data)) data$ag_dt <- as.Date(data$ag_dt, format = "%Y-%m-%d")
     }
-    
-    
-    siteInfo <- readNWISsite(siteNumbers)
+
+
+    siteInfo <- suppressMessages(readNWISsite(siteNumbers))
     siteInfo <- merge(
       x = unique(data[, c("agency_cd", "site_no")]),
       y = siteInfo,
       by = c("agency_cd", "site_no"),
       all.x = TRUE
     )
-    
+
     attr(data, "siteInfo") <- siteInfo
     attr(data, "variableInfo") <- NULL
     attr(data, "statisticInfo") <- NULL
   }
-  
+
   return(data)
 }
 
@@ -265,17 +265,17 @@ readNWISpeak <- function(siteNumbers,
 #' attr(data, "RATING")
 #' }
 readNWISrating <- function(siteNumber, type = "base", convertType = TRUE) {
-  
+
   # No rating xml service
   url <- constructNWISURL(siteNumber, service = "rating", ratingType = type)
-  
+
   data <- importRDB1(url, asDateTime = FALSE, convertType = convertType)
-  
+
   if ("current_rating_nu" %in% names(data)) {
     intColumns <- intColumns[!("current_rating_nu" %in% names(data)[intColumns])]
     data$current_rating_nu <- gsub(" ", "", data$current_rating_nu)
   }
-  
+
   if (nrow(data) > 0) {
     if (type == "base") {
       Rat <- grep("//RATING ", comment(data), value = TRUE, fixed = TRUE)
@@ -283,14 +283,14 @@ readNWISrating <- function(siteNumber, type = "base", convertType = TRUE) {
       Rat <- scan(text = Rat, sep = " ", what = "")
       attr(data, "RATING") <- Rat
     }
-    
-    siteInfo <- readNWISsite(siteNumber)
-    
+
+    siteInfo <- suppressMessages(readNWISsite(siteNumber))
+
     attr(data, "siteInfo") <- siteInfo
     attr(data, "variableInfo") <- NULL
     attr(data, "statisticInfo") <- NULL
   }
-  
+
   return(data)
 }
 
@@ -356,7 +356,7 @@ readNWISmeas <- function(siteNumbers,
                          tz = "UTC",
                          expanded = FALSE,
                          convertType = TRUE) {
-  
+
   # Doesn't seem to be a WaterML1 format option
   url <- constructNWISURL(
     siteNumbers = siteNumbers,
@@ -366,24 +366,24 @@ readNWISmeas <- function(siteNumbers,
     service = "meas",
     expanded = expanded
   )
-  
+
   data <- importRDB1(
     obs_url = url,
     asDateTime = TRUE,
     tz = tz,
     convertType = convertType
   )
-  
+
   if (nrow(data) > 0) {
     if ("diff_from_rating_pc" %in% names(data)) {
       data$diff_from_rating_pc <- as.numeric(data$diff_from_rating_pc)
     }
-    
+
     url <- attr(data, "url")
     comment <- attr(data, "comment")
     queryTime <- attr(data, "queryTime")
     header <- attr(data, "headerInfo")
-    
+
     if (convertType) {
       data$measurement_dateTime <- data$measurement_dt
       data$measurement_dt <- suppressWarnings(as.Date(data$measurement_dateTime))
@@ -396,15 +396,15 @@ readNWISmeas <- function(siteNumbers,
       newOrder <- c(
         1:indexDT, indexTM, indexTZrep,
         c((indexDT + 1):ncol(data))[!(c((indexDT + 1):ncol(data)) %in%
-                                        c(indexTZrep, indexTM, indexTZ))],
+          c(indexTZrep, indexTM, indexTZ))],
         indexTZ
       )
-      
+
       data <- data[, newOrder]
     }
-    
-    
-    siteInfo <- readNWISsite(siteNumbers)
+
+
+    siteInfo <- suppressMessages(readNWISsite(siteNumbers))
     siteInfo <- merge(
       x = unique(data[, c("agency_cd", "site_no")]),
       y = siteInfo,
@@ -415,12 +415,12 @@ readNWISmeas <- function(siteNumbers,
     attr(data, "comment") <- comment
     attr(data, "queryTime") <- queryTime
     attr(data, "header") <- header
-    
+
     attr(data, "siteInfo") <- siteInfo
     attr(data, "variableInfo") <- NULL
     attr(data, "statisticInfo") <- NULL
   }
-  
+
   return(data)
 }
 
@@ -496,10 +496,9 @@ readNWISmeas <- function(siteNumbers,
 #' data2 <- readNWISgwl(sites, "", "")
 #' data3 <- readNWISgwl("420125073193001", "", "")
 #' # handling of data where date has no day
-#' data4 <- readNWISgwl("263819081585801", startDate = "2000-01-01")
+#' data4 <- readNWISgwl("425957088141001", startDate = "1980-01-01")
 #'
-#' data5 <- readNWISgwl("263819081585801", parameterCd = "72019",
-#'                      startDate = "2000-01-01")
+#' data5 <- readNWISgwl("263819081585801", parameterCd = "72019")
 #' }
 readNWISgwl <- function(siteNumbers,
                         startDate = "",
@@ -522,10 +521,10 @@ readNWISgwl <- function(siteNumbers,
     tz = tz
   )
   
-  if(!is.na(parameterCd)){
+  if(!all(is.na(parameterCd))){
     data <- data[data$parameter_cd %in% parameterCd, ]
   }
-  
+
   if (nrow(data) > 0 && !all(is.na(data$lev_dt))) {
     if (convertType) {
       # check that the date includes a day, based on date string length
@@ -535,7 +534,7 @@ readNWISgwl <- function(siteNumbers,
         data$lev_dt <- as.Date(data$lev_dt)
       }
     }
-    siteInfo <- readNWISsite(siteNumbers)
+    siteInfo <- suppressMessages(readNWISsite(siteNumbers))
     siteInfo <- merge(
       x = unique(data[, c("agency_cd", "site_no")]),
       y = siteInfo,
@@ -544,7 +543,7 @@ readNWISgwl <- function(siteNumbers,
     )
     attr(data, "siteInfo") <- siteInfo
   }
-  
+
   return(data)
 }
 
@@ -616,7 +615,7 @@ readNWISgwl <- function(siteNumbers,
 #' }
 readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "", convertType = TRUE,
                          statReportType = "daily", statType = "mean") {
-  
+
   # check for NAs in site numbers
   if (any(is.na(siteNumbers))) {
     siteNumbers <- siteNumbers[!is.na(siteNumbers)]
@@ -635,15 +634,15 @@ readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "",
     statType = statType,
     statReportType = statReportType
   )
-  
+
   data <- importRDB1(
     obs_url = url,
     asDateTime = TRUE,
     convertType = convertType
   )
-  
-  siteInfo <- readNWISsite(siteNumbers)
-  
+
+  siteInfo <- suppressMessages(readNWISsite(siteNumbers))
+
   if (nrow(data) > 0) {
     siteInfo <- merge(
       x = unique(data[, c("agency_cd", "site_no")]),
@@ -652,9 +651,9 @@ readNWISstat <- function(siteNumbers, parameterCd, startDate = "", endDate = "",
       all.x = TRUE
     )
   }
-  
+
   attr(data, "siteInfo") <- siteInfo
-  
+
   return(data)
 }
 
@@ -723,7 +722,7 @@ readNWISuse <- function(stateCd,
                         transform = FALSE) {
   countyID <- NULL
   countyCd <- countyCd[countyCd != ""]
-  
+
   if (exists("countyCd") && !is.null(countyCd)) {
     if (!any(toupper(countyCd) == "ALL")) {
       for (c in countyCd) {
@@ -734,10 +733,10 @@ readNWISuse <- function(stateCd,
       countyID <- toupper(countyID)
     }
   }
-  
+
   years <- .capitalALL(years)
   categories <- .capitalALL(categories)
-  
+
   url <- constructUseURL(
     years = years,
     stateCd = stateCd,
@@ -748,7 +747,7 @@ readNWISuse <- function(stateCd,
     obs_url = url,
     convertType = convertType
   )
-  
+
   # for total country data arriving in named rows
   if (transform) {
     cmmnt <- comment(returned_data)

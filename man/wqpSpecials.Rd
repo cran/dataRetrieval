@@ -6,11 +6,11 @@
 \alias{whatWQPsites}
 \title{Site Data Import from Water Quality Portal}
 \usage{
-whatWQPsamples(..., convertType = TRUE)
+whatWQPsamples(..., convertType = TRUE, legacy = TRUE)
 
 whatWQPmetrics(..., convertType = TRUE)
 
-whatWQPsites(...)
+whatWQPsites(..., legacy = TRUE)
 }
 \arguments{
 \item{\dots}{see \url{https://www.waterqualitydata.us/webservices_documentation}
@@ -24,11 +24,14 @@ after "https://www.waterqualitydata.us/#". For example, if you chose "Nutrient"
 in the Characteristic Group dropdown, you will see characteristicType=Nutrient
 in the Query URL. The corresponding argument for dataRetrieval is
 characteristicType = "Nutrient". dataRetrieval users do not need to include
-mimeType, zip, and providers is optional (these arguments are picked automatically).}
+mimeType,  and providers is optional (these arguments are picked automatically).}
 
 \item{convertType}{logical, defaults to \code{TRUE}. If \code{TRUE},
 the function will convert the data to dates, datetimes,
 numerics based on a standard algorithm. If false, everything is returned as a character.}
+
+\item{legacy}{Logical. If TRUE, uses legacy WQP services. Default is TRUE.
+Setting legacy = FALSE uses WQX3.0 WQP services, which are in-development, use with caution.}
 }
 \value{
 data frame

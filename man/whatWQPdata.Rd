@@ -18,7 +18,7 @@ after "https://www.waterqualitydata.us/#". For example, if you chose "Nutrient"
 in the Characteristic Group dropdown, you will see characteristicType=Nutrient
 in the Query URL. The corresponding argument for dataRetrieval is
 characteristicType = "Nutrient". dataRetrieval users do not need to include
-mimeType, zip, and providers is optional (these arguments are picked automatically).}
+mimeType, and providers is optional (these arguments are picked automatically).}
 
 \item{saveFile}{path to save the incoming geojson output.}
 
@@ -57,6 +57,9 @@ lakeSites_chars <- whatWQPdata(
   siteType = "Lake, Reservoir, Impoundment",
   countycode = "US:55:025", convertType = FALSE)
 }
+
+bbox <- c(-86.9736, 34.4883, -86.6135, 34.6562)
+what_bb <- whatWQPdata(bBox = bbox)
 \dontshow{\}) # examplesIf}
 }
 \seealso{

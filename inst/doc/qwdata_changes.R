@@ -13,12 +13,6 @@ knitr::opts_chunk$set(
 )
 
 ## ----eval=FALSE-------------------------------------------
-#  
-#  site_ids <- c("04024430", "04024000")
-#  parameterCd <- c("34247", "30234", "32104", "34220")
-#  nwisData <- readNWISqw(site_ids, parameterCd)
-
-## ----eval=FALSE-------------------------------------------
 #  wqpData <- readWQPqw(paste0("USGS-", site_ids), parameterCd)
 
 ## ----echo=FALSE-------------------------------------------
@@ -27,53 +21,44 @@ wqpData <- readRDS("wqpData.rds")
 
 ## ---------------------------------------------------------
 nrow(nwisData)
-
-## ---------------------------------------------------------
 nrow(wqpData)
 
 ## ---------------------------------------------------------
 ncol(nwisData)
-
-## ---------------------------------------------------------
 ncol(wqpData)
 
 ## ---------------------------------------------------------
 names(attributes(nwisData))
-
-## ---------------------------------------------------------
 names(attributes(wqpData))
 
 ## ---------------------------------------------------------
 site_NWIS <- attr(nwisData, "siteInfo")
 site_WQP <- attr(wqpData, "siteInfo")
 
-param_NWIS <- attr(nwisData, "variableInfo")
-param_WQP <- attr(wqpData, "variableInfo")
-
 ## ---------------------------------------------------------
 library(dplyr)
 
-nwisData_relavent <- nwisData %>%
+nwisData_relevant <- nwisData |> 
   select(
     site_no, startDateTime, parm_cd,
-    hyd_cond_cd, remark_cd, result_va
-  ) %>%
+    remark_cd, result_va
+  ) |> 
   arrange(startDateTime, parm_cd)
 
-knitr::kable(head(nwisData_relavent))
+knitr::kable(head(nwisData_relevant))
 
 ## ---------------------------------------------------------
-wqpData_relavent <- wqpData %>%
+wqpData_relevant <- wqpData |> 
   select(
-    site_no = MonitoringLocationIdentifier,
-    startDateTime = ActivityStartDateTime,
-    parm_cd = USGSPCode,
-    hyd_cond_cd = HydrologicCondition,
-    remark_cd = ResultDetectionConditionText,
-    result_va = ResultMeasureValue
-  ) %>%
+    site_no = Location_Identifier,
+    startDateTime = Activity_StartDateTime,
+    parm_cd = USGSpcode,
+    remark_cd = Result_ResultDetectionCondition,
+    result_va = Result_Measure,
+    detection_level = DetectionLimit_MeasureA
+  ) |> 
   arrange(startDateTime, parm_cd)
-knitr::kable(head(wqpData_relavent))
+knitr::kable(head(wqpData_relevant))
 
 ## ---------------------------------------------------------
 
@@ -85,73 +70,23 @@ censored_text <- c(
   "Below Quantification Limit"
 )
 
-wqpData_relavent <- wqpData %>%
+wqpData_relevant <- wqpData |> 
   mutate(left_censored = grepl(paste(censored_text, collapse = "|"),
-    ResultDetectionConditionText,
+    Result_ResultDetectionCondition,
     ignore.case = TRUE
-  )) %>%
+  )) |> 
   select(
-    site_no = MonitoringLocationIdentifier,
-    startDateTime = ActivityStartDateTime,
-    parm_cd = USGSPCode,
+    site_no = Location_Identifier,
+    startDateTime = Activity_StartDateTime,
+    parm_cd = USGSpcode,
     left_censored,
-    result_va = ResultMeasureValue,
-    detection_level = DetectionQuantitationLimitMeasure.MeasureValue,
-    dl_units = DetectionQuantitationLimitMeasure.MeasureUnitCode
-  ) %>%
+    result_va = Result_Measure,
+    detection_level = DetectionLimit_MeasureA,
+    dl_units = DetectionLimit_MeasureUnitA
+  ) |> 
   arrange(startDateTime, parm_cd)
 
-knitr::kable(head(wqpData_relavent))
-
-## ---------------------------------------------------------
-wqpData_relavent_codes <- wqpData %>%
-  mutate(units = ifelse(is.na(ResultMeasure.MeasureUnitCode),
-    DetectionQuantitationLimitMeasure.MeasureUnitCode,
-    ResultMeasure.MeasureUnitCode
-  )) %>%
-  select(
-    parm_cd = USGSPCode,
-    CharacteristicName, ResultSampleFractionText,
-    units
-  ) %>%
-  distinct()
-
-knitr::kable(wqpData_relavent_codes)
-
-## ---------------------------------------------------------
-wqpData_with_codes <- wqpData %>%
-  select(
-    HydrologicCondition, HydrologicEvent,
-    ActivityTypeCode, ActivityMediaName
-  ) %>%
-  distinct()
-
-knitr::kable(head(wqpData_with_codes))
-
-## ----codes, echo=FALSE------------------------------------
-df <- data.frame(
-  NWIS = c(
-    "samp_type_cd = 9",
-    "hyd_cond_cd = 9",
-    "hyd_cond_cd = 5",
-    "hyd_cond_cd = 8",
-    "medium_cd = 'WS'",
-    "hyd_event_cd = 'B'",
-    "hyd_event_cd = 'A'",
-    "hyd_event_cd = 9"
-  ),
-  WQP = c(
-    "ActivityTypeCode = 'Sample-Routine'",
-    "HydrologicCondition = 'Stable, normal stage'",
-    "HydrologicCondition = 'Falling stage'",
-    "HydrologicCondition = 'Rising stage'",
-    "ActivityMediaName = 'Water'",
-    "HydrologicEvent = 'Under ice cover'",
-    "HydrologicEvent = 'Spring breakup'",
-    "HydrologicEvent = 'Routine sample'"
-  )
-)
-knitr::kable(df)
+knitr::kable(head(wqpData_relevant))
 
 ## ----whatdata, eval=FALSE---------------------------------
 #  whatNWIS <- whatNWISdata(
@@ -162,18 +97,15 @@ knitr::kable(df)
 ## ----whatdatanew, eval=FALSE------------------------------
 #  whatWQP <- whatWQPdata(siteNumber = paste0("USGS-", site_ids))
 
-## ----eval=FALSE-------------------------------------------
-#  qwData <- readNWISdata(
-#    state_cd = "WI",
-#    startDate = "2000-01-01",
-#    drain_area_va_min = 50, qw_count_nu = 50,
-#    qw_attributes = "expanded",
-#    qw_sample_wide = "wide",
-#    list_of_search_criteria = c(
-#      "state_cd",
-#      "drain_area_va",
-#      "obs_count_nu"
-#    ),
-#    service = "qw"
-#  )
+## ----echo=TRUE, eval=TRUE---------------------------------
+schema <- readr::read_csv("https://www.epa.gov/system/files/other-files/2024-07/schema_outbound_wqx3.0.csv")
+
+## ----echo=TRUE, eval=TRUE---------------------------------
+sub_schema <- schema |> 
+  select(WQX3 = FieldName3.0,
+         WQX2 = FieldName2.0.Narrow) |> 
+  filter(!is.na(WQX2))
+
+knitr::kable(sub_schema)
+
 

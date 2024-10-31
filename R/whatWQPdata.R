@@ -16,8 +16,10 @@
 #' lakeSites_samples <- whatWQPsamples(siteType = "Lake, Reservoir, Impoundment",
 #'                                     countycode = "US:55:025")
 #' }
-whatWQPsamples <- function(..., convertType = TRUE) {
-  values <- readWQPdots(...)
+whatWQPsamples <- function(..., 
+                           convertType = TRUE,
+                           legacy = TRUE) {
+  values <- readWQPdots(..., legacy = legacy)
 
   values <- values$values
 
@@ -30,27 +32,30 @@ whatWQPsamples <- function(..., convertType = TRUE) {
   }
 
   values <- sapply(values, function(x) utils::URLencode(x, reserved = TRUE))
+  
+  if(legacy){
+    baseURL <- drURL("Activity", arg.list = values)
+  } else {
+    baseURL <- drURL("ActivityWQX3", arg.list = values)
+  }
+  
+  baseURL <- appendDrURL(baseURL, mimeType = "csv")
 
-  baseURL <- drURL("Activity", arg.list = values)
-
-  baseURL <- appendDrURL(baseURL, mimeType = "tsv")
-
-  withCallingHandlers(
-    {
-      retval <- importWQP(baseURL,
-        zip = values["zip"] == "yes",
-        convertType = convertType
-      )
-    },
-    warning = function(w) {
-      if (any(grepl("Number of rows returned not matched in header", w))) {
-        invokeRestart("muffleWarning")
-      }
+  retval <- importWQP(baseURL,
+                      convertType = convertType)
+  if(!is.null(retval)){
+    
+    attr(retval, "legacy") <- legacy
+    attr(retval, "queryTime") <- Sys.time()
+    attr(retval, "url") <- baseURL
+    
+    if(legacy){
+      wqp_message()
+    } else {
+      wqp_message_beta()
+      attr(retval, "wqp-request-id") <- attr(retval, "headerInfo")$`wqp-request-id`
     }
-  )
-
-  attr(retval, "queryTime") <- Sys.time()
-  attr(retval, "url") <- baseURL
+  }
 
   return(retval)
 }
@@ -70,9 +75,10 @@ whatWQPsamples <- function(..., convertType = TRUE) {
 #' lakeSites_metrics <- whatWQPmetrics(siteType = "Lake, Reservoir, Impoundment",
 #'                                     countycode = "US:55:025")
 #' }
-whatWQPmetrics <- function(..., convertType = TRUE) {
-  values <- readWQPdots(...)
-
+whatWQPmetrics <- function(..., 
+                           convertType = TRUE) {
+  values <- readWQPdots(..., legacy = TRUE)
+  
   values <- values$values
 
   if ("tz" %in% names(values)) {
@@ -87,12 +93,11 @@ whatWQPmetrics <- function(..., convertType = TRUE) {
 
   baseURL <- drURL("ActivityMetric", arg.list = values)
 
-  baseURL <- appendDrURL(baseURL, mimeType = "tsv")
+  baseURL <- appendDrURL(baseURL, mimeType = "csv")
 
   withCallingHandlers(
     {
       retval <- importWQP(baseURL,
-        zip = values["zip"] == "yes",
         convertType = convertType
       )
     },
@@ -102,11 +107,15 @@ whatWQPmetrics <- function(..., convertType = TRUE) {
       }
     }
   )
-
-  attr(retval, "queryTime") <- Sys.time()
-  attr(retval, "url") <- baseURL
-
-  return(retval)
+  if(is.null(retval)){
+    return(NULL)
+  } else {
+    wqp_message()
+    attr(retval, "queryTime") <- Sys.time()
+    attr(retval, "url") <- baseURL
+  
+    return(retval)
+  }
 }
 
 
@@ -136,7 +145,7 @@ whatWQPmetrics <- function(..., convertType = TRUE) {
 #' in the Characteristic Group dropdown, you will see characteristicType=Nutrient
 #' in the Query URL. The corresponding argument for dataRetrieval is
 #' characteristicType = "Nutrient". dataRetrieval users do not need to include
-#' mimeType, zip, and providers is optional (these arguments are picked automatically).
+#' mimeType, and providers is optional (these arguments are picked automatically).
 #' @param saveFile path to save the incoming geojson output.
 #' @param convertType logical, defaults to \code{TRUE}. If \code{TRUE}, the function
 #' will convert the data to dates, datetimes,
@@ -159,11 +168,13 @@ whatWQPmetrics <- function(..., convertType = TRUE) {
 #'   siteType = "Lake, Reservoir, Impoundment",
 #'   countycode = "US:55:025", convertType = FALSE)
 #' }
+#' 
+#' bbox <- c(-86.9736, 34.4883, -86.6135, 34.6562)
+#' what_bb <- whatWQPdata(bBox = bbox)
+#' 
 whatWQPdata <- function(..., saveFile = tempfile(),
                         convertType = TRUE) {
-  values <- readWQPdots(...)
-
-  wqp_message()
+  values <- readWQPdots(..., legacy = TRUE)
   
   values <- values$values
 
@@ -180,16 +191,16 @@ whatWQPdata <- function(..., saveFile = tempfile(),
   baseURL <- drURL("Station", arg.list = values)
 
   baseURL <- appendDrURL(baseURL, mimeType = "geojson")
-
-  saveFile_zip <- saveFile
-  if (tools::file_ext(saveFile) != ".zip") {
-    saveFile_zip <- paste0(saveFile, ".zip")
-  }
-
-  doc <- getWebServiceData(baseURL, httr::write_disk(saveFile_zip))
+  
+  # Not sure if there's a geojson option with WQX
+  wqp_message()
+  
+  doc <- getWebServiceData(baseURL, httr::write_disk(saveFile))
+  
   if (is.null(doc)) {
     return(invisible(NULL))
   }
+  
   headerInfo <- attr(doc, "headerInfo")
 
   if (headerInfo$`total-site-count` == 0) {
@@ -216,10 +227,8 @@ whatWQPdata <- function(..., saveFile = tempfile(),
       y <- data.frame(lapply(y, as.character), stringsAsFactors = FALSE)
     }
   } else {
-    doc <- utils::unzip(saveFile_zip, exdir = saveFile)
-    unlink(saveFile_zip)
 
-    retval <- as.data.frame(jsonlite::fromJSON(doc), stringsAsFactors = FALSE)
+    retval <- as.data.frame(jsonlite::fromJSON(saveFile), stringsAsFactors = FALSE)
     df_cols <- as.integer(which(sapply(retval, class) == "data.frame"))
     y <- retval[, -df_cols]
 

@@ -51,7 +51,7 @@
 #' \donttest{
 #' data <- importWaterML1(obs_url, asDateTime = TRUE)
 #'
-#' 
+#'
 #' unitDataURL <- constructNWISURL(
 #'   site_id, property,
 #'   "2013-11-03", "2013-11-03", "uv"
@@ -192,15 +192,6 @@ importWaterML1 <- function(obs_url, asDateTime = FALSE, tz = "UTC") {
           "%Y-%m-%dT%H:%M:%OS%z"
         ), exact = TRUE)
         if (any(numChar < 20) && any(numChar > 16)) {
-          offsetLibrary <- data.frame(
-            offset = c(5, 4, 6, 5, 7, 6, 8, 7, 9, 8, 10, 10, 0),
-            code = c(
-              "EST", "EDT", "CST", "CDT", "MST",
-              "MDT", "PST", "PDT", "AKST", "AKDT", "HAST", "HST", ""
-            ),
-            stringsAsFactors = FALSE
-          )
-
           # not sure there is still a case for this (no offset on times)?
           dateTime[numChar < 20 & numChar > 16] <- dateTime[numChar < 20 & numChar > 16] +
             offsetLibrary[offsetLibrary$code == defaultTZ, "offset"] * 60 * 60
