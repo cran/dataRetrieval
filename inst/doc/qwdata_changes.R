@@ -13,7 +13,7 @@ knitr::opts_chunk$set(
 )
 
 ## ----eval=FALSE-------------------------------------------
-#  wqpData <- readWQPqw(paste0("USGS-", site_ids), parameterCd)
+# wqpData <- readWQPqw(paste0("USGS-", site_ids), parameterCd)
 
 ## ----echo=FALSE-------------------------------------------
 nwisData <- readRDS("nwisData.rds")
@@ -89,13 +89,13 @@ wqpData_relevant <- wqpData |>
 knitr::kable(head(wqpData_relevant))
 
 ## ----whatdata, eval=FALSE---------------------------------
-#  whatNWIS <- whatNWISdata(
-#    siteNumber = site_ids,
-#    service = "qw"
-#  )
+# whatNWIS <- whatNWISdata(
+#   siteNumber = site_ids,
+#   service = "qw"
+# )
 
 ## ----whatdatanew, eval=FALSE------------------------------
-#  whatWQP <- whatWQPdata(siteNumber = paste0("USGS-", site_ids))
+# whatWQP <- whatWQPdata(siteNumber = paste0("USGS-", site_ids))
 
 ## ----echo=TRUE, eval=TRUE---------------------------------
 schema <- readr::read_csv("https://www.epa.gov/system/files/other-files/2024-07/schema_outbound_wqx3.0.csv")
