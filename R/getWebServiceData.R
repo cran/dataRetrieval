@@ -36,7 +36,11 @@ getWebServiceData <- function(obs_url, ...) {
   obs_url <- httr2::req_headers(obs_url,
                                 `Accept-Encoding` = c("compress", "gzip")) 
   
-  message("GET:", obs_url$url) 
+  url_method <- "GET"
+  if(!is.null(obs_url$body)){
+    url_method <- "POST"
+  }
+  message(url_method, ": ", obs_url$url) 
   returnedList <- httr2::req_perform(obs_url)
 
   good <- check_non_200s(returnedList)
@@ -58,9 +62,8 @@ getWebServiceData <- function(obs_url, ...) {
       returnedDoc <- httr2::resp_body_string(returnedList)
     } else if (content %in% return_readLines) {
       returnedList <- httr2::resp_body_string(returnedList)
-      txt <- readLines(returnedList$content)
-      message(txt)
-      return(txt)
+      message(returnedList)
+      returnedDoc <- returnedList
     } else if (content %in% return_json){
       returnedDoc <- httr2::resp_body_json(returnedList)
     } else {

@@ -15,23 +15,22 @@ knitr::opts_chunk$set(
 ## ----workflow, echo=TRUE,eval=FALSE-----------------------
 # library(dataRetrieval)
 # # Choptank River near Greensboro, MD
-# siteNumber <- "01491000"
-# ChoptankInfo <- readNWISsite(siteNumber)
+# siteNumber <- "USGS-01491000"
+# ChoptankInfo <- read_waterdata_monitoring_location(siteNumber)
 # parameterCd <- "00060"
 # 
 # # Raw daily data:
-# rawDailyData <- readNWISdv(
-#   siteNumber, parameterCd,
-#   "1980-01-01", "2010-01-01"
-# )
+# rawDailyData <- read_waterdata_daily(monitoring_location_id = siteNumber,
+#                                      parameter_code = parameterCd,
+#                                      time = c("1980-01-01", "2010-01-01"))
 # 
 # 
 # pCode <- readNWISpCode(parameterCd)
 
 ## ----echo=FALSE-------------------------------------------
 Functions <- c(
-  "readNWISdata",
-  "readNWISdv",
+  "read_waterdata",
+  "read_waterdata_daily",
   "readNWISuv",
   "readNWISrating",
   "readNWISmeas",
@@ -40,9 +39,11 @@ Functions <- c(
   "readNWISuse",
   "readNWISstat",
   "readNWISpCode",
-  "readNWISsite",
+  "read_waterdata_monitoring_location",
+  "read_waterdata_samples",
+  "summarize_waterdata_samples",
   "whatNWISsites",
-  "whatNWISdata",
+  "read_waterdata_ts_meta",
   "readWQPdata",
   "readWQPqw",
   "whatWQPsites",
@@ -51,27 +52,9 @@ Functions <- c(
   "whatWQPmetrics",
   "whatWQPsamples"
 )
-Arguments <- c(
-  "service, tz='UTC', ...", # readNWISdata
-  "statCd='00003'", # readNWISdv
-  "tz='UTC'", # readNWISuv
-  "type='base", # readNWISrating
-  "tz='UTC'", # readNWISmeas
-  "", # readNWISpeak
-  "tz='UTC'", # readNWISgwl
-  "stateCd, countyCd, years='ALL', categories='ALL'", # readNWISuse
-  "statReportType='daily', statType='mean'", # readNWISstat
-  "", # readNWISpCode
-  "", # readNWISsite
-  "...", # whatNWISsites
-  "service, ...", # whatNWISdata
-  "...",
-  "", # readWQPdata
-  "...",
-  "...", "...", "...", "..."
-) # whatWQPsites
+
 Description <- c(
-  "Data using user-specified queries", # readNWISdata
+  "Time series data using user-specified queries", # readNWISdata
   "Daily values", # readNWISdv
   "Instantaneous values", # readNWISuv
   "Rating table for active streamgage", # readNWISrating
@@ -81,7 +64,9 @@ Description <- c(
   "Water use", # readNWISuse
   "Statistical service", # readNWISstat
   "Parameter code information", # readNWISpCode
-  "Site information", # readNWISsite
+  "Site information", # read_waterdata_monitoring_location
+  "Discrete UGSS water quality data", # read_waterdata_samples
+  "Discrete USGS water quality summary",
   "Site search using user-specified queries",
   "Data availability",
   "User-specified queries",
@@ -92,28 +77,20 @@ Description <- c(
   "Metric availability",
   "Sample availability"
 )
-Source <- c(rep("NWIS", 13), rep("WQP", 7))
-Site <- c(
-  "opt.", rep("req.", 6), "",
-  rep("req.", 4), "opt.", "opt.", "req.", rep("opt.", 5)
-)
-parameterCd <- c(
-  "opt.", rep("req.", 2),
-  rep("", 5), "req.", "req.",
-  rep("", 2), rep("opt.", 2), "req.", rep("", 5)
-)
-start <- c(
-  "opt.", rep("req.", 2), "",
-  rep("req.", 3), "", "req.", rep("", 5), "req.", rep("opt.", 5)
-)
+Source <- c("USGS Water Data API",
+            "USGS Water Data API",
+            rep("NWIS", 8),
+            "USGS Water Data API",
+            "USGS Samples Data",
+            "USGS Samples Data",
+            "NWIS",
+            "USGS Water Data API",
+            rep("WQP", 7))
+
 
 data.df <- data.frame(
   Name = Functions,
   `Data Returned` = Description,
-  siteNumbers = Site,
-  parameterCd = parameterCd,
-  `startDate \n endDate` = start,
-  Arguments,
   Source, stringsAsFactors = FALSE
 )
 
@@ -150,67 +127,36 @@ kable(data.df,
 )
 
 ## ----getSite, echo=TRUE, eval=FALSE-----------------------
-# siteNumbers <- c("01491000", "01645000")
-# siteINFO <- readNWISsite(siteNumbers)
-
-## ----siteNames3, echo=TRUE, eval=FALSE--------------------
-# comment(siteINFO)
+# siteNumbers <- c("USGS-01491000", "USGS-01645000")
+# siteINFO <- read_waterdata_monitoring_location(siteNumbers)
 
 ## ----getSiteExtended, echo=TRUE, eval=FALSE---------------
 # # Continuing from the previous example:
 # # This pulls out just the daily, mean data:
 # 
-# dailyDataAvailable <- whatNWISdata(
-#   siteNumber = siteNumbers,
-#   service = "dv",
-#   statCd = "00003"
+# dailyDataAvailable <- read_waterdata_ts_meta(
+#   monitoring_location_id = siteNumbers,
+#   computation_period_identifier = "Daily",
+#   statistic_id = "00003"
 # )
 
-## ----echo=FALSE-------------------------------------------
-
-tableData <- data.frame(
-  siteNumbers = c(
-    "01491000",
-    "01491000",
-    "01645000",
-    "01491000",
-    "01491000",
-    "01491000"
-  ),
-  srsname = c(
-    "Temperature, water",
-    "Stream flow, mean daily",
-    "Stream flow, mean daily",
-    "Specific conductance",
-    "Suspended sediment concentration (SSC)",
-    "Suspended sediment discharge"
-  ),
-  startDate = c(
-    "2010-10-01",
-    "1948-01-01",
-    "1930-09-26",
-    "2010-10-01",
-    "1980-10-01",
-    "1980-10-01"
-  ),
-  endDate = c(
-    "2012-05-09",
-    "2017-05-17",
-    "2017-05-17",
-    "2012-05-09",
-    "1991-09-30",
-    "1991-09-30"
-  ),
-  count = c("529", "25340", "31646", "527", "4017", "4017"),
-  units = c("deg C", "ft<sup>3</sup>/s", "ft<sup>3</sup>/s", "uS/cm @25C", "mg/l", "tons/day"),
-  stringsAsFactors = FALSE
-)
-
-# nolint start
-kable(tableData,
-  caption = "Table 4: Reformatted version of output from the whatNWISdata function for the Choptank River near Greensboro, MD, and from Seneca Creek at Dawsonville, MD from the daily values service [Some columns deleted for space considerations]"
-)
-# nolint end
+## ----echo=FALSE, eval=FALSE-------------------------------
+# 
+# tableData <- dailyDataAvailable[c("monitoring_location_id",
+#                          "parameter_description",
+#                          "unit_of_measure",
+#                          "begin", "end")]
+# 
+# tableData$begin <- as.Date(tableData$begin)
+# tableData$end <- as.Date(tableData$end)
+# tableData <- sf::st_drop_geometry(tableData)
+# 
+# 
+# knitr::kable(tableData,
+#              caption = "Table 4: Reformatted version of output from the whatNWISdata function for the Choptank River near Greensboro, MD, and from Seneca Creek at Dawsonville, MD from the daily values service [Some columns deleted for space considerations]")
+# 
+# 
+# # nolint end
 
 ## ----label=getPCodeInfo, echo=TRUE, eval=FALSE------------
 # # Using defaults:
@@ -220,24 +166,26 @@ kable(tableData,
 ## ----label=getNWISDaily, echo=TRUE, eval=FALSE------------
 # 
 # # Choptank River near Greensboro, MD:
-# siteNumber <- "01491000"
+# siteNumber <- "USSG-01491000"
 # parameterCd <- "00060" # Discharge
 # startDate <- "2009-10-01"
 # endDate <- "2012-09-30"
 # 
-# discharge <- readNWISdv(siteNumber, parameterCd, startDate, endDate)
+# discharge <- read_waterdata_daily(monitoring_location_id = siteNumber,
+#                                   parameter_code = parameterCd,
+#                                   time = c(startDate, endDate))
 
 ## ----label=getNWIStemperature, echo=TRUE, eval=FALSE------
-# siteNumber <- "01491000"
+# siteNumber <- "USGS-01491000"
 # parameterCd <- c("00010", "00060") # Temperature and discharge
 # statCd <- c("00001", "00003") # Mean and maximum
 # startDate <- "2012-01-01"
 # endDate <- "2012-05-01"
 # 
-# temperatureAndFlow <- readNWISdv(siteNumber, parameterCd,
-#   startDate, endDate,
-#   statCd = statCd
-# )
+# temperatureAndFlow <- read_waterdata_daily(monitoring_location_id = siteNumber,
+#                                   parameter_code = parameterCd,
+#                                   statistic_id = statCd,
+#                                   time = c(startDate, endDate))
 
 ## ----label=getNWIStemperature2, echo=FALSE, eval=TRUE-----
 filePath <- system.file("extdata", package = "dataRetrieval")
@@ -245,42 +193,31 @@ fileName <- "temperatureAndFlow.RData"
 fullPath <- file.path(filePath, fileName)
 load(fullPath)
 
-## ----label=renameColumns, echo=TRUE-----------------------
-names(temperatureAndFlow)
-
-temperatureAndFlow <- renameNWISColumns(temperatureAndFlow)
-names(temperatureAndFlow)
-
-## ----label=attr1, echo=TRUE-------------------------------
-# Information about the data frame attributes:
-names(attributes(temperatureAndFlow))
-
-statInfo <- attr(temperatureAndFlow, "statisticInfo")
-variableInfo <- attr(temperatureAndFlow, "variableInfo")
-siteInfo <- attr(temperatureAndFlow, "siteInfo")
-
 ## ---------------------------------------------------------
-variableInfo <- attr(temperatureAndFlow, "variableInfo")
-siteInfo <- attr(temperatureAndFlow, "siteInfo")
+
+temperature <- temperatureAndFlow[temperatureAndFlow$parameter_code == "00010",]
+temperature <- temperature[temperature$statistic_id == "00001",]
+
+flow <- temperatureAndFlow[temperatureAndFlow$parameter_code == "00060",]
 
 par(mar = c(5, 5, 5, 5)) # sets the size of the plot window
 
-plot(temperatureAndFlow$Date, temperatureAndFlow$Wtemp_Max,
-  ylab = variableInfo$parameter_desc[1],
+plot(temperature$time, temperature$value,
+  ylab = "Maximum Temperture [C]",
   xlab = ""
 )
 par(new = TRUE)
-plot(temperatureAndFlow$Date,
-  temperatureAndFlow$Flow,
+plot(flow$time,
+  flow$value,
   col = "red", type = "l",
   xaxt = "n", yaxt = "n",
   xlab = "", ylab = "",
   axes = FALSE
 )
 axis(4, col = "red", col.axis = "red")
-mtext(variableInfo$parameter_desc[2], side = 4, line = 3, col = "red")
-title(paste(siteInfo$station_nm, "2012"))
-legend("topleft", variableInfo$param_units,
+mtext("Discharge [ft3/s]", side = 4, line = 3, col = "red")
+title("CHOPTANK RIVER NEAR GREENSBORO, MD")
+legend("topleft", unique(temperatureAndFlow$unit_of_measure),
   col = c("black", "red"), lty = c(NA, 1),
   pch = c(1, NA)
 )
@@ -401,29 +338,6 @@ kable(tableData,
 ## ----eval=FALSE-------------------------------------------
 # type <- "Stream"
 # sites <- whatWQPmetrics(countycode = "US:55:025", siteType = type)
-
-## ----meta1, eval=FALSE------------------------------------
-# 
-# attr(dischargeWI, "url")
-# 
-# attr(dischargeWI, "queryTime")
-# 
-# siteInfo <- attr(dischargeWI, "siteInfo")
-
-## ----meta2, eval=FALSE------------------------------------
-# names(attributes(dischargeWI))
-
-## ----meta3, eval=FALSE------------------------------------
-# 
-# siteInfo <- attr(dischargeWI, "siteInfo")
-# 
-# variableInfo <- attr(dischargeWI, "variableInfo")
-
-## ----meta5, eval=FALSE------------------------------------
-# comment(peakData)
-# 
-# # Which is equivalent to:
-# attr(peakData, "comment")
 
 ## ----seeVignette,eval = FALSE-----------------------------
 # # to see all available vignettes:

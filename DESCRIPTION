@@ -2,7 +2,7 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrology and Water Quality
         Data
-Version: 2.7.18
+Version: 2.7.19
 Authors@R: c(
     person("Laura", "DeCicco", role = c("aut","cre"),
             email = "ldecicco@usgs.gov",
@@ -27,39 +27,51 @@ Authors@R: c(
             comment=c(ORCID = "0000-0003-2521-5043")),
     person("Lee", "Stanish", role="ctb",
             email = "lstanish@usgs.gov",
-            comment=c(ORCID = "0000-0002-9775-6861")))
+            comment=c(ORCID = "0000-0002-9775-6861")),
+    person("Joeseph", "Zemmels", role="ctb",
+            email = "jzemmels@usgs.gov",
+            comment=c(ORCID = "0009-0008-1463-6313")),
+    person("Elise", "Hinman", role="ctb",
+            email = "ehinman@usgs.gov",
+            comment=c(ORCID = "0000-0001-5396-1583")),  
+    person("Michael", "Mahoney", role="ctb",
+            email = "mjmahoney@usgs.gov",
+            comment=c(ORCID = "0000-0003-2402-304X"))  
+            )
 Description: Collection of functions to help retrieve U.S. Geological Survey
     and U.S. Environmental Protection Agency water quality and
-    hydrology data from web services. Data are discovered from 
-    National Water Information System <https://waterservices.usgs.gov/> and <https://waterdata.usgs.gov/nwis>. 
-    Water quality data are obtained from the Water Quality Portal <https://www.waterqualitydata.us/>.
+    hydrology data from web services. 
 License: CC0
 Copyright: This software is in the public domain because it contains
         materials that originally came from the United States
         Geological Survey, an agency of the United States Department of
         Interior.
 Depends: R (>= 4.1.0)
-Imports: curl, lubridate (>= 1.5.0), stats, utils, xml2, readr (>=
-        1.4.0), jsonlite, httr2
-Suggests: covr, dplyr, knitr, rmarkdown, sf, testthat
+Imports: curl (>= 6.0.0), lubridate (>= 1.5.0), stats, utils, xml2,
+        readr (>= 1.4.0), jsonlite, httr2, whisker, sf
+Suggests: covr, dplyr, knitr, rmarkdown, testthat
 Encoding: UTF-8
 BuildVignettes: true
 VignetteBuilder: knitr
 BugReports: https://github.com/DOI-USGS/dataRetrieval/issues
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2025-02-26 20:56:45 UTC; ldecicco
-Author: Laura DeCicco [aut, cre] (<https://orcid.org/0000-0002-3915-9487>),
-  Robert Hirsch [aut] (<https://orcid.org/0000-0002-4534-075X>),
+Packaged: 2025-06-27 15:16:24 UTC; ldecicco
+Author: Laura DeCicco [aut, cre] (ORCID:
+    <https://orcid.org/0000-0002-3915-9487>),
+  Robert Hirsch [aut] (ORCID: <https://orcid.org/0000-0002-4534-075X>),
   David Lorenz [aut],
   Jordan Read [ctb],
   Jordan Walker [ctb],
   Lindsay Platt [ctb],
-  David Watkins [aut] (<https://orcid.org/0000-0002-7544-0700>),
-  David Blodgett [aut] (<https://orcid.org/0000-0001-9489-1710>),
-  Mike Johnson [aut] (<https://orcid.org/0000-0002-5288-8350>),
-  Aliesha Krall [ctb] (<https://orcid.org/0000-0003-2521-5043>),
-  Lee Stanish [ctb] (<https://orcid.org/0000-0002-9775-6861>)
+  David Watkins [aut] (ORCID: <https://orcid.org/0000-0002-7544-0700>),
+  David Blodgett [aut] (ORCID: <https://orcid.org/0000-0001-9489-1710>),
+  Mike Johnson [aut] (ORCID: <https://orcid.org/0000-0002-5288-8350>),
+  Aliesha Krall [ctb] (ORCID: <https://orcid.org/0000-0003-2521-5043>),
+  Lee Stanish [ctb] (ORCID: <https://orcid.org/0000-0002-9775-6861>),
+  Joeseph Zemmels [ctb] (ORCID: <https://orcid.org/0009-0008-1463-6313>),
+  Elise Hinman [ctb] (ORCID: <https://orcid.org/0000-0001-5396-1583>),
+  Michael Mahoney [ctb] (ORCID: <https://orcid.org/0000-0003-2402-304X>)
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2025-02-27 14:50:02 UTC
+Date/Publication: 2025-06-27 16:20:17 UTC

@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Introduction to the dataRetrieval
 package</h1>
 <h4 class="author">Laura A. DeCicco and Robert M. Hirsch</h4>
-<h4 class="date">26 February, 2025</h4>
+<h4 class="date">27 June, 2025</h4>
 
 
 <div id="TOC">
@@ -349,8 +349,9 @@ package</h1>
 <ul>
 <li><a href="#site-information" id="toc-site-information"><span class="toc-section-number">1.1</span> Site Information</a>
 <ul>
-<li><a href="#readnwissite" id="toc-readnwissite"><span class="toc-section-number">1.1.1</span> readNWISsite</a></li>
-<li><a href="#whatnwisdata" id="toc-whatnwisdata"><span class="toc-section-number">1.1.2</span> whatNWISdata</a></li>
+<li><a href="#read_waterdata_monitoring_location" id="toc-read_waterdata_monitoring_location"><span class="toc-section-number">1.1.1</span>
+read_waterdata_monitoring_location</a></li>
+<li><a href="#read_waterdata_ts_meta" id="toc-read_waterdata_ts_meta"><span class="toc-section-number">1.1.2</span> read_waterdata_ts_meta</a></li>
 </ul></li>
 <li><a href="#parameter-information" id="toc-parameter-information"><span class="toc-section-number">1.2</span> Parameter Information</a></li>
 <li><a href="#daily-data" id="toc-daily-data"><span class="toc-section-number">1.3</span> Daily Data</a></li>
@@ -382,21 +383,20 @@ whatWQPdata</a></li>
 <li><a href="#metrics-whatwqpmetrics" id="toc-metrics-whatwqpmetrics"><span class="toc-section-number">3.2.5</span> Metrics: whatWQPmetrics</a></li>
 </ul></li>
 </ul></li>
-<li><a href="#embedded-metadata" id="toc-embedded-metadata"><span class="toc-section-number">4</span> Embedded Metadata</a></li>
-<li><a href="#getting-started-in-r" id="toc-getting-started-in-r"><span class="toc-section-number">5</span> Getting Started in R</a>
+<li><a href="#getting-started-in-r" id="toc-getting-started-in-r"><span class="toc-section-number">4</span> Getting Started in R</a>
 <ul>
-<li><a href="#new-to-r" id="toc-new-to-r"><span class="toc-section-number">5.1</span> New to R?</a></li>
+<li><a href="#new-to-r" id="toc-new-to-r"><span class="toc-section-number">4.1</span> New to R?</a></li>
 </ul></li>
-<li><a href="#citations" id="toc-citations"><span class="toc-section-number">6</span> Citations</a>
+<li><a href="#citations" id="toc-citations"><span class="toc-section-number">5</span> Citations</a>
 <ul>
-<li><a href="#citing-the-dataretrieval-package" id="toc-citing-the-dataretrieval-package"><span class="toc-section-number">6.1</span> Citing the dataRetrieval
+<li><a href="#citing-the-dataretrieval-package" id="toc-citing-the-dataretrieval-package"><span class="toc-section-number">5.1</span> Citing the dataRetrieval
 package</a></li>
-<li><a href="#citing-nwis-data" id="toc-citing-nwis-data"><span class="toc-section-number">6.2</span> Citing NWIS data</a></li>
-<li><a href="#citing-wqp-data" id="toc-citing-wqp-data"><span class="toc-section-number">6.3</span> Citing WQP data</a></li>
-<li><a href="#citing-water-quality-portal-itself" id="toc-citing-water-quality-portal-itself"><span class="toc-section-number">6.4</span> Citing Water Quality Portal
+<li><a href="#citing-nwis-data" id="toc-citing-nwis-data"><span class="toc-section-number">5.2</span> Citing NWIS data</a></li>
+<li><a href="#citing-wqp-data" id="toc-citing-wqp-data"><span class="toc-section-number">5.3</span> Citing WQP data</a></li>
+<li><a href="#citing-water-quality-portal-itself" id="toc-citing-water-quality-portal-itself"><span class="toc-section-number">5.4</span> Citing Water Quality Portal
 itself</a></li>
 </ul></li>
-<li><a href="#disclaimer" id="toc-disclaimer"><span class="toc-section-number">7</span> Disclaimer</a></li>
+<li><a href="#disclaimer" id="toc-disclaimer"><span class="toc-section-number">6</span> Disclaimer</a></li>
 </ul>
 </div>
 
@@ -415,223 +415,144 @@ not imply endorsement by the U.S. Government.</p>
 <p>A quick workflow for USGS <code>dataRetrieval</code> functions:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(dataRetrieval)</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="co"># Choptank River near Greensboro, MD</span></span>
-<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01491000&quot;</span></span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>ChoptankInfo <span class="ot">&lt;-</span> <span class="fu">readNWISsite</span>(siteNumber)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;USGS-01491000&quot;</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>ChoptankInfo <span class="ot">&lt;-</span> <span class="fu">read_waterdata_monitoring_location</span>(siteNumber)</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span></span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
 <span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co"># Raw daily data:</span></span>
-<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>rawDailyData <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(</span>
-<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  siteNumber, parameterCd,</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>  <span class="st">&quot;1980-01-01&quot;</span>, <span class="st">&quot;2010-01-01&quot;</span></span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>)</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>rawDailyData <span class="ot">&lt;-</span> <span class="fu">read_waterdata_daily</span>(<span class="at">monitoring_location_id =</span> siteNumber,</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>                                     <span class="at">parameter_code =</span> parameterCd,</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>                                     <span class="at">time =</span> <span class="fu">c</span>(<span class="st">&quot;1980-01-01&quot;</span>, <span class="st">&quot;2010-01-01&quot;</span>))</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a></span>
 <span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a></span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a></span>
-<span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>pCode <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>pCode <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
 <p>USGS data are made available through the National Water Information
 System (NWIS).</p>
 <p>Table 1 describes the functions available in the
 <code>dataRetrieval</code> package.</p>
-<table style="width:100%;">
+<table>
 <caption>Table 1: dataRetrieval functions</caption>
 <colgroup>
-<col width="9%" />
-<col width="26%" />
-<col width="7%" />
-<col width="7%" />
-<col width="12%" />
-<col width="31%" />
-<col width="4%" />
+<col width="34%" />
+<col width="45%" />
+<col width="19%" />
 </colgroup>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
 <th align="left">Data.Returned</th>
-<th align="left">siteNumbers</th>
-<th align="left">parameterCd</th>
-<th align="left">startDate…endDate</th>
-<th align="left">Arguments</th>
 <th align="left">Source</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">readNWISdata</td>
-<td align="left">Data using user-specified queries</td>
-<td align="left">opt.</td>
-<td align="left">opt.</td>
-<td align="left">opt.</td>
-<td align="left">service, tz=‘UTC’, …</td>
-<td align="left">NWIS</td>
+<td align="left">read_waterdata</td>
+<td align="left">Time series data using user-specified queries</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="even">
-<td align="left">readNWISdv</td>
+<td align="left">read_waterdata_daily</td>
 <td align="left">Daily values</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">statCd=‘00003’</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="odd">
 <td align="left">readNWISuv</td>
 <td align="left">Instantaneous values</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">tz=‘UTC’</td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="even">
 <td align="left">readNWISrating</td>
 <td align="left">Rating table for active streamgage</td>
-<td align="left">req.</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">type=’base</td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
 <td align="left">readNWISmeas</td>
 <td align="left">Surface-water measurements</td>
-<td align="left">req.</td>
-<td align="left"></td>
-<td align="left">req.</td>
-<td align="left">tz=‘UTC’</td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="even">
 <td align="left">readNWISpeak</td>
 <td align="left">Peak flow</td>
-<td align="left">req.</td>
-<td align="left"></td>
-<td align="left">req.</td>
-<td align="left"></td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
 <td align="left">readNWISgwl</td>
 <td align="left">Groundwater levels</td>
-<td align="left">req.</td>
-<td align="left"></td>
-<td align="left">req.</td>
-<td align="left">tz=‘UTC’</td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="even">
 <td align="left">readNWISuse</td>
 <td align="left">Water use</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">stateCd, countyCd, years=‘ALL’, categories=‘ALL’</td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
 <td align="left">readNWISstat</td>
 <td align="left">Statistical service</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">statReportType=‘daily’, statType=‘mean’</td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="even">
 <td align="left">readNWISpCode</td>
 <td align="left">Parameter code information</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left"></td>
-<td align="left"></td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
-<td align="left">readNWISsite</td>
+<td align="left">read_waterdata_monitoring_location</td>
 <td align="left">Site information</td>
-<td align="left">req.</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
+</tr>
+<tr class="even">
+<td align="left">read_waterdata_samples</td>
+<td align="left">Discrete UGSS water quality data</td>
+<td align="left">USGS Samples Data</td>
+</tr>
+<tr class="odd">
+<td align="left">summarize_waterdata_samples</td>
+<td align="left">Discrete USGS water quality summary</td>
+<td align="left">USGS Samples Data</td>
 </tr>
 <tr class="even">
 <td align="left">whatNWISsites</td>
 <td align="left">Site search using user-specified queries</td>
-<td align="left">req.</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">…</td>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
-<td align="left">whatNWISdata</td>
+<td align="left">read_waterdata_ts_meta</td>
 <td align="left">Data availability</td>
-<td align="left">opt.</td>
-<td align="left">opt.</td>
-<td align="left"></td>
-<td align="left">service, …</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="even">
 <td align="left">readWQPdata</td>
 <td align="left">User-specified queries</td>
-<td align="left">opt.</td>
-<td align="left">opt.</td>
-<td align="left"></td>
-<td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
 <tr class="odd">
 <td align="left">readWQPqw</td>
 <td align="left">Water quality data</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left">req.</td>
-<td align="left"></td>
 <td align="left">WQP</td>
 </tr>
 <tr class="even">
 <td align="left">whatWQPsites</td>
 <td align="left">Site search</td>
-<td align="left">opt.</td>
-<td align="left"></td>
-<td align="left">opt.</td>
-<td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
 <tr class="odd">
 <td align="left">whatWQPdata</td>
 <td align="left">Data availability</td>
-<td align="left">opt.</td>
-<td align="left"></td>
-<td align="left">opt.</td>
-<td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
 <tr class="even">
 <td align="left">readWQPsummary</td>
 <td align="left">Summary data</td>
-<td align="left">opt.</td>
-<td align="left"></td>
-<td align="left">opt.</td>
-<td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
 <tr class="odd">
 <td align="left">whatWQPmetrics</td>
 <td align="left">Metric availability</td>
-<td align="left">opt.</td>
-<td align="left"></td>
-<td align="left">opt.</td>
-<td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
 <tr class="even">
 <td align="left">whatWQPsamples</td>
 <td align="left">Sample availability</td>
-<td align="left">opt.</td>
-<td align="left"></td>
-<td align="left">opt.</td>
-<td align="left">…</td>
 <td align="left">WQP</td>
 </tr>
 </tbody>
@@ -641,8 +562,8 @@ defaults to request the maximum data.</p>
 <div id="usgs-web-retrievals" class="section level1" number="1">
 <h1><span class="header-section-number">1</span> USGS Web
 Retrievals</h1>
-<p>In this section, examples of National Water Information System (NWIS)
-retrievals show how to get raw data into R. This data includes <a href="#site-information">site information</a>, measured <a href="#parameter-information">parameter information</a>, historical <a href="#daily-data">daily values</a>, <a href="#unit-data">unit
+<p>In this section we’ll show how to get raw data into R. This data
+includes <a href="#site-information">site information</a>, measured <a href="#parameter-information">parameter information</a>, historical <a href="#daily-data">daily values</a>, <a href="#unit-data">unit
 values</a> (which include real-time data but can also include other
 sensor data stored at regular time intervals), <a href="#groundwater-level-data">groundwater level data</a>, <a href="#peak-flow-data">peak flow data</a>, <a href="#rating-curve-data">rating curve data</a>, <a href="#surface-water-measurement-data">surface-water measurement
 data</a>, <a href="#water-use-data">water use data</a>, and <a href="#statistics-data">statistics data</a>. The section <a href="#embedded-metadata">Embedded Metadata</a> shows instructions for
@@ -744,128 +665,143 @@ case, the data is returned as a data frame that is entirely character
 columns.</p>
 <div id="site-information" class="section level2" number="1.1">
 <h2><span class="header-section-number">1.1</span> Site Information</h2>
-<div id="readnwissite" class="section level3" number="1.1.1">
-<h3><span class="header-section-number">1.1.1</span> readNWISsite</h3>
-<p>Use the <code>readNWISsite</code> function to obtain all of the
-information available for a particular USGS site (or sites) such as full
-station name, drainage area, latitude, and longitude.
-<code>readNWISsite</code> can also access information about multiple
-sites with a vector input.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>siteNumbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;01491000&quot;</span>, <span class="st">&quot;01645000&quot;</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>siteINFO <span class="ot">&lt;-</span> <span class="fu">readNWISsite</span>(siteNumbers)</span></code></pre></div>
-<p>Site information is obtained from: <a href="https://waterservices.usgs.gov/docs/site-service/">https://waterservices.usgs.gov/docs/site-service/</a></p>
-<p>Information on the returned data can be found with the
-<code>comment</code> function as described in the <a href="#embedded-metadata">Metadata</a> section.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">comment</span>(siteINFO)</span></code></pre></div>
+<div id="read_waterdata_monitoring_location" class="section level3" number="1.1.1">
+<h3><span class="header-section-number">1.1.1</span>
+read_waterdata_monitoring_location</h3>
+<p>Use the <code>read_waterdata_monitoring_location</code> function to
+obtain all of the information available for a particular USGS site (or
+sites) such as full station name, drainage area, latitude, and
+longitude. <code>read_waterdata_monitoring_location</code> can also
+access information about multiple sites with a vector input.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>siteNumbers <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;USGS-01491000&quot;</span>, <span class="st">&quot;USGS-01645000&quot;</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>siteINFO <span class="ot">&lt;-</span> <span class="fu">read_waterdata_monitoring_location</span>(siteNumbers)</span></code></pre></div>
+<p>Site information is obtained from: <a href="https://api.waterdata.usgs.gov/ogcapi/v0/collections/monitoring-locations" class="uri">https://api.waterdata.usgs.gov/ogcapi/v0/collections/monitoring-locations</a></p>
 </div>
-<div id="whatnwisdata" class="section level3" number="1.1.2">
-<h3><span class="header-section-number">1.1.2</span> whatNWISdata</h3>
-<p>To discover what data is available for a particular USGS site,
-including measured parameters, period of record, and number of samples
-(count), use the <code>whatNWISdata</code> function. It is possible to
-limit the retrieval information to a subset of services. The possible
-choices for services are: “dv” (daily values), “uv”, or “iv” (unit
-values), “qw” (water-quality), “sv” (sites visits), “pk” (peak
-measurements), “gw” (groundwater levels), “ad” (sites included in USGS
-Annual Water Data Reports External Link), “aw” (sites monitored by the
-USGS Active Groundwater Level Network External Link), and “id”
-(historical instantaneous values).</p>
+<div id="read_waterdata_ts_meta" class="section level3" number="1.1.2">
+<h3><span class="header-section-number">1.1.2</span>
+read_waterdata_ts_meta</h3>
+<p>To discover what time series data is available for a particular USGS
+site, including measured parameters, period of record, and number of
+samples (count), use the <code>read_waterdata_ts_meta</code>
+function.</p>
 <p>In the following example, we limit the retrieved data to only daily
-data. The default for “service” is <code>all</code>, which returns all
-of the available data for that site. Likewise, there are arguments for
-parameter code (<code>parameterCd</code>) and statistic code
-(<code>statCd</code>) to filter the results. The default for both is to
-return all possible values (<code>all</code>). The returned
-<code>count_nu</code> for “uv” data is the count of days with returned
-data, not the actual count of returned values.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Continuing from the previous example:</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="co"># This pulls out just the daily, mean data:</span></span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>dailyDataAvailable <span class="ot">&lt;-</span> <span class="fu">whatNWISdata</span>(</span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>  <span class="at">siteNumber =</span> siteNumbers,</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">service =</span> <span class="st">&quot;dv&quot;</span>,</span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">statCd =</span> <span class="st">&quot;00003&quot;</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>)</span></code></pre></div>
+data.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="co"># Continuing from the previous example:</span></span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="co"># This pulls out just the daily, mean data:</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>dailyDataAvailable <span class="ot">&lt;-</span> <span class="fu">read_waterdata_ts_meta</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">monitoring_location_id =</span> siteNumbers, </span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">computation_period_identifier =</span> <span class="st">&quot;Daily&quot;</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="at">statistic_id =</span> <span class="st">&quot;00003&quot;</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>)</span></code></pre></div>
+<p>Table 4: Reformatted version of output from the whatNWISdata function
+for the Choptank River near Greensboro, MD, and from Seneca Creek at
+Dawsonville, MD from the daily values service [Some columns deleted for
+space considerations]</p>
 <table>
-<caption>Table 4: Reformatted version of output from the whatNWISdata
-function for the Choptank River near Greensboro, MD, and from Seneca
-Creek at Dawsonville, MD from the daily values service [Some columns
-deleted for space considerations]</caption>
 <colgroup>
-<col width="12%" />
-<col width="40%" />
 <col width="11%" />
-<col width="11%" />
-<col width="6%" />
-<col width="17%" />
+<col width="70%" />
+<col width="7%" />
+<col width="5%" />
+<col width="5%" />
 </colgroup>
 <thead>
 <tr class="header">
-<th align="left">siteNumbers</th>
-<th align="left">srsname</th>
-<th align="left">startDate</th>
-<th align="left">endDate</th>
-<th align="left">count</th>
-<th align="left">units</th>
+<th align="left">monitoring_location_id</th>
+<th align="left">parameter_description</th>
+<th align="left">unit_of_measure</th>
+<th align="left">begin</th>
+<th align="left">end</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">01491000</td>
-<td align="left">Temperature, water</td>
+<td align="left">USGS-01491000</td>
+<td align="left">Specific conductance, water, unfiltered, microsiemens
+per centimeter at 25 degrees Celsius</td>
+<td align="left">uS/cm</td>
 <td align="left">2010-10-01</td>
 <td align="left">2012-05-09</td>
-<td align="left">529</td>
-<td align="left">deg C</td>
 </tr>
 <tr class="even">
-<td align="left">01491000</td>
-<td align="left">Stream flow, mean daily</td>
-<td align="left">1948-01-01</td>
-<td align="left">2017-05-17</td>
-<td align="left">25340</td>
-<td align="left">ft<sup>3</sup>/s</td>
-</tr>
-<tr class="odd">
-<td align="left">01645000</td>
-<td align="left">Stream flow, mean daily</td>
-<td align="left">1930-09-26</td>
-<td align="left">2017-05-17</td>
-<td align="left">31646</td>
-<td align="left">ft<sup>3</sup>/s</td>
-</tr>
-<tr class="even">
-<td align="left">01491000</td>
-<td align="left">Specific conductance</td>
-<td align="left">2010-10-01</td>
-<td align="left">2012-05-09</td>
-<td align="left">527</td>
-<td align="left">uS/cm <span class="citation">@25C</span></td>
-</tr>
-<tr class="odd">
-<td align="left">01491000</td>
-<td align="left">Suspended sediment concentration (SSC)</td>
-<td align="left">1980-10-01</td>
-<td align="left">1991-09-30</td>
-<td align="left">4017</td>
+<td align="left">USGS-01491000</td>
+<td align="left">Dissolved oxygen, water, unfiltered, milligrams per
+liter</td>
 <td align="left">mg/l</td>
+<td align="left">2023-04-21</td>
+<td align="left">2025-06-15</td>
+</tr>
+<tr class="odd">
+<td align="left">USGS-01491000</td>
+<td align="left">Discharge, cubic feet per second</td>
+<td align="left">ft^3/s</td>
+<td align="left">1948-01-01</td>
+<td align="left">2025-06-15</td>
 </tr>
 <tr class="even">
-<td align="left">01491000</td>
-<td align="left">Suspended sediment discharge</td>
+<td align="left">USGS-01645000</td>
+<td align="left">Discharge, cubic feet per second</td>
+<td align="left">ft^3/s</td>
+<td align="left">1930-09-26</td>
+<td align="left">2025-06-15</td>
+</tr>
+<tr class="odd">
+<td align="left">USGS-01491000</td>
+<td align="left">Suspended sediment concentration, milligrams per
+liter</td>
+<td align="left">mg/l</td>
 <td align="left">1980-10-01</td>
-<td align="left">1991-09-30</td>
-<td align="left">4017</td>
+<td align="left">1991-09-29</td>
+</tr>
+<tr class="even">
+<td align="left">USGS-01491000</td>
+<td align="left">Suspended sediment discharge, short tons per day</td>
 <td align="left">tons/day</td>
+<td align="left">1980-10-01</td>
+<td align="left">1991-09-29</td>
+</tr>
+<tr class="odd">
+<td align="left">USGS-01491000</td>
+<td align="left">Nitrate plus nitrite, water, in situ, milligrams per
+liter as nitrogen</td>
+<td align="left">mg/l</td>
+<td align="left">2023-08-02</td>
+<td align="left">2025-06-14</td>
+</tr>
+<tr class="even">
+<td align="left">USGS-01491000</td>
+<td align="left">Temperature, water, degrees Celsius</td>
+<td align="left">degC</td>
+<td align="left">2023-04-21</td>
+<td align="left">2025-06-15</td>
+</tr>
+<tr class="odd">
+<td align="left">USGS-01491000</td>
+<td align="left">Turbidity, water, unfiltered, monochrome near infra-red
+LED light, 780-900 nm, detection angle 90 +-2.5 degrees, formazin
+nephelometric units (FNU)</td>
+<td align="left">_FNU</td>
+<td align="left">2023-04-21</td>
+<td align="left">2025-06-14</td>
+</tr>
+<tr class="even">
+<td align="left">USGS-01491000</td>
+<td align="left">Temperature, water, degrees Celsius</td>
+<td align="left">degC</td>
+<td align="left">2010-10-01</td>
+<td align="left">2012-05-09</td>
+</tr>
+<tr class="odd">
+<td align="left">USGS-01491000</td>
+<td align="left">Specific conductance, water, unfiltered, microsiemens
+per centimeter at 25 degrees Celsius</td>
+<td align="left">uS/cm</td>
+<td align="left">2023-04-21</td>
+<td align="left">2025-06-14</td>
 </tr>
 </tbody>
 </table>
-<p>See <a href="#creating-tables-in-microsoft-software-from-r">Creating
-Tables</a> for instructions on converting an R data frame to a table in
-Microsoft® software Excel or Word to display a data availability table
-similar to Table 4. Excel, Microsoft, PowerPoint, Windows, and Word are
-registered trademarks of Microsoft Corporation in the United States and
-other countries.</p>
 </div>
 </div>
 <div id="parameter-information" class="section level2" number="1.2">
@@ -874,9 +810,9 @@ Information</h2>
 <p>To obtain all of the available information concerning a measured
 parameter (or multiple parameters), use the <code>readNWISpCode</code>
 function:</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Using defaults:</span></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00618&quot;</span></span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>parameterINFO <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Using defaults:</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00618&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>parameterINFO <span class="ot">&lt;-</span> <span class="fu">readNWISpCode</span>(parameterCd)</span></code></pre></div>
 </div>
 <div id="daily-data" class="section level2" number="1.3">
 <h2><span class="header-section-number">1.3</span> Daily Data</h2>
@@ -891,80 +827,57 @@ the user must include the quotes). Setting the start date to “” (no
 space) will prompt the program to ask for the earliest date, and setting
 the end date to “” (no space) will prompt for the latest available
 date.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Choptank River near Greensboro, MD:</span></span>
-<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01491000&quot;</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span> <span class="co"># Discharge</span></span>
-<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2009-10-01&quot;</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-09-30&quot;</span></span>
-<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
-<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>discharge <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(siteNumber, parameterCd, startDate, endDate)</span></code></pre></div>
-<p>The column “datetime” in the returned data frame is automatically
-imported as a variable of class “Date” in R. Each requested parameter
-has a value and remark code column. The names of these columns depend on
-the requested parameter and stat code combinations. USGS daily value
-qualification codes are often “A” (approved for publication) or “P”
-(provisional data subject to revision).</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># Choptank River near Greensboro, MD:</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;USSG-01491000&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span> <span class="co"># Discharge</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2009-10-01&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-09-30&quot;</span></span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>discharge <span class="ot">&lt;-</span> <span class="fu">read_waterdata_daily</span>(<span class="at">monitoring_location_id =</span> siteNumber,</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>                                  <span class="at">parameter_code =</span> parameterCd, </span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>                                  <span class="at">time =</span> <span class="fu">c</span>(startDate, endDate))</span></code></pre></div>
+<p>The column “time” in the returned data frame is automatically
+imported as a variable of class “Date” in R.</p>
 <p>Another example would be a request for mean and maximum daily
 temperature and discharge in early 2012:</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01491000&quot;</span></span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;00010&quot;</span>, <span class="st">&quot;00060&quot;</span>) <span class="co"># Temperature and discharge</span></span>
-<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>statCd <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;00001&quot;</span>, <span class="st">&quot;00003&quot;</span>) <span class="co"># Mean and maximum</span></span>
-<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-01-01&quot;</span></span>
-<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-01&quot;</span></span>
-<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
-<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>temperatureAndFlow <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(siteNumber, parameterCd,</span>
-<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  startDate, endDate,</span>
-<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="at">statCd =</span> statCd</span>
-<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>)</span></code></pre></div>
-<p>The column names can be shortened and simplified using the
-<code>renameNWISColumns</code> function. This is not necessary, but may
-streamline subsequent data analysis and presentation. Site information,
-daily statistic information, and measured parameter information is
-attached to the data frame as attributes. This is discussed further in
-the <a href="#embedded-metadata">metadata</a> section.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a><span class="fu">names</span>(temperatureAndFlow)</span></code></pre></div>
-<pre><code>## [1] &quot;agency_cd&quot;        &quot;site_no&quot;          &quot;Date&quot;            
-## [4] &quot;X_00010_00001_cd&quot; &quot;X_00010_00001&quot;    &quot;X_00010_00003_cd&quot;
-## [7] &quot;X_00010_00003&quot;    &quot;X_00060_00003_cd&quot; &quot;X_00060_00003&quot;</code></pre>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>temperatureAndFlow <span class="ot">&lt;-</span> <span class="fu">renameNWISColumns</span>(temperatureAndFlow)</span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">names</span>(temperatureAndFlow)</span></code></pre></div>
-<pre><code>## [1] &quot;agency_cd&quot;    &quot;site_no&quot;      &quot;Date&quot;        
-## [4] &quot;Wtemp_Max_cd&quot; &quot;Wtemp_Max&quot;    &quot;Wtemp_cd&quot;    
-## [7] &quot;Wtemp&quot;        &quot;Flow_cd&quot;      &quot;Flow&quot;</code></pre>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Information about the data frame attributes:</span></span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">attributes</span>(temperatureAndFlow))</span></code></pre></div>
-<pre><code>## [1] &quot;names&quot;         &quot;row.names&quot;     &quot;url&quot;          
-## [4] &quot;siteInfo&quot;      &quot;variableInfo&quot;  &quot;disclaimer&quot;   
-## [7] &quot;statisticInfo&quot; &quot;queryTime&quot;     &quot;class&quot;</code></pre>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>statInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;statisticInfo&quot;</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>variableInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;variableInfo&quot;</span>)</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;siteInfo&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;USGS-01491000&quot;</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;00010&quot;</span>, <span class="st">&quot;00060&quot;</span>) <span class="co"># Temperature and discharge</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>statCd <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;00001&quot;</span>, <span class="st">&quot;00003&quot;</span>) <span class="co"># Mean and maximum</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-01-01&quot;</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-01&quot;</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>temperatureAndFlow <span class="ot">&lt;-</span> <span class="fu">read_waterdata_daily</span>(<span class="at">monitoring_location_id =</span> siteNumber,</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>                                  <span class="at">parameter_code =</span> parameterCd, </span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>                                  <span class="at">statistic_id =</span> statCd,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>                                  <span class="at">time =</span> <span class="fu">c</span>(startDate, endDate))</span></code></pre></div>
 <p>An example of plotting the above data:</p>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>variableInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;variableInfo&quot;</span>)</span>
-<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(temperatureAndFlow, <span class="st">&quot;siteInfo&quot;</span>)</span>
-<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)) <span class="co"># sets the size of the plot window</span></span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="fu">plot</span>(temperatureAndFlow<span class="sc">$</span>Date, temperatureAndFlow<span class="sc">$</span>Wtemp_Max,</span>
-<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>  <span class="at">ylab =</span> variableInfo<span class="sc">$</span>parameter_desc[<span class="dv">1</span>],</span>
-<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span></span>
-<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a>)</span>
-<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="fu">par</span>(<span class="at">new =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="fu">plot</span>(temperatureAndFlow<span class="sc">$</span>Date,</span>
-<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a>  temperatureAndFlow<span class="sc">$</span>Flow,</span>
-<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
-<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a>  <span class="at">xaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>,</span>
-<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>,</span>
-<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>  <span class="at">axes =</span> <span class="cn">FALSE</span></span>
-<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a>)</span>
-<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">4</span>, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">col.axis =</span> <span class="st">&quot;red&quot;</span>)</span>
-<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a><span class="fu">mtext</span>(variableInfo<span class="sc">$</span>parameter_desc[<span class="dv">2</span>], <span class="at">side =</span> <span class="dv">4</span>, <span class="at">line =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
-<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a><span class="fu">title</span>(<span class="fu">paste</span>(siteInfo<span class="sc">$</span>station_nm, <span class="st">&quot;2012&quot;</span>))</span>
-<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topleft&quot;</span>, variableInfo<span class="sc">$</span>param_units,</span>
-<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">1</span>),</span>
-<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a>  <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="cn">NA</span>)</span>
-<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a>)</span></code></pre></div>
-<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>temperature <span class="ot">&lt;-</span> temperatureAndFlow[temperatureAndFlow<span class="sc">$</span>parameter_code <span class="sc">==</span> <span class="st">&quot;00010&quot;</span>,]</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>temperature <span class="ot">&lt;-</span> temperature[temperature<span class="sc">$</span>statistic_id <span class="sc">==</span> <span class="st">&quot;00001&quot;</span>,]</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>flow <span class="ot">&lt;-</span> temperatureAndFlow[temperatureAndFlow<span class="sc">$</span>parameter_code <span class="sc">==</span> <span class="st">&quot;00060&quot;</span>,]</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>, <span class="dv">5</span>)) <span class="co"># sets the size of the plot window</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">plot</span>(temperature<span class="sc">$</span>time, temperature<span class="sc">$</span>value,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="at">ylab =</span> <span class="st">&quot;Maximum Temperture [C]&quot;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>)</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="fu">par</span>(<span class="at">new =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="fu">plot</span>(flow<span class="sc">$</span>time,</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  flow<span class="sc">$</span>value,</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">type =</span> <span class="st">&quot;l&quot;</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="at">xaxt =</span> <span class="st">&quot;n&quot;</span>, <span class="at">yaxt =</span> <span class="st">&quot;n&quot;</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="at">xlab =</span> <span class="st">&quot;&quot;</span>, <span class="at">ylab =</span> <span class="st">&quot;&quot;</span>,</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>  <span class="at">axes =</span> <span class="cn">FALSE</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>)</span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="fu">axis</span>(<span class="dv">4</span>, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>, <span class="at">col.axis =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="fu">mtext</span>(<span class="st">&quot;Discharge [ft3/s]&quot;</span>, <span class="at">side =</span> <span class="dv">4</span>, <span class="at">line =</span> <span class="dv">3</span>, <span class="at">col =</span> <span class="st">&quot;red&quot;</span>)</span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="fu">title</span>(<span class="st">&quot;CHOPTANK RIVER NEAR GREENSBORO, MD&quot;</span>)</span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">&quot;topleft&quot;</span>, <span class="fu">unique</span>(temperatureAndFlow<span class="sc">$</span>unit_of_measure),</span>
+<span id="cb7-24"><a href="#cb7-24" tabindex="-1"></a>  <span class="at">col =</span> <span class="fu">c</span>(<span class="st">&quot;black&quot;</span>, <span class="st">&quot;red&quot;</span>), <span class="at">lty =</span> <span class="fu">c</span>(<span class="cn">NA</span>, <span class="dv">1</span>),</span>
+<span id="cb7-25"><a href="#cb7-25" tabindex="-1"></a>  <span class="at">pch =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="cn">NA</span>)</span>
+<span id="cb7-26"><a href="#cb7-26" tabindex="-1"></a>)</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,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" /><!-- --></p>
 </div>
 <div id="unit-data" class="section level2" number="1.4">
 <h2><span class="header-section-number">1.4</span> Unit Data</h2>
@@ -975,11 +888,11 @@ cases) are available through the function <code>readNWISuv</code>. Some
 of these unit values are available for many years, and some are only
 available for a recent time period such as 120 days. Here is an example
 of a retrieval of such data.</p>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span> <span class="co"># Discharge</span></span>
-<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-12&quot;</span></span>
-<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-13&quot;</span></span>
-<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>dischargeUnit <span class="ot">&lt;-</span> <span class="fu">readNWISuv</span>(siteNumber, parameterCd, startDate, endDate)</span>
-<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>dischargeUnit <span class="ot">&lt;-</span> <span class="fu">renameNWISColumns</span>(dischargeUnit)</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>parameterCd <span class="ot">&lt;-</span> <span class="st">&quot;00060&quot;</span> <span class="co"># Discharge</span></span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>startDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-12&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>endDate <span class="ot">&lt;-</span> <span class="st">&quot;2012-05-13&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>dischargeUnit <span class="ot">&lt;-</span> <span class="fu">readNWISuv</span>(siteNumber, parameterCd, startDate, endDate)</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>dischargeUnit <span class="ot">&lt;-</span> <span class="fu">renameNWISColumns</span>(dischargeUnit)</span></code></pre></div>
 <p>The retrieval produces a data frame that contains 96 rows (one for
 every 15 minute period in the day). They include all data collected from
 the <code>startDate</code> through the <code>endDate</code> (starting
@@ -1014,8 +927,8 @@ Data</h2>
 be found with the <code>comment</code> function, and attached attributes
 as described in the <a href="#embedded-metadata">metadata</a>
 section.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;434400121275801&quot;</span></span>
-<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>groundWater <span class="ot">&lt;-</span> <span class="fu">readNWISgwl</span>(siteNumber)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;434400121275801&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>groundWater <span class="ot">&lt;-</span> <span class="fu">readNWISgwl</span>(siteNumber)</span></code></pre></div>
 </div>
 <div id="peak-flow-data" class="section level2" number="1.6">
 <h2><span class="header-section-number">1.6</span> Peak Flow Data</h2>
@@ -1026,8 +939,8 @@ that are lower than the annual maximum. Peak discharge measurements can
 be obtained with the <code>readNWISpeak</code> function. Information on
 the returned data can be found with the <code>comment</code> function
 and attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01594440&quot;</span></span>
-<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>peakData <span class="ot">&lt;-</span> <span class="fu">readNWISpeak</span>(siteNumber)</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01594440&quot;</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>peakData <span class="ot">&lt;-</span> <span class="fu">readNWISpeak</span>(siteNumber)</span></code></pre></div>
 </div>
 <div id="rating-curve-data" class="section level2" number="1.7">
 <h2><span class="header-section-number">1.7</span> Rating Curve
@@ -1039,8 +952,8 @@ returned data can be found with the <code>comment</code> function and
 attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
 <p>Rating curves can be obtained with the <code>readNWISrating</code>
 function.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>ratingData <span class="ot">&lt;-</span> <span class="fu">readNWISrating</span>(siteNumber, <span class="st">&quot;base&quot;</span>)</span>
-<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a><span class="fu">attr</span>(ratingData, <span class="st">&quot;RATING&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>ratingData <span class="ot">&lt;-</span> <span class="fu">readNWISrating</span>(siteNumber, <span class="st">&quot;base&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">attr</span>(ratingData, <span class="st">&quot;RATING&quot;</span>)</span></code></pre></div>
 </div>
 <div id="surface-water-measurement-data" class="section level2" number="1.8">
 <h2><span class="header-section-number">1.8</span> Surface-Water
@@ -1051,7 +964,7 @@ on the returned data can be found with the <code>comment</code> function
 and attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
 <p>Surface-water measurement data can be obtained with the
 <code>readNWISmeas</code> function.</p>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>surfaceData <span class="ot">&lt;-</span> <span class="fu">readNWISmeas</span>(siteNumber)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>surfaceData <span class="ot">&lt;-</span> <span class="fu">readNWISmeas</span>(siteNumber)</span></code></pre></div>
 </div>
 <div id="water-use-data" class="section level2" number="1.9">
 <h2><span class="header-section-number">1.9</span> Water Use Data</h2>
@@ -1059,27 +972,27 @@ and attached attributes as described in the <a href="#embedded-metadata">metadat
 <a href="https://waterdata.usgs.gov/nwis/wu">https://waterdata.usgs.gov/nwis/wu</a>
 for more information. All available use categories for the supplied
 arguments are retrieved.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>allegheny <span class="ot">&lt;-</span> <span class="fu">readNWISuse</span>(</span>
-<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="st">&quot;Pennsylvania&quot;</span>,</span>
-<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a>  <span class="at">countyCd =</span> <span class="st">&quot;Allegheny&quot;</span></span>
-<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a>)</span>
-<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a></span>
-<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a>national <span class="ot">&lt;-</span> <span class="fu">readNWISuse</span>(</span>
-<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="cn">NULL</span>,</span>
-<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a>  <span class="at">countyCd =</span> <span class="cn">NULL</span>,</span>
-<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a>  <span class="at">transform =</span> <span class="cn">TRUE</span></span>
-<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>allegheny <span class="ot">&lt;-</span> <span class="fu">readNWISuse</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="st">&quot;Pennsylvania&quot;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="at">countyCd =</span> <span class="st">&quot;Allegheny&quot;</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>national <span class="ot">&lt;-</span> <span class="fu">readNWISuse</span>(</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="cn">NULL</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>  <span class="at">countyCd =</span> <span class="cn">NULL</span>,</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>  <span class="at">transform =</span> <span class="cn">TRUE</span></span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="statistics-data" class="section level2" number="1.10">
 <h2><span class="header-section-number">1.10</span> Statistics Data</h2>
 <p>Retrieves site statistics from the USGS Statistics Web Service
 beta.</p>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>discharge_stats <span class="ot">&lt;-</span> <span class="fu">readNWISstat</span>(</span>
-<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>  <span class="at">siteNumbers =</span> <span class="fu">c</span>(<span class="st">&quot;02319394&quot;</span>),</span>
-<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="fu">c</span>(<span class="st">&quot;00060&quot;</span>),</span>
-<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a>  <span class="at">statReportType =</span> <span class="st">&quot;annual&quot;</span></span>
-<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>discharge_stats <span class="ot">&lt;-</span> <span class="fu">readNWISstat</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>  <span class="at">siteNumbers =</span> <span class="fu">c</span>(<span class="st">&quot;02319394&quot;</span>),</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="fu">c</span>(<span class="st">&quot;00060&quot;</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>  <span class="at">statReportType =</span> <span class="st">&quot;annual&quot;</span></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 </div>
 <div id="water-quality-portal-web-retrievals" class="section level1" number="2">
@@ -1094,11 +1007,11 @@ or a more general characteristic name in the parameterCd input argument.
 The Water Quality Data Portal includes data discovery tools and
 information on characteristic names. The following example retrieves
 specific conductance from a DNR site in Wisconsin.</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a>specificCond <span class="ot">&lt;-</span> <span class="fu">readWQPqw</span>(</span>
-<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a>  <span class="st">&quot;WIDNR_WQX-10032762&quot;</span>,</span>
-<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a>  <span class="st">&quot;Specific conductance&quot;</span>,</span>
-<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a>  <span class="st">&quot;2011-05-01&quot;</span>, <span class="st">&quot;2011-09-30&quot;</span></span>
-<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>specificCond <span class="ot">&lt;-</span> <span class="fu">readWQPqw</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="st">&quot;WIDNR_WQX-10032762&quot;</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="st">&quot;Specific conductance&quot;</span>,</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="st">&quot;2011-05-01&quot;</span>, <span class="st">&quot;2011-09-30&quot;</span></span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="generalized-retrievals" class="section level1" number="3">
 <h1><span class="header-section-number">3</span> Generalized
@@ -1127,11 +1040,11 @@ sites that have daily discharge (parameter code = 00060) and temperature
 <p><a href="https://waterservices.usgs.gov/nwis/site/?format=rdb&amp;bBox=-83.0,36.5,-81.0,38.5&amp;parameterCd=00010,00060&amp;hasDataTypeCd=dv">https://waterservices.usgs.gov/nwis/site/?format=rdb&amp;bBox=-83.0,36.5,-81.0,38.5&amp;parameterCd=00010,00060&amp;hasDataTypeCd=dv</a></p>
 <p>The following <code>dataRetrieval</code> code can be used to get
 those sites:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatNWISsites</span>(</span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>  <span class="at">bBox =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">83.0</span>, <span class="fl">36.5</span>, <span class="sc">-</span><span class="fl">81.0</span>, <span class="fl">38.5</span>),</span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="fu">c</span>(<span class="st">&quot;00010&quot;</span>, <span class="st">&quot;00060&quot;</span>),</span>
-<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>  <span class="at">hasDataTypeCd =</span> <span class="st">&quot;dv&quot;</span></span>
-<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatNWISsites</span>(</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a>  <span class="at">bBox =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">83.0</span>, <span class="fl">36.5</span>, <span class="sc">-</span><span class="fl">81.0</span>, <span class="fl">38.5</span>),</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="fu">c</span>(<span class="st">&quot;00010&quot;</span>, <span class="st">&quot;00060&quot;</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="at">hasDataTypeCd =</span> <span class="st">&quot;dv&quot;</span></span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="data-readnwisdata" class="section level3" number="3.1.2">
 <h3><span class="header-section-number">3.1.2</span> Data:
@@ -1193,15 +1106,15 @@ links provide instructions on how to create a URL to request data.
 Perhaps you want sites only in Wisconsin, with a drainage area less than
 50 mi<sup>2</sup>, and the most recent daily discharge data. That
 request would be done as follows:</p>
-<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>dischargeWI <span class="ot">&lt;-</span> <span class="fu">readNWISdata</span>(</span>
-<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>  <span class="at">service =</span> <span class="st">&quot;dv&quot;</span>,</span>
-<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="st">&quot;WI&quot;</span>,</span>
-<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="st">&quot;00060&quot;</span>,</span>
-<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>  <span class="at">drainAreaMin =</span> <span class="st">&quot;50&quot;</span>,</span>
-<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>  <span class="at">statCd =</span> <span class="st">&quot;00003&quot;</span></span>
-<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>)</span>
-<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a></span>
-<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;siteInfo&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a>dischargeWI <span class="ot">&lt;-</span> <span class="fu">readNWISdata</span>(</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a>  <span class="at">service =</span> <span class="st">&quot;dv&quot;</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a>  <span class="at">stateCd =</span> <span class="st">&quot;WI&quot;</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="st">&quot;00060&quot;</span>,</span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a>  <span class="at">drainAreaMin =</span> <span class="st">&quot;50&quot;</span>,</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a>  <span class="at">statCd =</span> <span class="st">&quot;00003&quot;</span></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a>)</span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a></span>
+<span id="cb18-9"><a href="#cb18-9" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;siteInfo&quot;</span>)</span></code></pre></div>
 </div>
 </div>
 <div id="wqp" class="section level2" number="3.2">
@@ -1214,10 +1127,10 @@ arguments for WQP site searches is found <a href="https://www.waterqualitydata.u
 whatWQPsites</h3>
 <p>To discover available sites in the WQP in New Jersey that have
 measured Chloride, use the function <code>whatWQPsites</code>.</p>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>sitesNJ <span class="ot">&lt;-</span> <span class="fu">whatWQPsites</span>(</span>
-<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>  <span class="at">statecode =</span> <span class="st">&quot;US:34&quot;</span>,</span>
-<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a>  <span class="at">characteristicName =</span> <span class="st">&quot;Chloride&quot;</span></span>
-<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a>sitesNJ <span class="ot">&lt;-</span> <span class="fu">whatWQPsites</span>(</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a>  <span class="at">statecode =</span> <span class="st">&quot;US:34&quot;</span>,</span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a>  <span class="at">characteristicName =</span> <span class="st">&quot;Chloride&quot;</span></span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="data-readwqpdata" class="section level3" number="3.2.2">
 <h3><span class="header-section-number">3.2.2</span> Data:
@@ -1225,18 +1138,18 @@ readWQPdata</h3>
 <p>To get data from the WQP using generalized Web service calls, use the
 function <code>readWQPdata</code>. For example, to get all the pH data
 in Wisconsin:</p>
-<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>dataPH <span class="ot">&lt;-</span> <span class="fu">readWQPdata</span>(</span>
-<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>  <span class="at">statecode =</span> <span class="st">&quot;US:55&quot;</span>,</span>
-<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>  <span class="at">characteristicName =</span> <span class="st">&quot;pH&quot;</span></span>
-<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a>dataPH <span class="ot">&lt;-</span> <span class="fu">readWQPdata</span>(</span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  <span class="at">statecode =</span> <span class="st">&quot;US:55&quot;</span>,</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a>  <span class="at">characteristicName =</span> <span class="st">&quot;pH&quot;</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 <div id="availability-whatwqpdata" class="section level3" number="3.2.3">
 <h3><span class="header-section-number">3.2.3</span> Availability:
 whatWQPdata</h3>
 <p>The function <code>whatWQPdata</code> returns a data frame with
 information on the amount of data collected at a site. For example:</p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">&quot;Stream&quot;</span></span>
-<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatWQPdata</span>(<span class="at">countycode =</span> <span class="st">&quot;US:55:025&quot;</span>, <span class="at">siteType =</span> type)</span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">&quot;Stream&quot;</span></span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatWQPdata</span>(<span class="at">countycode =</span> <span class="st">&quot;US:55:025&quot;</span>, <span class="at">siteType =</span> type)</span></code></pre></div>
 <p>This returns a data frame with all of the sites that were measured in
 streams in Dane County, WI. Also, in that table, there is a measure of
 <code>activityCount</code> (how often the site was sampled), and
@@ -1248,7 +1161,7 @@ available).</p>
 whatWQPsamples</h3>
 <p>The function <code>whatWQPsamples</code> returns information on the
 individual samples collected at a site. For example:</p>
-<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a>site <span class="ot">&lt;-</span> <span class="fu">whatWQPsamples</span>(<span class="at">siteid =</span> <span class="st">&quot;USGS-01594440&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a>site <span class="ot">&lt;-</span> <span class="fu">whatWQPsamples</span>(<span class="at">siteid =</span> <span class="st">&quot;USGS-01594440&quot;</span>)</span></code></pre></div>
 <p>This returns one row for each instance that a sample was collect.</p>
 </div>
 <div id="metrics-whatwqpmetrics" class="section level3" number="3.2.5">
@@ -1256,52 +1169,18 @@ individual samples collected at a site. For example:</p>
 whatWQPmetrics</h3>
 <p>The function <code>whatWQPmetrics</code> provides metric information.
 This is only currently available for STORET data:</p>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">&quot;Stream&quot;</span></span>
-<span id="cb31-2"><a href="#cb31-2" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatWQPmetrics</span>(<span class="at">countycode =</span> <span class="st">&quot;US:55:025&quot;</span>, <span class="at">siteType =</span> type)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a>type <span class="ot">&lt;-</span> <span class="st">&quot;Stream&quot;</span></span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a>sites <span class="ot">&lt;-</span> <span class="fu">whatWQPmetrics</span>(<span class="at">countycode =</span> <span class="st">&quot;US:55:025&quot;</span>, <span class="at">siteType =</span> type)</span></code></pre></div>
 </div>
 </div>
 </div>
-<div id="embedded-metadata" class="section level1" number="4">
-<h1><span class="header-section-number">4</span> Embedded Metadata</h1>
-<p>All data frames returned from the Web services have some form of
-associated metadata. This information is included as attributes to the
-data frame. All data frames will have a <code>url</code> (returning a
-character of the url used to obtain the data), <code>siteInfo</code>
-(returning a data frame with information on sites), and
-<code>queryTime</code> (returning a POSIXct datetime) attributes. For
-example, the url and query time used to obtain the data can be found as
-follows:</p>
-<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">attr</span>(dischargeWI, <span class="st">&quot;url&quot;</span>)</span>
-<span id="cb32-2"><a href="#cb32-2" tabindex="-1"></a></span>
-<span id="cb32-3"><a href="#cb32-3" tabindex="-1"></a><span class="fu">attr</span>(dischargeWI, <span class="st">&quot;queryTime&quot;</span>)</span>
-<span id="cb32-4"><a href="#cb32-4" tabindex="-1"></a></span>
-<span id="cb32-5"><a href="#cb32-5" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;siteInfo&quot;</span>)</span></code></pre></div>
-<p>Depending on the format that the data was obtained (RDB, WaterML1,
-etc), there will be additional information embedded in the data frame as
-attributes. To discover the available attributes:</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" tabindex="-1"></a><span class="fu">names</span>(<span class="fu">attributes</span>(dischargeWI))</span></code></pre></div>
-<p>For data obtained from <code>readNWISuv</code>,
-<code>readNWISdv</code>, <code>readNWISgwl</code> there are two
-attributes that are particularly useful: <code>siteInfo</code> and
-<code>variableInfo</code>.</p>
-<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a>siteInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;siteInfo&quot;</span>)</span>
-<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a></span>
-<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a>variableInfo <span class="ot">&lt;-</span> <span class="fu">attr</span>(dischargeWI, <span class="st">&quot;variableInfo&quot;</span>)</span></code></pre></div>
-<p>Data obtained from <code>readNWISpeak</code>,
-<code>readNWISmeas</code>, and <code>readNWISrating</code>, the
-<code>comment</code> attribute is useful.</p>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" tabindex="-1"></a><span class="fu">comment</span>(peakData)</span>
-<span id="cb35-2"><a href="#cb35-2" tabindex="-1"></a></span>
-<span id="cb35-3"><a href="#cb35-3" tabindex="-1"></a><span class="co"># Which is equivalent to:</span></span>
-<span id="cb35-4"><a href="#cb35-4" tabindex="-1"></a><span class="fu">attr</span>(peakData, <span class="st">&quot;comment&quot;</span>)</span></code></pre></div>
-</div>
-<div id="getting-started-in-r" class="section level1" number="5">
-<h1><span class="header-section-number">5</span> Getting Started in
+<div id="getting-started-in-r" class="section level1" number="4">
+<h1><span class="header-section-number">4</span> Getting Started in
 R</h1>
 <p>This section describes the options for downloading and installing the
 <code>dataRetrieval</code> package.</p>
-<div id="new-to-r" class="section level2" number="5.1">
-<h2><span class="header-section-number">5.1</span> New to R?</h2>
+<div id="new-to-r" class="section level2" number="4.1">
+<h2><span class="header-section-number">4.1</span> New to R?</h2>
 <p>If you are new to R, you will need to first install the latest
 version of R, which can be found [here] (www.R-project.org).</p>
 <p>At any time, you can get information about any function in R by
@@ -1317,59 +1196,59 @@ code, type the name of the function, without parentheses.</p>
 </div>
 <p>Additionally, many R packages have vignette files attached (such as
 this paper). To see the list of vignettes in a package:</p>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" tabindex="-1"></a><span class="co"># to see all available vignettes:</span></span>
-<span id="cb37-2"><a href="#cb37-2" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">package=</span><span class="st">&quot;dataRetrieval&quot;</span>)</span>
-<span id="cb37-3"><a href="#cb37-3" tabindex="-1"></a></span>
-<span id="cb37-4"><a href="#cb37-4" tabindex="-1"></a><span class="co">#to open a specific vignette:</span></span>
-<span id="cb37-5"><a href="#cb37-5" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">topic =</span> <span class="st">&quot;qwdata_changes&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="co"># to see all available vignettes:</span></span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">package=</span><span class="st">&quot;dataRetrieval&quot;</span>)</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a></span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a><span class="co">#to open a specific vignette:</span></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a><span class="fu">vignette</span>(<span class="at">topic =</span> <span class="st">&quot;qwdata_changes&quot;</span>, <span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
 </div>
 </div>
-<div id="citations" class="section level1" number="6">
-<h1><span class="header-section-number">6</span> Citations</h1>
-<div id="citing-the-dataretrieval-package" class="section level2" number="6.1">
-<h2><span class="header-section-number">6.1</span> Citing the
+<div id="citations" class="section level1" number="5">
+<h1><span class="header-section-number">5</span> Citations</h1>
+<div id="citing-the-dataretrieval-package" class="section level2" number="5.1">
+<h2><span class="header-section-number">5.1</span> Citing the
 dataRetrieval package</h2>
-<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a><span class="fu">citation</span>(<span class="at">package =</span> <span class="st">&quot;dataRetrieval&quot;</span>)</span></code></pre></div>
 <pre><code>## To cite dataRetrieval in publications, please use:
 ## 
 ##   De Cicco, L.A., Hirsch, R.M., Lorenz, D., Watkins,
 ##   W.D., Johnson, M., 2025, dataRetrieval: R packages
 ##   for discovering and retrieving water data available
-##   from Federal hydrologic web services, v.2.7.18,
+##   from Federal hydrologic web services, v.2.7.19,
 ##   doi:10.5066/P9X4L3GE
 ## 
 ## A BibTeX entry for LaTeX users is
 ## 
 ##   @Manual{,
-##     author = {Laura DeCicco and Robert Hirsch and David Lorenz and Jordan Read and Jordan Walker and Lindsay Platt and David Watkins and David Blodgett and Mike Johnson and Aliesha Krall and Lee Stanish},
+##     author = {Laura DeCicco and Robert Hirsch and David Lorenz and Jordan Read and Jordan Walker and Lindsay Platt and David Watkins and David Blodgett and Mike Johnson and Aliesha Krall and Lee Stanish and Joeseph Zemmels and Elise Hinman and Michael Mahoney},
 ##     title = {dataRetrieval: R packages for discovering and retrieving water data available from U.S. federal hydrologic web services},
 ##     publisher = {U.S. Geological Survey},
 ##     address = {Reston, VA},
-##     version = {2.7.18},
+##     version = {2.7.19},
 ##     institution = {U.S. Geological Survey},
 ##     year = {2025},
 ##     doi = {10.5066/P9X4L3GE},
 ##   }</code></pre>
 </div>
-<div id="citing-nwis-data" class="section level2" number="6.2">
-<h2><span class="header-section-number">6.2</span> Citing NWIS data</h2>
+<div id="citing-nwis-data" class="section level2" number="5.2">
+<h2><span class="header-section-number">5.2</span> Citing NWIS data</h2>
 <p>The requested format is:</p>
 <p>U.S. Geological Survey, 2023, National Water Information System data
 available on the World Wide Web (USGS Water Data for the Nation),
 accessed [April 26, 2023], at <a href="https://waterdata.usgs.gov/nwis/" class="uri">https://waterdata.usgs.gov/nwis/</a>. <a href="https://dx.doi.org/10.5066/F7P55KJN" class="uri">https://dx.doi.org/10.5066/F7P55KJN</a></p>
 <p>This can be created from the attributes of the data using the
 <code>create_NWIS_bib</code> function:</p>
-<div class="sourceCode" id="cb40"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" tabindex="-1"></a>dv <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(<span class="st">&quot;09010500&quot;</span>, <span class="st">&quot;00060&quot;</span>)</span>
-<span id="cb40-2"><a href="#cb40-2" tabindex="-1"></a></span>
-<span id="cb40-3"><a href="#cb40-3" tabindex="-1"></a>NWIScitation <span class="ot">&lt;-</span> <span class="fu">create_NWIS_bib</span>(dv)</span>
-<span id="cb40-4"><a href="#cb40-4" tabindex="-1"></a>NWIScitation</span></code></pre></div>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>dv <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(<span class="st">&quot;09010500&quot;</span>, <span class="st">&quot;00060&quot;</span>)</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a></span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a>NWIScitation <span class="ot">&lt;-</span> <span class="fu">create_NWIS_bib</span>(dv)</span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a>NWIScitation</span></code></pre></div>
 <pre><code>U.S. Geological Survey (2024). _National Water Information
 System data available on the World Wide Web (USGS Water Data
 for the Nation)_. doi:10.5066/F7P55KJN
 &lt;https://doi.org/10.5066/F7P55KJN&gt;, Accessed Feb 09, 2024,
 &lt;https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01&gt;.</code></pre>
 <p>Alternative output is available:</p>
-<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;Bibtex&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;Bibtex&quot;</span>)</span></code></pre></div>
 <pre><code>@Manual{,
   title = {National Water Information System data available on the World Wide Web (USGS Water Data for the Nation)},
   author = {{U.S. Geological Survey}},
@@ -1378,7 +1257,7 @@ for the Nation)_. doi:10.5066/F7P55KJN
   year = {2024},
   url = {https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01},
 }</code></pre>
-<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;citation&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;citation&quot;</span>)</span></code></pre></div>
 <pre><code>U.S. Geological Survey, 2024, National Water Information System
 data available on the World Wide Web (USGS Water Data for the
 Nation), accessed Feb 09, 2024, at
@@ -1396,23 +1275,23 @@ A BibTeX entry for LaTeX users is
     url = {https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01},
   }</code></pre>
 </div>
-<div id="citing-wqp-data" class="section level2" number="6.3">
-<h2><span class="header-section-number">6.3</span> Citing WQP data</h2>
+<div id="citing-wqp-data" class="section level2" number="5.3">
+<h2><span class="header-section-number">5.3</span> Citing WQP data</h2>
 <p>Citations for specific datasets should use this format:</p>
 <p>National Water Quality Monitoring Council, YYYY, Water Quality
 Portal, accessed mm, dd, yyyy, hyperlink_for_query, <a href="https://doi.org/10.5066/P9QRKUVJ" class="uri">https://doi.org/10.5066/P9QRKUVJ</a>.</p>
 <p>This can be obtained using the <code>create_WQP_bib</code>
 function:</p>
-<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" tabindex="-1"></a>SC <span class="ot">&lt;-</span> <span class="fu">readWQPqw</span>(<span class="at">siteNumbers =</span> <span class="st">&quot;USGS-05288705&quot;</span>,</span>
-<span id="cb46-2"><a href="#cb46-2" tabindex="-1"></a>                <span class="at">parameterCd =</span> <span class="st">&quot;00300&quot;</span>)</span>
-<span id="cb46-3"><a href="#cb46-3" tabindex="-1"></a></span>
-<span id="cb46-4"><a href="#cb46-4" tabindex="-1"></a>WQPcitation <span class="ot">&lt;-</span> <span class="fu">create_WQP_bib</span>(SC)</span>
-<span id="cb46-5"><a href="#cb46-5" tabindex="-1"></a>WQPcitation</span></code></pre></div>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" tabindex="-1"></a>SC <span class="ot">&lt;-</span> <span class="fu">readWQPqw</span>(<span class="at">siteNumbers =</span> <span class="st">&quot;USGS-05288705&quot;</span>,</span>
+<span id="cb34-2"><a href="#cb34-2" tabindex="-1"></a>                <span class="at">parameterCd =</span> <span class="st">&quot;00300&quot;</span>)</span>
+<span id="cb34-3"><a href="#cb34-3" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" tabindex="-1"></a>WQPcitation <span class="ot">&lt;-</span> <span class="fu">create_WQP_bib</span>(SC)</span>
+<span id="cb34-5"><a href="#cb34-5" tabindex="-1"></a>WQPcitation</span></code></pre></div>
 <pre><code>National Water Quality Monitoring Council (2024). _ Water
 Quality Portal_. doi:10.5066/P9QRKUVJ
 &lt;https://doi.org/10.5066/P9QRKUVJ&gt;, Accessed Feb 09, 2024,
 &lt;https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes&gt;.</code></pre>
-<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" tabindex="-1"></a><span class="fu">print</span>(WQPcitation, <span class="at">style =</span> <span class="st">&quot;Bibtex&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" tabindex="-1"></a><span class="fu">print</span>(WQPcitation, <span class="at">style =</span> <span class="st">&quot;Bibtex&quot;</span>)</span></code></pre></div>
 <pre><code>@Manual{,
   title = { Water Quality Portal},
   author = {{National Water Quality Monitoring Council}},
@@ -1421,7 +1300,7 @@ Quality Portal_. doi:10.5066/P9QRKUVJ
   year = {2024},
   url = {https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes},
 }</code></pre>
-<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" tabindex="-1"></a><span class="fu">print</span>(WQPcitation, <span class="at">style =</span> <span class="st">&quot;citation&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" tabindex="-1"></a><span class="fu">print</span>(WQPcitation, <span class="at">style =</span> <span class="st">&quot;citation&quot;</span>)</span></code></pre></div>
 <pre><code>National Water Quality Monitoring Council, 2024, Water Quality
 Portal, accessed 02, 09, 2024,
 https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes,
@@ -1438,8 +1317,8 @@ A BibTeX entry for LaTeX users is
     url = {https://www.waterqualitydata.us/data/Result/search?siteid=USGS-05288705&amp;pCode=00300&amp;mimeType=tsv&amp;zip=yes},
   }</code></pre>
 </div>
-<div id="citing-water-quality-portal-itself" class="section level2" number="6.4">
-<h2><span class="header-section-number">6.4</span> Citing Water Quality
+<div id="citing-water-quality-portal-itself" class="section level2" number="5.4">
+<h2><span class="header-section-number">5.4</span> Citing Water Quality
 Portal itself</h2>
 <p>General Water Quality Portal citations should use the following:</p>
 <p>Water Quality Portal. Washington (DC): National Water Quality
@@ -1447,8 +1326,8 @@ Monitoring Council, United States Geological Survey (USGS),
 Environmental Protection Agency (EPA); 2021. <a href="https://doi.org/10.5066/P9QRKUVJ" class="uri">https://doi.org/10.5066/P9QRKUVJ</a>.</p>
 </div>
 </div>
-<div id="disclaimer" class="section level1" number="7">
-<h1><span class="header-section-number">7</span> Disclaimer</h1>
+<div id="disclaimer" class="section level1" number="6">
+<h1><span class="header-section-number">6</span> Disclaimer</h1>
 <p>This information is preliminary and is subject to revision. It is
 being provided to meet the need for timely best science. The information
 is provided on the condition that neither the U.S. Geological Survey nor
