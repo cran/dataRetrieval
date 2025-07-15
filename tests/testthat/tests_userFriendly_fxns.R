@@ -383,7 +383,7 @@ test_that("Construct USGS urls", {
   
   # nolint start: line_length_linter
   expect_equal(url_daily$url,
-               "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&lang=en-US&time=2024-01-01T00%3A00%3A00Z%2F..&skipGeometry=FALSE&limit=10000")
+               "https://api.waterdata.usgs.gov/ogcapi/v0/collections/daily/items?f=json&lang=en-US&time=2024-01-01%2F..&skipGeometry=FALSE&limit=10000")
 
   url_works <- dataRetrieval:::walk_pages(url_daily, max_results = 1)
   expect_true(nrow(url_works) > 0)
@@ -481,26 +481,17 @@ context("pCode Stuff")
 test_that("pCode Stuff", {
   testthat::skip_on_cran()
 
-  paramINFO <- readNWISpCode(c("00060", "01075", "00931", NA))
-  expect_equal(nrow(paramINFO), 4)
-  expect_equal(paramINFO$parameter_cd, c("00060", "01075", "00931", NA))
+  paramINFO <- read_waterdata_parameter_codes(parameter_code = c("00060", "01075", "00931", NA))
+  expect_equal(nrow(paramINFO), 3)
+  expect_true(all(paramINFO$parameter_code %in% c("00060", "01075", "00931")))
   
   # pcode 12345 isn't a valid code:
-  expect_warning(paramINFO <- readNWISpCode(c("12345")))
-  expect_warning(paramINFO <- readNWISpCode(c("00060", "01075",
-                                              "12345", NA_character_)))
-  expect_equal(nrow(paramINFO), 4)
-  expect_equal(paramINFO$parameter_cd, c("00060", "01075", 
-                                         "12345", NA_character_))
-  
-  expect_equal(paramINFO$parameter_group_nm[3:4], c(NA_character_, NA_character_))
+  paramINFO <- read_waterdata_parameter_codes(c("12345"))
+  expect_true(nrow(paramINFO) == 0)
 
-  paramINFO <- readNWISpCode("all")
+  paramINFO <- read_waterdata_parameter_codes()
   expect_true(nrow(paramINFO) > 10000)
-  expect_equal(
-    attr(paramINFO, "url"),
-    "https://help.waterdata.usgs.gov/code/parameter_cd_query?fmt=rdb&group_cd=%25"
-  )
+
 })
 
 context("pCode Name Stuff")

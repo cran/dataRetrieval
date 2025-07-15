@@ -20,19 +20,12 @@
 #'
 #' @export
 #' @seealso [importRDB1()]
-#' @examples
-#'
-#' paramINFO <- readNWISpCode(c("01075", "00060", "00931"))
-#' paramINFO <- readNWISpCode(c("01075", "00060", "00931", NA))
-#' \donttest{
-#' all_codes <- readNWISpCode("all")
-#' 
-#' one_extra <- readNWISpCode(c("01075", "12345"))
-#' 
-#' }
 readNWISpCode <- function(parameterCd) {
   
-  message(new_nwis_message())
+  .Deprecated(new = "read_waterdata_parameter_codes",
+              package = "dataRetrieval", 
+              msg = "NWIS servers are slated for decommission. Please begin to migrate to read_waterdata_parameter_codes")
+  
   
   parameterCd.orig <- parameterCd
   parameterCd <- parameterCd[!is.na(parameterCd)]

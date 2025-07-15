@@ -25,7 +25,7 @@ knitr::opts_chunk$set(
 #                                      time = c("1980-01-01", "2010-01-01"))
 # 
 # 
-# pCode <- readNWISpCode(parameterCd)
+# pCode <- read_waterdata_parameter_codes(parameter_code = parameterCd)
 
 ## ----echo=FALSE-------------------------------------------
 Functions <- c(
@@ -38,7 +38,7 @@ Functions <- c(
   "readNWISgwl",
   "readNWISuse",
   "readNWISstat",
-  "readNWISpCode",
+  "read_waterdata_parameter_codes",
   "read_waterdata_monitoring_location",
   "read_waterdata_samples",
   "summarize_waterdata_samples",
@@ -63,7 +63,7 @@ Description <- c(
   "Groundwater levels", # readNWISgwl
   "Water use", # readNWISuse
   "Statistical service", # readNWISstat
-  "Parameter code information", # readNWISpCode
+  "Parameter code information", # read_waterdata_parameter_codes
   "Site information", # read_waterdata_monitoring_location
   "Discrete UGSS water quality data", # read_waterdata_samples
   "Discrete USGS water quality summary",
@@ -79,7 +79,8 @@ Description <- c(
 )
 Source <- c("USGS Water Data API",
             "USGS Water Data API",
-            rep("NWIS", 8),
+            rep("NWIS", 7),
+            "USGS Water Data API",
             "USGS Water Data API",
             "USGS Samples Data",
             "USGS Samples Data",
@@ -161,7 +162,7 @@ kable(data.df,
 ## ----label=getPCodeInfo, echo=TRUE, eval=FALSE------------
 # # Using defaults:
 # parameterCd <- "00618"
-# parameterINFO <- readNWISpCode(parameterCd)
+# parameterINFO <- read_waterdata_parameter_codes(parameter_code = parameterCd)
 
 ## ----label=getNWISDaily, echo=TRUE, eval=FALSE------------
 # 
