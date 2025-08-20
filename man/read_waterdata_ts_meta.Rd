@@ -19,6 +19,7 @@ read_waterdata_ts_meta(
   thresholds = NA,
   sublocation_identifier = NA_character_,
   primary = NA_character_,
+  parent_time_series_id = NA_character_,
   time_series_id = NA_character_,
   web_description = NA_character_,
   skipGeometry = NA,
@@ -37,7 +38,7 @@ read_waterdata_ts_meta(
 
 \item{properties}{A vector of requested columns to be returned from the query.
 Available options are:
-geometry, id, unit_of_measure, parameter_name, parameter_code, statistic_id, last_modified, begin, end, computation_period_identifier, computation_identifier, thresholds, sublocation_identifier, primary, monitoring_location_id, web_description, parameter_description}
+geometry, id, unit_of_measure, parameter_name, parameter_code, statistic_id, last_modified, begin, end, computation_period_identifier, computation_identifier, thresholds, sublocation_identifier, primary, monitoring_location_id, web_description, parameter_description, parent_time_series_id}
 
 \item{statistic_id}{A code corresponding to the statistic an observation represents. Example codes include 00001 (max), 00002 (min), and 00003 (mean). A complete list of codes and their descriptions can be found at \url{https://help.waterdata.usgs.gov/code/stat_cd_nm_query?stat_nm_cd=\%25&fmt=html}.}
 
@@ -51,11 +52,31 @@ Examples:
 \item Duration objects: "P1M" for data from the past month or "PT36H" for the last 36 hours
 }
 
-Only features that have a \code{last_modified} that intersects the value of datetime are selected. If a feature has multiple temporal properties, it is the decision of the server whether only a single temporal property is used to determine the extent or all relevant temporal properties.}
+Only features that have a \code{last_modified} that intersects the value of datetime are selected.}
 
-\item{begin}{The datetime of the earliest observation in the time series. Together with \code{end}, this field represents the period of record of a time series. Note that some time series may have large gaps in their collection record. This field is currently in the local time of the monitoring location. We intend to update this \strong{in version v0} to use UTC with a time zone.}
+\item{begin}{The datetime of the earliest observation in the time series. Together with \code{end}, this field represents the period of record of a time series. Note that some time series may have large gaps in their collection record. This field is currently in the local time of the monitoring location. We intend to update this \strong{in version v0} to use UTC with a time zone.
+You can query this field using date-times or intervals, adhering to RFC 3339, or using ISO 8601 duration objects. Intervals may be bounded or half-bounded (double-dots at start or end).
+Examples:
+\itemize{
+\item A date-time: "2018-02-12T23:20:50Z"
+\item A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+\item Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+\item Duration objects: "P1M" for data from the past month or "PT36H" for the last 36 hours
+}
 
-\item{end}{The datetime of the most recent observation in the time series. Data returned by this endpoint updates at most once per day, and potentially less frequently than that, and as such there may be more recent observations within a time series than the time series \code{end} value reflects. Together with \code{begin}, this field represents the period of record of a time series. It is additionally used to determine whether a time series is "active". We intend to update this \strong{in version v0} to use UTC with a time zone.}
+Only features that have a \code{begin} that intersects the value of datetime are selected.}
+
+\item{end}{The datetime of the most recent observation in the time series. Data returned by this endpoint updates at most once per day, and potentially less frequently than that, and as such there may be more recent observations within a time series than the time series \code{end} value reflects. Together with \code{begin}, this field represents the period of record of a time series. It is additionally used to determine whether a time series is "active". We intend to update this \strong{in version v0} to use UTC with a time zone.
+You can query this field using date-times or intervals, adhering to RFC 3339, or using ISO 8601 duration objects. Intervals may be bounded or half-bounded (double-dots at start or end).
+Examples:
+\itemize{
+\item A date-time: "2018-02-12T23:20:50Z"
+\item A bounded interval: "2018-02-12T00:00:00Z/2018-03-18T12:31:12Z"
+\item Half-bounded intervals: "2018-02-12T00:00:00Z/.." or "../2018-03-18T12:31:12Z"
+\item Duration objects: "P1M" for data from the past month or "PT36H" for the last 36 hours
+}
+
+Only features that have a \code{end} that intersects the value of datetime are selected.}
 
 \item{unit_of_measure}{A human-readable description of the units of measurement associated with an observation.}
 
@@ -68,6 +89,8 @@ Only features that have a \code{last_modified} that intersects the value of date
 \item{sublocation_identifier}{An optional human-readable identifier used to specify where measurements are recorded at a monitoring location.}
 
 \item{primary}{A flag identifying if the time series is a "primary" time series. "Primary" time series (which have this flag) are standard observations which undergo \href{https://www.usgs.gov/survey-manual/5028-fundamental-science-practices-review-and-approval-scientific-data-release}{Bureau review and approval processes}. Non-primary time series, which will have missing values for "primary", are provisional datasets made available to meet the need for timely best science and to assist with daily operations which need real-time information. Non-primary time series data are only retained by this system for 120 days. See the \href{https://waterdata.usgs.gov/provisional-data-statement/}{USGS Provisional Data Statement} for more information.}
+
+\item{parent_time_series_id}{The unique identifier representing the parent or "upchain" time series that a daily values time series is generated from. Daily values time series have one and only one parent time series.}
 
 \item{time_series_id}{A unique identifier representing a single time series. This corresponds to the \code{id} field in the \code{time-series-metadata} endpoint.}
 

@@ -340,7 +340,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Introduction to the dataRetrieval
 package</h1>
 <h4 class="author">Laura A. DeCicco and Robert M. Hirsch</h4>
-<h4 class="date">14 July, 2025</h4>
+<h4 class="date">19 August, 2025</h4>
 
 
 <div id="TOC">
@@ -466,9 +466,9 @@ System (NWIS).</p>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
-<td align="left">readNWISmeas</td>
+<td align="left">read_waterdata_field_measurements</td>
 <td align="left">Surface-water measurements</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="even">
 <td align="left">readNWISpeak</td>
@@ -476,9 +476,9 @@ System (NWIS).</p>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
-<td align="left">readNWISgwl</td>
+<td align="left">read_waterdata_field_measurements</td>
 <td align="left">Groundwater levels</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="even">
 <td align="left">readNWISuse</td>
@@ -927,8 +927,8 @@ Data</h2>
 be found with the <code>comment</code> function, and attached attributes
 as described in the <a href="#embedded-metadata">metadata</a>
 section.</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;434400121275801&quot;</span></span>
-<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>groundWater <span class="ot">&lt;-</span> <span class="fu">readNWISgwl</span>(siteNumber)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;USGS-434400121275801&quot;</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>groundWater <span class="ot">&lt;-</span> <span class="fu">read_waterdata_field_measurements</span>(<span class="at">monitoring_location_id =</span> siteNumber)</span></code></pre></div>
 </div>
 <div id="peak-flow-data" class="section level2" number="1.6">
 <h2><span class="header-section-number">1.6</span> Peak Flow Data</h2>
@@ -964,7 +964,7 @@ on the returned data can be found with the <code>comment</code> function
 and attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
 <p>Surface-water measurement data can be obtained with the
 <code>readNWISmeas</code> function.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>surfaceData <span class="ot">&lt;-</span> <span class="fu">readNWISmeas</span>(siteNumber)</span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>surfaceData <span class="ot">&lt;-</span> <span class="fu">read_waterdata_field_measurements</span>(<span class="at">monitoring_location_id =</span> <span class="st">&quot;USGS-01594440&quot;</span>)</span></code></pre></div>
 </div>
 <div id="water-use-data" class="section level2" number="1.9">
 <h2><span class="header-section-number">1.9</span> Water Use Data</h2>
@@ -1224,7 +1224,7 @@ dataRetrieval package</h2>
 ##     title = {dataRetrieval: R packages for discovering and retrieving water data available from U.S. federal hydrologic web services},
 ##     publisher = {U.S. Geological Survey},
 ##     address = {Reston, VA},
-##     version = {2.7.20},
+##     version = {2.7.21},
 ##     institution = {U.S. Geological Survey},
 ##     year = {2025},
 ##     doi = {10.5066/P9X4L3GE},

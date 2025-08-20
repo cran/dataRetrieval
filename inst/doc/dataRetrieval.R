@@ -33,9 +33,9 @@ Functions <- c(
   "read_waterdata_daily",
   "readNWISuv",
   "readNWISrating",
-  "readNWISmeas",
+  "read_waterdata_field_measurements",
   "readNWISpeak",
-  "readNWISgwl",
+  "read_waterdata_field_measurements",
   "readNWISuse",
   "readNWISstat",
   "read_waterdata_parameter_codes",
@@ -79,7 +79,11 @@ Description <- c(
 )
 Source <- c("USGS Water Data API",
             "USGS Water Data API",
-            rep("NWIS", 7),
+            rep("NWIS",2),
+            "USGS Water Data API",
+            "NWIS",
+            "USGS Water Data API",
+            rep("NWIS",2),
             "USGS Water Data API",
             "USGS Water Data API",
             "USGS Samples Data",
@@ -232,8 +236,8 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 # dischargeUnit <- renameNWISColumns(dischargeUnit)
 
 ## ----gwlexample, echo=TRUE, eval=FALSE--------------------
-# siteNumber <- "434400121275801"
-# groundWater <- readNWISgwl(siteNumber)
+# siteNumber <- "USGS-434400121275801"
+# groundWater <- read_waterdata_field_measurements(monitoring_location_id = siteNumber)
 
 ## ----peakexample, echo=TRUE, eval=FALSE-------------------
 # siteNumber <- "01594440"
@@ -244,7 +248,7 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 # attr(ratingData, "RATING")
 
 ## ----surfexample, echo=TRUE, eval=FALSE-------------------
-# surfaceData <- readNWISmeas(siteNumber)
+# surfaceData <- read_waterdata_field_measurements(monitoring_location_id = "USGS-01594440")
 
 ## ----eval=FALSE-------------------------------------------
 # allegheny <- readNWISuse(
