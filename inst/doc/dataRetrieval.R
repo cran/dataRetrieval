@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
 Functions <- c(
   "read_waterdata",
   "read_waterdata_daily",
-  "readNWISuv",
+  "read_waterdata_continuous",
   "readNWISrating",
   "read_waterdata_field_measurements",
   "readNWISpeak",
@@ -54,13 +54,13 @@ Functions <- c(
 )
 
 Description <- c(
-  "Time series data using user-specified queries", # readNWISdata
-  "Daily values", # readNWISdv
-  "Instantaneous values", # readNWISuv
+  "Time series data using user-specified queries", # read_waterdata
+  "Daily values", # read_waterdata_daily
+  "Instantaneous values", # read_waterdata_continuous
   "Rating table for active streamgage", # readNWISrating
-  "Surface-water measurements", # readNWISmeas
+  "Surface-water measurements", # read_waterdata_field_measurements
   "Peak flow", # readNWISpeak
-  "Groundwater levels", # readNWISgwl
+  "Groundwater levels", # read_waterdata_field_measurements
   "Water use", # readNWISuse
   "Statistical service", # readNWISstat
   "Parameter code information", # read_waterdata_parameter_codes
@@ -79,7 +79,8 @@ Description <- c(
 )
 Source <- c("USGS Water Data API",
             "USGS Water Data API",
-            rep("NWIS",2),
+            "USGS Water Data API",
+            "NWIS",
             "USGS Water Data API",
             "NWIS",
             "USGS Water Data API",
@@ -158,7 +159,7 @@ kable(data.df,
 # 
 # 
 # knitr::kable(tableData,
-#              caption = "Table 4: Reformatted version of output from the whatNWISdata function for the Choptank River near Greensboro, MD, and from Seneca Creek at Dawsonville, MD from the daily values service [Some columns deleted for space considerations]")
+#              caption = "Table 4: Reformatted version of output from the read_waterdata_ts_meta function for the Choptank River near Greensboro, MD, and from Seneca Creek at Dawsonville, MD from the daily values service [Some columns deleted for space considerations]")
 # 
 # 
 # # nolint end
@@ -232,8 +233,10 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 # parameterCd <- "00060" # Discharge
 # startDate <- "2012-05-12"
 # endDate <- "2012-05-13"
-# dischargeUnit <- readNWISuv(siteNumber, parameterCd, startDate, endDate)
-# dischargeUnit <- renameNWISColumns(dischargeUnit)
+# dischargeUnit <- read_waterdata_continuous(monitoring_location_id = siteNumber,
+#                                            parameter_code = parameterCd,
+#                                            time = c(startDate, endDate))
+# 
 
 ## ----gwlexample, echo=TRUE, eval=FALSE--------------------
 # siteNumber <- "USGS-434400121275801"
@@ -251,19 +254,6 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 # surfaceData <- read_waterdata_field_measurements(monitoring_location_id = "USGS-01594440")
 
 ## ----eval=FALSE-------------------------------------------
-# allegheny <- readNWISuse(
-#   stateCd = "Pennsylvania",
-#   countyCd = "Allegheny"
-# )
-# 
-# 
-# national <- readNWISuse(
-#   stateCd = NULL,
-#   countyCd = NULL,
-#   transform = TRUE
-# )
-
-## ----eval=FALSE-------------------------------------------
 # discharge_stats <- readNWISstat(
 #   siteNumbers = c("02319394"),
 #   parameterCd = c("00060"),
@@ -276,49 +266,6 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 #   "Specific conductance",
 #   "2011-05-01", "2011-09-30"
 # )
-
-## ----siteSearch, eval=FALSE-------------------------------
-# sites <- whatNWISsites(
-#   bBox = c(-83.0, 36.5, -81.0, 38.5),
-#   parameterCd = c("00010", "00060"),
-#   hasDataTypeCd = "dv"
-# )
-
-## ----echo=FALSE-------------------------------------------
-# nolint start
-Service <- c("dv", "iv", "gwlevels", "measurements", "peak", "stat")
-Description <- c("Daily", "Instantaneous", "Groundwater Levels", "Surface Water Measurements", "Peak Flow", "Statistics Service")
-URL <- c(
-  "<a href='https://waterservices.usgs.gov/docs/dv-service/' target='_blank'>https://waterservices.usgs.gov/docs/dv-service/<a>",
-  "<a href='https://waterservices.usgs.gov/docs/instantaneous-values/' target='_blank'>https://waterservices.usgs.gov/docs/instantaneous-values/<a>",
-  "<a href='https://waterservices.usgs.gov/docs/groundwater-levels/' target='_blank'>https://waterservices.usgs.gov/docs/groundwater-levels/<a>",
-  "<a href='https://waterdata.usgs.gov/nwis/measurements/' target='_blank'>https://waterdata.usgs.gov/nwis/measurements/<a>",
-  "<a href='https://nwis.waterdata.usgs.gov/usa/nwis/peak/' target='_blank'>https://nwis.waterdata.usgs.gov/usa/nwis/peak/<a>",
-  "<a href='https://waterservices.usgs.gov/docs/statistics/' target='_blank'>https://waterservices.usgs.gov/docs/statistics/<a>"
-)
-
-tableData <- data.frame(Service,
-  Description,
-  URL,
-  stringsAsFactors = FALSE
-)
-
-
-kable(tableData,
-  caption = "Table 5: NWIS general data calls"
-)
-# nolint end
-
-## ----dataExample, eval=FALSE------------------------------
-# dischargeWI <- readNWISdata(
-#   service = "dv",
-#   stateCd = "WI",
-#   parameterCd = "00060",
-#   drainAreaMin = "50",
-#   statCd = "00003"
-# )
-# 
-# siteInfo <- attr(dischargeWI, "siteInfo")
 
 ## ----NJChloride, eval=FALSE-------------------------------
 # 

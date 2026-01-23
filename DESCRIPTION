@@ -2,7 +2,7 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrology and Water Quality
         Data
-Version: 2.7.21
+Version: 2.7.22
 Authors@R: c(
     person("Laura", "DeCicco", role = c("aut","cre"),
             email = "ldecicco@usgs.gov",
@@ -26,12 +26,11 @@ Authors@R: c(
             email = "akrall@usgs.gov",
             comment=c(ORCID = "0000-0003-2521-5043")),
     person("Lee", "Stanish", role="ctb",
-            email = "lstanish@usgs.gov",
             comment=c(ORCID = "0000-0002-9775-6861")),
     person("Joeseph", "Zemmels", role="ctb",
             email = "jzemmels@usgs.gov",
             comment=c(ORCID = "0009-0008-1463-6313")),
-    person("Elise", "Hinman", role="ctb",
+    person("Elise", "Hinman", role="aut",
             email = "ehinman@usgs.gov",
             comment=c(ORCID = "0000-0001-5396-1583")),  
     person("Michael", "Mahoney", role="ctb",
@@ -47,16 +46,16 @@ Copyright: This software is in the public domain because it contains
         Geological Survey, an agency of the United States Department of
         Interior.
 Depends: R (>= 4.1.0)
-Imports: curl (>= 6.0.0), lubridate (>= 1.5.0), stats, utils, xml2,
+Imports: curl (>= 7.0.0), lubridate (>= 1.5.0), stats, utils, xml2,
         readr (>= 1.4.0), jsonlite, httr2, whisker, sf
 Suggests: covr, dplyr, knitr, rmarkdown, testthat
 Encoding: UTF-8
 BuildVignettes: true
 VignetteBuilder: knitr
 BugReports: https://github.com/DOI-USGS/dataRetrieval/issues
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 NeedsCompilation: no
-Packaged: 2025-08-19 17:16:13 UTC; ldecicco
+Packaged: 2026-01-23 16:47:52 UTC; ldecicco
 Author: Laura DeCicco [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-3915-9487>),
   Robert Hirsch [aut] (ORCID: <https://orcid.org/0000-0002-4534-075X>),
@@ -70,8 +69,8 @@ Author: Laura DeCicco [aut, cre] (ORCID:
   Aliesha Krall [ctb] (ORCID: <https://orcid.org/0000-0003-2521-5043>),
   Lee Stanish [ctb] (ORCID: <https://orcid.org/0000-0002-9775-6861>),
   Joeseph Zemmels [ctb] (ORCID: <https://orcid.org/0009-0008-1463-6313>),
-  Elise Hinman [ctb] (ORCID: <https://orcid.org/0000-0001-5396-1583>),
+  Elise Hinman [aut] (ORCID: <https://orcid.org/0000-0001-5396-1583>),
   Michael Mahoney [ctb] (ORCID: <https://orcid.org/0000-0003-2402-304X>)
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2025-08-20 05:01:07 UTC
+Date/Publication: 2026-01-23 18:10:02 UTC
