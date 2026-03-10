@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Introduction to the dataRetrieval
 package</h1>
 <h4 class="author">Laura A. DeCicco and Robert M. Hirsch</h4>
-<h4 class="date">23 January, 2026</h4>
+<h4 class="date">10 March, 2026</h4>
 
 
 <div id="TOC">
@@ -441,9 +441,9 @@ to be recognized.</p>
 <table>
 <caption>Table 1: dataRetrieval functions</caption>
 <colgroup>
-<col width="34%" />
-<col width="45%" />
-<col width="19%" />
+<col width="46%" />
+<col width="37%" />
+<col width="16%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -494,7 +494,8 @@ to be recognized.</p>
 <td align="left">NWIS</td>
 </tr>
 <tr class="odd">
-<td align="left">readNWISstat</td>
+<td align="left">read_waterdata_stats_por,
+read_waterdata_stats_daterange</td>
 <td align="left">Statistical service</td>
 <td align="left">NWIS</td>
 </tr>
@@ -583,9 +584,7 @@ streamgage has a unique ID (referred in this document and throughout the
 <code>dataRetrieval</code> package as <code>siteNumber</code>). Often
 (but not always), these ID’s are 8 digits for surface-water sites and 15
 digits for groundwater sites. The first step to finding data is
-discovering this <code>siteNumber</code>. There are many ways to do
-this, one is the <a href="https://maps.waterdata.usgs.gov/mapper/index.html">National Water
-Information System: Mapper</a>.</p>
+discovering this <code>siteNumber</code>.</p>
 <p>Once the <code>siteNumber</code> is known, the next required input
 for USGS data retrievals is the “parameter code”. This is a 5-digit code
 that specifies the measured parameter being requested. For example,
@@ -696,10 +695,10 @@ data.</p>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  <span class="at">computation_period_identifier =</span> <span class="st">&quot;Daily&quot;</span>,</span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">statistic_id =</span> <span class="st">&quot;00003&quot;</span></span>
 <span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>)</span></code></pre></div>
-<p>Table 4: Reformatted version of output from the whatNWISdata function
-for the Choptank River near Greensboro, MD, and from Seneca Creek at
-Dawsonville, MD from the daily values service [Some columns deleted for
-space considerations]</p>
+<p>Table 4: Reformatted version of output from the
+read_waterdata_ts_meta function for the Choptank River near Greensboro,
+MD, and from Seneca Creek at Dawsonville, MD from the daily values
+service [Some columns deleted for space considerations]</p>
 <table>
 <colgroup>
 <col width="11%" />
@@ -942,13 +941,22 @@ developments on replacement functions.</p>
 </div>
 <div id="statistics-data" class="section level2" number="1.10">
 <h2><span class="header-section-number">1.10</span> Statistics Data</h2>
-<p>Retrieves site statistics from the USGS Statistics Web Service
-beta.</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>discharge_stats <span class="ot">&lt;-</span> <span class="fu">readNWISstat</span>(</span>
-<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="at">siteNumbers =</span> <span class="fu">c</span>(<span class="st">&quot;02319394&quot;</span>),</span>
-<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="at">parameterCd =</span> <span class="fu">c</span>(<span class="st">&quot;00060&quot;</span>),</span>
-<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="at">statReportType =</span> <span class="st">&quot;annual&quot;</span></span>
-<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>)</span></code></pre></div>
+<p>Retrieves site statistics from the <a href="https://api.waterdata.usgs.gov/statistics/v0/docs">USGS Water Data
+Statistics API</a>. The <code>read_waterdata_stats_por</code> function
+retieves day-of-year and month-of-year daily data statistics from the
+<code>observationNormals</code> endpoint. The
+<code>read_waterdata_stats_daterange</code> function retieves calendar
+month, calendar year, and water year daily data statistics from the
+<code>observationIntervals</code> endpoint.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>discharge_stats_por <span class="ot">&lt;-</span> <span class="fu">read_waterdata_stats_por</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="at">monitoring_location_id =</span> <span class="st">&quot;USGS-05428500&quot;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="at">parameter_code =</span> <span class="st">&quot;00060&quot;</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>discharge_stats_daterange <span class="ot">&lt;-</span> <span class="fu">read_waterdata_stats_daterange</span>(</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a>  <span class="at">monitoring_location_id =</span> <span class="st">&quot;USGS-05428500&quot;</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a>  <span class="at">parameter_code =</span> <span class="st">&quot;00060&quot;</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>)</span></code></pre></div>
 </div>
 </div>
 <div id="water-quality-portal-web-retrievals" class="section level1" number="2">
@@ -1063,21 +1071,22 @@ dataRetrieval package</h2>
 <pre><code>## To cite dataRetrieval in publications, please use:
 ## 
 ##   De Cicco, L.A., Hirsch, R.M., Lorenz, D., Watkins,
-##   W.D., Johnson, M., 2025, dataRetrieval: R packages
-##   for discovering and retrieving water data available
-##   from Federal hydrologic web services, v.2.7.20,
+##   W.D., Johnson, M., Blodgett, D.L., Hinman, E.D.,
+##   Zemmels, J., 2026, dataRetrieval: R packages for
+##   discovering and retrieving water data available
+##   from Federal hydrologic web services, v.2.7.23,
 ##   doi:10.5066/P9X4L3GE
 ## 
 ## A BibTeX entry for LaTeX users is
 ## 
 ##   @Manual{,
-##     author = {Laura DeCicco and Robert Hirsch and David Lorenz and Jordan Read and Jordan Walker and Lindsay Platt and David Watkins and David Blodgett and Mike Johnson and Aliesha Krall and Lee Stanish and Joeseph Zemmels and Elise Hinman and Michael Mahoney},
+##     author = {Laura DeCicco and Robert Hirsch and David Lorenz and Jordan Read and Jordan Walker and Lindsay Platt and David Watkins and David Blodgett and Mike Johnson and Aliesha Krall and Lee Stanish and Joseph Zemmels and Elise Hinman and Michael Mahoney},
 ##     title = {dataRetrieval: R packages for discovering and retrieving water data available from U.S. federal hydrologic web services},
 ##     publisher = {U.S. Geological Survey},
 ##     address = {Reston, VA},
-##     version = {2.7.22},
+##     version = {2.7.23},
 ##     institution = {U.S. Geological Survey},
-##     year = {2025},
+##     year = {2026},
 ##     doi = {10.5066/P9X4L3GE},
 ##   }</code></pre>
 </div>
@@ -1086,27 +1095,26 @@ dataRetrieval package</h2>
 <p>The requested format is:</p>
 <p>U.S. Geological Survey, 2023, National Water Information System data
 available on the World Wide Web (USGS Water Data for the Nation),
-accessed [April 26, 2023], at <a href="https://waterdata.usgs.gov/nwis/" class="uri">https://waterdata.usgs.gov/nwis/</a>. <a href="https://dx.doi.org/10.5066/F7P55KJN" class="uri">https://dx.doi.org/10.5066/F7P55KJN</a></p>
+accessed [April 26, 2023], at <a href="https://dx.doi.org/10.5066/F7P55KJN" class="uri">https://dx.doi.org/10.5066/F7P55KJN</a></p>
 <p>This can be created from the attributes of the data using the
 <code>create_NWIS_bib</code> function:</p>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>dv <span class="ot">&lt;-</span> <span class="fu">readNWISdv</span>(<span class="st">&quot;09010500&quot;</span>, <span class="st">&quot;00060&quot;</span>)</span>
-<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a></span>
-<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>NWIScitation <span class="ot">&lt;-</span> <span class="fu">create_NWIS_bib</span>(dv)</span>
-<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a>NWIScitation</span></code></pre></div>
-<pre><code>U.S. Geological Survey (2024). _National Water Information
-System data available on the World Wide Web (USGS Water Data
-for the Nation)_. doi:10.5066/F7P55KJN
-&lt;https://doi.org/10.5066/F7P55KJN&gt;, Accessed Feb 09, 2024,
-&lt;https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01&gt;.</code></pre>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a>dv <span class="ot">&lt;-</span> <span class="fu">read_waterdata_daily</span>(<span class="at">monitoring_location_id =</span> <span class="st">&quot;USGS-04085427&quot;</span>,</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a>                           <span class="at">parameter_code =</span> <span class="st">&quot;00060&quot;</span>,</span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a>                           <span class="at">time =</span> <span class="fu">c</span>(<span class="st">&quot;2012-01-01&quot;</span>, <span class="st">&quot;2012-06-30&quot;</span>))</span>
+<span id="cb25-4"><a href="#cb25-4" tabindex="-1"></a></span>
+<span id="cb25-5"><a href="#cb25-5" tabindex="-1"></a>NWIScitation <span class="ot">&lt;-</span> <span class="fu">create_NWIS_bib</span>(dv)</span>
+<span id="cb25-6"><a href="#cb25-6" tabindex="-1"></a>NWIScitation</span></code></pre></div>
+<pre><code>U.S. Geological Survey (2026). _USGS Water Data for the Nation: U.S. Geological Survey
+National Water Information System database_. doi:10.5066/F7P55KJN
+&lt;https://doi.org/10.5066/F7P55KJN&gt;, Accessed Mar 09, 2026.</code></pre>
 <p>Alternative output is available:</p>
 <div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;Bibtex&quot;</span>)</span></code></pre></div>
 <pre><code>@Manual{,
-  title = {National Water Information System data available on the World Wide Web (USGS Water Data for the Nation)},
+  title = {USGS Water Data for the Nation: U.S. Geological Survey National Water Information System database},
   author = {{U.S. Geological Survey}},
   doi = {10.5066/F7P55KJN},
-  note = {Accessed Feb 09, 2024},
-  year = {2024},
-  url = {https://waterservices.usgs.gov/nwis/dv/?site=09010500&amp;format=waterml,1.1&amp;ParameterCd=00060&amp;StatCd=00003&amp;startDT=1851-01-01},
+  note = {Accessed Mar 09, 2026},
+  year = {2026},
 }</code></pre>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="fu">print</span>(NWIScitation, <span class="at">style =</span> <span class="st">&quot;citation&quot;</span>)</span></code></pre></div>
 <pre><code>U.S. Geological Survey, 2024, National Water Information System

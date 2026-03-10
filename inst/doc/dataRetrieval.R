@@ -37,7 +37,7 @@ Functions <- c(
   "readNWISpeak",
   "read_waterdata_field_measurements",
   "readNWISuse",
-  "readNWISstat",
+  "read_waterdata_stats_por, read_waterdata_stats_daterange",
   "read_waterdata_parameter_codes",
   "read_waterdata_monitoring_location",
   "read_waterdata_samples",
@@ -254,10 +254,14 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 # surfaceData <- read_waterdata_field_measurements(monitoring_location_id = "USGS-01594440")
 
 ## ----eval=FALSE-------------------------------------------
-# discharge_stats <- readNWISstat(
-#   siteNumbers = c("02319394"),
-#   parameterCd = c("00060"),
-#   statReportType = "annual"
+# discharge_stats_por <- read_waterdata_stats_por(
+#   monitoring_location_id = "USGS-05428500",
+#   parameter_code = "00060"
+# )
+# 
+# discharge_stats_daterange <- read_waterdata_stats_daterange(
+#   monitoring_location_id = "USGS-05428500",
+#   parameter_code = "00060"
 # )
 
 ## ----label=getQWData, echo=TRUE, eval=FALSE---------------
@@ -303,7 +307,9 @@ citation(package = "dataRetrieval")
 
 ## ----nwisCite, eval=FALSE---------------------------------
 # 
-# dv <- readNWISdv("09010500", "00060")
+# dv <- read_waterdata_daily(monitoring_location_id = "USGS-04085427",
+#                            parameter_code = "00060",
+#                            time = c("2012-01-01", "2012-06-30"))
 # 
 # NWIScitation <- create_NWIS_bib(dv)
 # NWIScitation
