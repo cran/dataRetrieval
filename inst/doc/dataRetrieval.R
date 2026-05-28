@@ -32,9 +32,9 @@ Functions <- c(
   "read_waterdata",
   "read_waterdata_daily",
   "read_waterdata_continuous",
-  "readNWISrating",
+  "read_waterdata_rating",
   "read_waterdata_field_measurements",
-  "readNWISpeak",
+  "read_waterdata_peaks",
   "read_waterdata_field_measurements",
   "readNWISuse",
   "read_waterdata_stats_por, read_waterdata_stats_daterange",
@@ -42,7 +42,7 @@ Functions <- c(
   "read_waterdata_monitoring_location",
   "read_waterdata_samples",
   "summarize_waterdata_samples",
-  "whatNWISsites",
+  "read_waterdata_combined_meta",
   "read_waterdata_ts_meta",
   "readWQPdata",
   "readWQPqw",
@@ -80,16 +80,17 @@ Description <- c(
 Source <- c("USGS Water Data API",
             "USGS Water Data API",
             "USGS Water Data API",
-            "NWIS",
+            "USGS Water Data API",
+            "USGS Water Data API",
+            "USGS Water Data API",
             "USGS Water Data API",
             "NWIS",
             "USGS Water Data API",
-            rep("NWIS",2),
             "USGS Water Data API",
             "USGS Water Data API",
             "USGS Samples Data",
             "USGS Samples Data",
-            "NWIS",
+            "USGS Water Data API",
             "USGS Water Data API",
             rep("WQP", 7))
 
@@ -100,7 +101,7 @@ data.df <- data.frame(
   Source, stringsAsFactors = FALSE
 )
 
-kable(data.df,
+kable(data.df, col.names = c("Name", "Data Returned", "Source"),
   caption = "Table 1: dataRetrieval functions"
 )
 
@@ -243,12 +244,13 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 # groundWater <- read_waterdata_field_measurements(monitoring_location_id = siteNumber)
 
 ## ----peakexample, echo=TRUE, eval=FALSE-------------------
-# siteNumber <- "01594440"
-# peakData <- readNWISpeak(siteNumber)
+# siteNumber <- "USGS-01594440"
+# peakData <- read_waterdata_peaks(monitoring_location_id = siteNumber)
 
 ## ----ratingexample, echo=TRUE, eval=FALSE-----------------
-# ratingData <- readNWISrating(siteNumber, "base")
-# attr(ratingData, "RATING")
+# ratingData <- read_waterdata_ratings(monitoring_location_id = siteNumber,
+#                                     file_type = "base")
+# comment(ratingData[[1]])
 
 ## ----surfexample, echo=TRUE, eval=FALSE-------------------
 # surfaceData <- read_waterdata_field_measurements(monitoring_location_id = "USGS-01594440")

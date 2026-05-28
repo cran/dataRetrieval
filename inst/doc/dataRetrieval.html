@@ -341,7 +341,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h1 class="title toc-ignore">Introduction to the dataRetrieval
 package</h1>
 <h4 class="author">Laura A. DeCicco and Robert M. Hirsch</h4>
-<h4 class="date">31 March, 2026</h4>
+<h4 class="date">27 May, 2026</h4>
 
 
 <div id="TOC">
@@ -448,7 +448,7 @@ to be recognized.</p>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Data.Returned</th>
+<th align="left">Data Returned</th>
 <th align="left">Source</th>
 </tr>
 </thead>
@@ -469,9 +469,9 @@ to be recognized.</p>
 <td align="left">USGS Water Data API</td>
 </tr>
 <tr class="even">
-<td align="left">readNWISrating</td>
+<td align="left">read_waterdata_rating</td>
 <td align="left">Rating table for active streamgage</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="odd">
 <td align="left">read_waterdata_field_measurements</td>
@@ -479,9 +479,9 @@ to be recognized.</p>
 <td align="left">USGS Water Data API</td>
 </tr>
 <tr class="even">
-<td align="left">readNWISpeak</td>
+<td align="left">read_waterdata_peaks</td>
 <td align="left">Peak flow</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="odd">
 <td align="left">read_waterdata_field_measurements</td>
@@ -497,7 +497,7 @@ to be recognized.</p>
 <td align="left">read_waterdata_stats_por,
 read_waterdata_stats_daterange</td>
 <td align="left">Statistical service</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="even">
 <td align="left">read_waterdata_parameter_codes</td>
@@ -520,9 +520,9 @@ read_waterdata_stats_daterange</td>
 <td align="left">USGS Samples Data</td>
 </tr>
 <tr class="even">
-<td align="left">whatNWISsites</td>
+<td align="left">read_waterdata_combined_meta</td>
 <td align="left">Site search using user-specified queries</td>
-<td align="left">NWIS</td>
+<td align="left">USGS Water Data API</td>
 </tr>
 <tr class="odd">
 <td align="left">read_waterdata_ts_meta</td>
@@ -906,11 +906,9 @@ Data</h2>
 the maximum values of these variables during a flood event. They include
 the annual peak flood event but can also include records of other peaks
 that are lower than the annual maximum. Peak discharge measurements can
-be obtained with the <code>readNWISpeak</code> function. Information on
-the returned data can be found with the <code>comment</code> function
-and attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;01594440&quot;</span></span>
-<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>peakData <span class="ot">&lt;-</span> <span class="fu">readNWISpeak</span>(siteNumber)</span></code></pre></div>
+be obtained with the <code>read_waterdata_peaks</code> function.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>siteNumber <span class="ot">&lt;-</span> <span class="st">&quot;USGS-01594440&quot;</span></span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>peakData <span class="ot">&lt;-</span> <span class="fu">read_waterdata_peaks</span>(<span class="at">monitoring_location_id =</span> siteNumber)</span></code></pre></div>
 </div>
 <div id="rating-curve-data" class="section level2" number="1.7">
 <h2><span class="header-section-number">1.7</span> Rating Curve
@@ -920,10 +918,11 @@ measurements of stage to discharge. Because of changing hydrologic
 conditions these rating curves change over time. Information on the
 returned data can be found with the <code>comment</code> function and
 attached attributes as described in the <a href="#embedded-metadata">metadata</a> section.</p>
-<p>Rating curves can be obtained with the <code>readNWISrating</code>
-function.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>ratingData <span class="ot">&lt;-</span> <span class="fu">readNWISrating</span>(siteNumber, <span class="st">&quot;base&quot;</span>)</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="fu">attr</span>(ratingData, <span class="st">&quot;RATING&quot;</span>)</span></code></pre></div>
+<p>Rating curves can be obtained with the
+<code>read_waterdata_ratings</code> function.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>ratingData <span class="ot">&lt;-</span> <span class="fu">read_waterdata_ratings</span>(<span class="at">monitoring_location_id =</span> siteNumber,</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>                                    <span class="at">file_type =</span> <span class="st">&quot;base&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="fu">comment</span>(ratingData[[<span class="dv">1</span>]])</span></code></pre></div>
 </div>
 <div id="surface-water-measurement-data" class="section level2" number="1.8">
 <h2><span class="header-section-number">1.8</span> Surface-Water
@@ -1074,7 +1073,7 @@ dataRetrieval package</h2>
 ##   W.D., Johnson, M., Blodgett, D.L., Hinman, E.D.,
 ##   Zemmels, J., 2026, dataRetrieval: R packages for
 ##   discovering and retrieving water data available
-##   from Federal hydrologic web services, v.2.7.24,
+##   from Federal hydrologic web services, v.2.7.25,
 ##   doi:10.5066/P9X4L3GE
 ## 
 ## A BibTeX entry for LaTeX users is
@@ -1084,7 +1083,7 @@ dataRetrieval package</h2>
 ##     title = {dataRetrieval: R packages for discovering and retrieving water data available from U.S. federal hydrologic web services},
 ##     publisher = {U.S. Geological Survey},
 ##     address = {Reston, VA},
-##     version = {2.7.24},
+##     version = {2.7.25},
 ##     institution = {U.S. Geological Survey},
 ##     year = {2026},
 ##     doi = {10.5066/P9X4L3GE},
