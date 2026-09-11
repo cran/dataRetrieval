@@ -45,7 +45,7 @@ Multiple parameter_codes can be requested as a character vector.}
 
 \item{properties}{A vector of requested columns to be returned from the query.
 Available options are:
-geometry, field_measurement_id, field_measurements_series_id, field_visit_id, parameter_code, monitoring_location_id, observing_procedure_code, observing_procedure, value, unit_of_measure, time, qualifier, vertical_datum, approval_status, measuring_agency, last_modified, control_condition, measurement_rated.
+geometry, field_measurements_series_id, reading_type, field_visit_id, parameter_code, monitoring_location_id, observing_procedure_code, observing_procedure, value, unit_of_measure, time, qualifier, vertical_datum, approval_status, measuring_agency, last_modified, control_condition, measurement_rated, year, month, day, time_of_day.
 The default (\code{NA}) will return all columns of the data.}
 
 \item{field_visit_id}{A universally unique identifier (UUID) for the field visit. Multiple measurements may be made during a single field visit.}
@@ -118,8 +118,10 @@ vector structured: c(xmin,ymin,xmax,ymax).
 Another way to think of it is c(Western-most longitude,
 Southern-most latitude, Eastern-most longitude, Northern-most longitude).}
 
-\item{...}{Not used. Included to help differentiate official Water Data API arguments
-from more seldom used, optional dataRetrieval-specific arguments.}
+\item{\dots}{Arguments that can be queried,
+but are not returned. These are used as alternatives to specifying specific
+monitoring_location_ids. See \code{?get_monitoring_location_arguments}
+for available arguments.}
 
 \item{convertType}{logical, defaults to TRUE.
 If \code{TRUE}, the function will convert the data to dates, any qualifiers to string
@@ -171,7 +173,7 @@ daily data, which returns time values in local dates.
 \dontshow{if (is_dataRetrieval_user()) withAutoprint(\{ # examplesIf}
 
 \donttest{
-site <- "USGS-02238500"
+site <- "USGS-14202650"
 field_data_sf <- read_waterdata_field_measurements(monitoring_location_id = site)
 
 groundwater <- read_waterdata_field_measurements(monitoring_location_id = "USGS-375907091432201")
@@ -206,7 +208,16 @@ surface_water <- read_waterdata_field_measurements(
                          time = "2024-07-01T00:00:00Z/..",
                          parameter_code = "00060")
 
+dane <- read_waterdata_field_measurements(
+  state_name = "Wisconsin",
+  county_name = "Dane County",
+  parameter_code = "00060",
+  time = "P30D")
+
 
 }
 \dontshow{\}) # examplesIf}
+}
+\seealso{
+\code{\link[=get_monitoring_location_arguments]{get_monitoring_location_arguments()}}
 }

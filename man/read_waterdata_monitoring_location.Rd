@@ -45,10 +45,15 @@ read_waterdata_monitoring_location(
   well_constructed_depth = NA_character_,
   hole_constructed_depth = NA_character_,
   depth_source_code = NA_character_,
+  revision_note = NA_character_,
+  revision_created = NA_character_,
+  revision_modified = NA_character_,
   properties = NA_character_,
+  q = NA_character_,
   bbox = NA,
   skipGeometry = NA,
   ...,
+  convertType = getOption("dataRetrieval.convertType"),
   limit = getOption("dataRetrieval.limit"),
   no_paging = getOption("dataRetrieval.no_paging"),
   chunk_size = getOption("dataRetrieval.site_chunk_size_meta"),
@@ -88,7 +93,7 @@ Multiple monitoring_location_ids can be requested as a character vector.}
 
 \item{site_type}{A description of the hydrologic setting of the monitoring location. A list of codes is available at \url{https://api.waterdata.usgs.gov/ogcapi/v0/collections/site-types/items}.}
 
-\item{hydrologic_unit_code}{The United States is divided and sub-divided into successively smaller hydrologic units which are classified into four levels: regions, sub-regions, accounting units, and cataloging units. The hydrologic units are arranged within each other, from the smallest (cataloging units) to the largest (regions). Each hydrologic unit is identified by a unique hydrologic unit code (HUC) consisting of two to eight digits based on the four levels of classification in the hydrologic unit system.}
+\item{hydrologic_unit_code}{The hydrologic unit code (HUC) for the monitoring location. Supports prefix matching — querying with a shorter HUC (e.g. "04") matches all locations within that hydrologic region.}
 
 \item{basin_code}{The Basin Code or "drainage basin code" is a two-digit code that further subdivides the 8-digit hydrologic-unit code. The drainage basin code is defined by the USGS State Office where the monitoring location is located.}
 
@@ -138,10 +143,30 @@ Multiple monitoring_location_ids can be requested as a character vector.}
 
 \item{depth_source_code}{A code indicating the source of water-level data.}
 
+\item{revision_note}{Approved water data are considered published record, but on occasion changes or deletions (revisions) must be made to data after they are approved. Data revisions are rare because of USGS quality assurance practices, including documentation of all data before they are officially approved. This field contains text explanations for data revisions at this monitoring location. Changes to data also are indicated with revision qualifier codes alongside the data. Text explanations before 2017 are not necessarily available online, but can be requested.}
+
+\item{revision_created}{The date a revision statement was created.}
+
+\item{revision_modified}{The most recent date a revision statement was modified.}
+
 \item{properties}{A vector of requested columns to be returned from the query.
 Available options are:
 geometry, monitoring_location_id, agency_code, agency_name, monitoring_location_number, monitoring_location_name, district_code, country_code, country_name, state_code, state_name, county_code, county_name, minor_civil_division_code, site_type_code, site_type, hydrologic_unit_code, basin_code, altitude, altitude_accuracy, altitude_method_code, altitude_method_name, vertical_datum, vertical_datum_name, horizontal_positional_accuracy_code, horizontal_positional_accuracy, horizontal_position_method_code, horizontal_position_method_name, original_horizontal_datum, original_horizontal_datum_name, drainage_area, contributing_drainage_area, time_zone_abbreviation, uses_daylight_savings, construction_date, aquifer_code, national_aquifer_code, aquifer_type_code, well_constructed_depth, hole_constructed_depth, depth_source_code, revision_note, revision_created, revision_modified.
 The default (\code{NA}) will return all columns of the data.}
+
+\item{q}{Full-text search across the most relevant text fields for this collection
+(e.g. site name, identifier, number, state, county, and site type).
+Matching rules:
+\itemize{
+\item Case-insensitive, with prefix matching (e.g. poud matches POUDRE).
+\item Words separated by spaces are AND'd together (all must match).
+\item Terms separated by commas are OR'd together (any may match).
+\item Common abbreviations are expanded, so river also matches sites stored as RV (and vice versa).
+Examples are:
+q=poudre - sites whose name/identifier starts with or contains poudre
+q=colorado river - sites matching both colorado and river/rv
+q=poudre,cache creek - sites matching poudre OR (cache AND creek/ck)
+}}
 
 \item{bbox}{Only features that have a geometry that intersects the bounding
 box are selected.The bounding box is provided as four or six numbers, depending
@@ -155,8 +180,12 @@ Southern-most latitude, Eastern-most longitude, Northern-most longitude).}
 each feature. The returning object will be a data frame with no spatial
 information. The default \code{NA} will not specify the argument in the request.}
 
-\item{...}{Not used. Included to help differentiate official Water Data API arguments
+\item{\dots}{Not used. Included to help differentiate official Water Data API arguments
 from more seldom used, optional dataRetrieval-specific arguments.}
+
+\item{convertType}{logical, defaults to TRUE.
+If \code{TRUE}, the function will convert the data to dates, any qualifiers to string
+vector and reorder the returned data frame.}
 
 \item{limit}{numeric, The optional limit parameter is used to control the subset of the
 selected features that should be returned in each page. The maximum allowable
@@ -215,6 +244,7 @@ site_info_no_sf <- read_waterdata_monitoring_location(
 bbox_vals = c(-94.00, 35.0, -93.5, 35.5)
 multi_site <- read_waterdata_monitoring_location(bbox = bbox_vals)
 
+poudre <- read_waterdata_monitoring_location(q = "poudre")
 
 }
 \dontshow{\}) # examplesIf}

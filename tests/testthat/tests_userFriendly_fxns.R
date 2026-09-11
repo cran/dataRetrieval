@@ -30,7 +30,11 @@ test_that("Unit value data returns correct types", {
   expect_equal(
     grep(
       x = attr(recent_uv, "request")[["url"]],
-      pattern = "https://api.waterdata.usgs.gov/ogcapi/v0/collections/continuous"
+      pattern = paste0(
+        "https://api.waterdata.usgs.gov/ogcapi/",
+        getOption("dataRetrieval.api_version"),
+        "/collections/continuous"
+      )
     ),
     1
   )
@@ -38,7 +42,11 @@ test_that("Unit value data returns correct types", {
   expect_equal(
     grep(
       x = attr(spreadOver120, "request")[["url"]],
-      pattern = "https://api.waterdata.usgs.gov/ogcapi/v0/collections/continuous"
+      pattern = paste0(
+        "https://api.waterdata.usgs.gov/ogcapi/",
+        getOption("dataRetrieval.api_version"),
+        "/collections/continuous"
+      )
     ),
     1
   )
@@ -123,11 +131,24 @@ test_that("peak, rating curves, surface-water measurements", {
     monitoring_location_id = siteNumber,
     file_type = "base"
   )
-  expect_gt(length(comment(data[[1]])), 1)
+  expect_type(data, "list")
+  expect_length(data, 1)
+
+  sub <- data[[1]]
+  expect_type(sub, "list")
+  expect_setequal(names(sub), c("ratings", "metadata"))
 
   # Surface meas:
   siteNumbers <- c("USGS-01594440", "USGS-040851325")
-  data <- read_waterdata_field_measurements(siteNumbers)
+  data <- read_waterdata_field_measurements(
+    monitoring_location_id = siteNumbers
+  )
+  expect_is(data$monitoring_location_id, "character")
+
+  # Latest Surface meas:
+  latest_data <- read_waterdata_latest_field_measurements(
+    monitoring_location_id = siteNumbers
+  )
   expect_is(data$monitoring_location_id, "character")
 
   siteINFO_USGS <- read_waterdata_monitoring_location(
@@ -144,7 +165,8 @@ test_that("peak, rating curves, surface-water measurements", {
   Meas07227500.ex <- read_waterdata_field_measurements(
     monitoring_location_id = "USGS-07227500"
   )
-  expect_is(Meas07227500.ex$time, "POSIXct")
+
+  expect_is(Meas07227500.ex$time, "Date")
 
   expect_equal(
     nrow(read_waterdata_ts_meta(
@@ -169,13 +191,12 @@ test_that("peak, rating curves, surface-water measurements", {
   expect_equal(unique(gwl_1$monitoring_location_id), siteID)
 
   # No data:
-  stations <- "06011000"
-  expect_message(readNWISpeak(
-    stations,
-    startDate = "2024-08-01",
-    endDate = "2024-08-31",
-    convertType = FALSE
-  ))
+
+  no_data <- read_waterdata_peaks(
+    monitoring_location_id = "USGS-06011000",
+    time = c("2024-08-01", "2024-08-31")
+  )
+  expect_equal(nrow(no_data), 0)
 })
 
 test_that("read_waterdata_daily", {
@@ -260,45 +281,44 @@ test_that("read_waterdata_daily", {
   #                                                  "ICE, REGULATED, UNKNOWNREGULATION"))
 })
 
-test_that("WQP qw tests", {
-  testthat::skip_on_cran()
-  skip_on_ci()
-  # nameToUse <- "Specific conductance"
-  # pcodeToUse <- "00095"
-  #
-  # INFO_WQP <- readWQPqw(
-  #   "USGS-04024315",
-  #   pcodeToUse,
-  #   startDate = "",
-  #   endDate = "",
-  #   legacy = FALSE
-  # )
-  # expect_is(INFO_WQP$Activity_StartDateTime, "POSIXct")
-  #
-  # INFO2 <- readWQPqw(
-  #   "WIDNR_WQX-10032762",
-  #   nameToUse,
-  #   startDate = "",
-  #   endDate = "",
-  #   legacy = FALSE
-  # )
-  # expect_is(INFO2$Activity_StartDateTime, "POSIXct")
-  #
-  # df <- readWQPqw("USGS-04193500", parameterCd = "00665", legacy = FALSE)
-  # expect_true(nrow(df) > 0)
-  #
-  # df2 <- readWQPqw("USGS-05427718", parameterCd = "all")
-  # expect_true(nrow(df2) > 0)
-  #
-  # #Empty legacy:
-  # df3 <- readWQPqw(
-  #   siteNumbers = "USGS-385032115220501",
-  #   parameterCd = "all",
-  #   legacy = TRUE
-  # )
-  # expect_true(nrow(df3) == 0)
-})
-
+# test_that("WQP qw tests", {
+#   testthat::skip_on_cran()
+#   skip_on_ci()
+# nameToUse <- "Specific conductance"
+# pcodeToUse <- "00095"
+#
+# INFO_WQP <- readWQPqw(
+#   "USGS-04024315",
+#   pcodeToUse,
+#   startDate = "",
+#   endDate = "",
+#   legacy = FALSE
+# )
+# expect_is(INFO_WQP$Activity_StartDateTime, "POSIXct")
+#
+# INFO2 <- readWQPqw(
+#   "WIDNR_WQX-10032762",
+#   nameToUse,
+#   startDate = "",
+#   endDate = "",
+#   legacy = FALSE
+# )
+# expect_is(INFO2$Activity_StartDateTime, "POSIXct")
+#
+# df <- readWQPqw("USGS-04193500", parameterCd = "00665", legacy = FALSE)
+# expect_true(nrow(df) > 0)
+#
+# df2 <- readWQPqw("USGS-05427718", parameterCd = "all")
+# expect_true(nrow(df2) > 0)
+#
+# #Empty legacy:
+# df3 <- readWQPqw(
+#   siteNumbers = "USGS-385032115220501",
+#   parameterCd = "all",
+#   legacy = TRUE
+# )
+# expect_true(nrow(df3) == 0)
+# })
 
 context("state tests")
 test_that("state county tests", {
@@ -579,32 +599,6 @@ test_that("pCode Stuff", {
 
   paramINFO <- read_waterdata_parameter_codes()
   expect_true(nrow(paramINFO) > 10000)
-})
-
-context("pCode Name Stuff")
-test_that("pCode Stuff", {
-  testthat::skip_on_cran()
-
-  paramINFO <- pcode_to_name(c("00060", "01075", "00931", NA))
-  expect_equal(nrow(paramINFO), 4)
-  expect_equal(paramINFO$parm_cd, c("00060", "01075", "00931", NA))
-
-  # pcode 12345 isn't a valid code:
-  expect_warning(paramINFO <- pcode_to_name(c("12345")))
-  expect_warning(
-    paramINFO <- pcode_to_name(c("00060", "01075", "12345", NA_character_))
-  )
-  expect_equal(nrow(paramINFO), 4)
-  expect_equal(paramINFO$parm_cd, c("00060", "01075", "12345", NA_character_))
-
-  expect_equal(paramINFO$description[3:4], c(NA_character_, NA_character_))
-
-  paramINFO <- pcode_to_name("all")
-  expect_true(nrow(paramINFO) > 19000)
-  expect_equal(
-    attr(paramINFO, "url"),
-    "https://www.waterqualitydata.us/Codes/public_srsnames/?mimeType=json"
-  )
 })
 
 context("Smart errors, warnings")

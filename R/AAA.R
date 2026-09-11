@@ -3,8 +3,10 @@ pkg.env <- new.env()
 .onLoad <- function(libname, pkgname) {
   suppressMessages(setAccess("public"))
   pkg.env$local_sf <- requireNamespace("sf", quietly = TRUE)
-  options("dataRetrieval.nldi_base" = "https://api.water.usgs.gov/nldi/linked-data/")
-  options("dataRetrieval.api_version" = "v0")
+  options(
+    "dataRetrieval.nldi_base" = "https://api.water.usgs.gov/nldi/linked-data/"
+  )
+  options("dataRetrieval.api_version" = "v1")
   options("dataRetrieval.api_version_stat" = "v0")
   options("dataRetrieval.attach_request" = TRUE)
   options("dataRetrieval.convertType" = TRUE)
@@ -21,6 +23,7 @@ pkg.env <- new.env()
     "latest-continuous",
     "field-measurements",
     "latest-daily",
+    "latest-field-measurements",
     "continuous",
     "field-measurements-metadata",
     "combined-metadata",
@@ -78,6 +81,7 @@ pkg.env <- new.env()
     "time_zone_code"
   )
 
+  num_cols <- c()
   pkg.env$api_endpoints <- services
   pkg.env$metadata <- collections
 }
@@ -134,8 +138,7 @@ https://doi-usgs.github.io/dataRetrieval/articles/Status.html"
 
 new_nwis_message <- function() {
   return(
-    "ALERT: All NWIS services are slated for decommission
-and new dataRetrieval functions will be added.
+    "ALERT: All NWIS services are slated for decommission in early 2027.
 For up-to-date information, see: 
 https://doi-usgs.github.io/dataRetrieval/articles/Status.html"
   )

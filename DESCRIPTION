@@ -2,7 +2,7 @@ Package: dataRetrieval
 Type: Package
 Title: Retrieval Functions for USGS and EPA Hydrology and Water Quality
         Data
-Version: 2.7.25
+Version: 2.7.26
 Authors@R: c(
     person("Laura", "DeCicco", role = c("aut","cre"),
             email = "ldecicco@usgs.gov",
@@ -35,7 +35,10 @@ Authors@R: c(
             comment=c(ORCID = "0000-0001-5396-1583")),  
     person("Michael", "Mahoney", role="ctb",
             email = "mjmahoney@usgs.gov",
-            comment=c(ORCID = "0000-0003-2402-304X"))  
+            comment=c(ORCID = "0000-0003-2402-304X")),
+    person("Matthew", "Conlon", role="ctb",
+            email = "mconlon@usgs.gov",
+            comment=c(ORCID = "0000-0001-8266-9610")) 
             )
 Description: Collection of functions to help retrieve U.S. Geological Survey
     and U.S. Environmental Protection Agency water quality and
@@ -54,9 +57,9 @@ Encoding: UTF-8
 BuildVignettes: true
 VignetteBuilder: knitr
 BugReports: https://github.com/DOI-USGS/dataRetrieval/issues
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
 NeedsCompilation: no
-Packaged: 2026-05-27 18:01:15 UTC; ldecicco
+Packaged: 2026-09-10 16:57:52 UTC; ldecicco
 Author: Laura DeCicco [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-3915-9487>),
   Robert Hirsch [aut] (ORCID: <https://orcid.org/0000-0002-4534-075X>),
@@ -71,7 +74,8 @@ Author: Laura DeCicco [aut, cre] (ORCID:
   Lee Stanish [ctb] (ORCID: <https://orcid.org/0000-0002-9775-6861>),
   Joseph Zemmels [aut] (ORCID: <https://orcid.org/0009-0008-1463-6313>),
   Elise Hinman [aut] (ORCID: <https://orcid.org/0000-0001-5396-1583>),
-  Michael Mahoney [ctb] (ORCID: <https://orcid.org/0000-0003-2402-304X>)
+  Michael Mahoney [ctb] (ORCID: <https://orcid.org/0000-0003-2402-304X>),
+  Matthew Conlon [ctb] (ORCID: <https://orcid.org/0000-0001-8266-9610>)
 Maintainer: Laura DeCicco <ldecicco@usgs.gov>
 Repository: CRAN
-Date/Publication: 2026-05-28 05:11:18 UTC
+Date/Publication: 2026-09-11 02:10:02 UTC

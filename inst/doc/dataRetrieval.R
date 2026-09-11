@@ -307,21 +307,6 @@ legend("topleft", unique(temperatureAndFlow$unit_of_measure),
 ## ----cite, eval=TRUE--------------------------------------
 citation(package = "dataRetrieval")
 
-## ----nwisCite, eval=FALSE---------------------------------
-# 
-# dv <- read_waterdata_daily(monitoring_location_id = "USGS-04085427",
-#                            parameter_code = "00060",
-#                            time = c("2012-01-01", "2012-06-30"))
-# 
-# NWIScitation <- create_NWIS_bib(dv)
-# NWIScitation
-
-## ----show1, eval=FALSE------------------------------------
-# print(NWIScitation, style = "Bibtex")
-
-## ----show2, eval=FALSE------------------------------------
-# print(NWIScitation, style = "citation")
-
 ## ----WQPcite, eval=FALSE----------------------------------
 # SC <- readWQPqw(siteNumbers = "USGS-05288705",
 #                 parameterCd = "00300")
